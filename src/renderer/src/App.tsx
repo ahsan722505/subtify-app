@@ -4,7 +4,7 @@ function App(): JSX.Element {
   return (
     <div className="w-screen h-screen flex flex-col">
       <div className="flex w-full h-3/4">
-        <div className="w-1/2 border-r border-gray-200">
+        <div className="w-1/2 border-r border-gray-200 overflow-auto">
           <Subtitles />
         </div>
         <div className="w-1/2">video</div>

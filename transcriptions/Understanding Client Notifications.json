@@ -1,1 +1,253 @@
-{"text": " Hello, so right now this request with the ID of 59, here the notifications are disabled and we can see a client cannot access this request. So now if I go and you can notify clients, here I can choose whether the client should know about the existing information, by existing information I mean the questions and documents available right now in the request, yes I want the client to notify about them and I can yes notify. Okay, now if I go to the client dashboard, now you can see this request and you can see every question is here, okay, now let's do it again, we can denotify now, yes denotify, now we can see client cannot request this, client doesn't have access to this request. Now if I go again and I notify, now this time, I uncheck this, no so what this means is that client won't see the questions that are available right now in the request, okay, so if I go ahead and yes notify, if I go to the client dashboard, you can see if I reload, the request is accessible for client but the questions that were available at that time are not available to client, now if I add one more question then that question will be available, so let's see, if I go ahead and I add a question, I add a question, this is our test question, save, okay, now if I go here, very low, now you can see that that question is available but not the questions before that, okay, so yes this is how the feature works.", "segments": [{"id": 0, "seek": 0, "start": 0.0, "end": 7.36, "text": " Hello, so right now this request with the ID of 59, here the notifications are disabled", "tokens": [50364, 2425, 11, 370, 558, 586, 341, 5308, 365, 264, 7348, 295, 24624, 11, 510, 264, 13426, 366, 15191, 50732], "temperature": 0.0, "avg_logprob": -0.3663003162671161, "compression_ratio": 1.8333333333333333, "no_speech_prob": 0.7740461826324463}, {"id": 1, "seek": 0, "start": 7.36, "end": 11.28, "text": " and we can see a client cannot access this request.", "tokens": [50732, 293, 321, 393, 536, 257, 6423, 2644, 2105, 341, 5308, 13, 50928], "temperature": 0.0, "avg_logprob": -0.3663003162671161, "compression_ratio": 1.8333333333333333, "no_speech_prob": 0.7740461826324463}, {"id": 2, "seek": 0, "start": 11.28, "end": 18.0, "text": " So now if I go and you can notify clients, here I can choose whether the client should", "tokens": [50928, 407, 586, 498, 286, 352, 293, 291, 393, 36560, 6982, 11, 510, 286, 393, 2826, 1968, 264, 6423, 820, 51264], "temperature": 0.0, "avg_logprob": -0.3663003162671161, "compression_ratio": 1.8333333333333333, "no_speech_prob": 0.7740461826324463}, {"id": 3, "seek": 0, "start": 18.0, "end": 23.16, "text": " know about the existing information, by existing information I mean the questions and documents", "tokens": [51264, 458, 466, 264, 6741, 1589, 11, 538, 6741, 1589, 286, 914, 264, 1651, 293, 8512, 51522], "temperature": 0.0, "avg_logprob": -0.3663003162671161, "compression_ratio": 1.8333333333333333, "no_speech_prob": 0.7740461826324463}, {"id": 4, "seek": 0, "start": 23.16, "end": 28.16, "text": " available right now in the request, yes I want the client to notify about them and I", "tokens": [51522, 2435, 558, 586, 294, 264, 5308, 11, 2086, 286, 528, 264, 6423, 281, 36560, 466, 552, 293, 286, 51772], "temperature": 0.0, "avg_logprob": -0.3663003162671161, "compression_ratio": 1.8333333333333333, "no_speech_prob": 0.7740461826324463}, {"id": 5, "seek": 2816, "start": 28.16, "end": 29.16, "text": " can yes notify.", "tokens": [50364, 393, 2086, 36560, 13, 50414], "temperature": 0.0, "avg_logprob": -0.2933560624907288, "compression_ratio": 1.7375, "no_speech_prob": 0.06915296614170074}, {"id": 6, "seek": 2816, "start": 29.16, "end": 36.2, "text": " Okay, now if I go to the client dashboard, now you can see this request and you can", "tokens": [50414, 1033, 11, 586, 498, 286, 352, 281, 264, 6423, 18342, 11, 586, 291, 393, 536, 341, 5308, 293, 291, 393, 50766], "temperature": 0.0, "avg_logprob": -0.2933560624907288, "compression_ratio": 1.7375, "no_speech_prob": 0.06915296614170074}, {"id": 7, "seek": 2816, "start": 36.2, "end": 48.24, "text": " see every question is here, okay, now let's do it again, we can denotify now, yes denotify,", "tokens": [50766, 536, 633, 1168, 307, 510, 11, 1392, 11, 586, 718, 311, 360, 309, 797, 11, 321, 393, 1441, 310, 2505, 586, 11, 2086, 1441, 310, 2505, 11, 51368], "temperature": 0.0, "avg_logprob": -0.2933560624907288, "compression_ratio": 1.7375, "no_speech_prob": 0.06915296614170074}, {"id": 8, "seek": 2816, "start": 48.24, "end": 55.36, "text": " now we can see client cannot request this, client doesn't have access to this request.", "tokens": [51368, 586, 321, 393, 536, 6423, 2644, 5308, 341, 11, 6423, 1177, 380, 362, 2105, 281, 341, 5308, 13, 51724], "temperature": 0.0, "avg_logprob": -0.2933560624907288, "compression_ratio": 1.7375, "no_speech_prob": 0.06915296614170074}, {"id": 9, "seek": 5536, "start": 56.36, "end": 64.03999999999999, "text": " Now if I go again and I notify, now this time, I uncheck this, no so what this means", "tokens": [50414, 823, 498, 286, 352, 797, 293, 286, 36560, 11, 586, 341, 565, 11, 286, 46672, 341, 11, 572, 370, 437, 341, 1355, 50798], "temperature": 0.0, "avg_logprob": -0.23819267586485982, "compression_ratio": 1.6358024691358024, "no_speech_prob": 0.12474629282951355}, {"id": 10, "seek": 5536, "start": 64.03999999999999, "end": 71.28, "text": " is that client won't see the questions that are available right now in the request, okay,", "tokens": [50798, 307, 300, 6423, 1582, 380, 536, 264, 1651, 300, 366, 2435, 558, 586, 294, 264, 5308, 11, 1392, 11, 51160], "temperature": 0.0, "avg_logprob": -0.23819267586485982, "compression_ratio": 1.6358024691358024, "no_speech_prob": 0.12474629282951355}, {"id": 11, "seek": 5536, "start": 71.28, "end": 81.92, "text": " so if I go ahead and yes notify, if I go to the client dashboard, you can see if I reload,", "tokens": [51160, 370, 498, 286, 352, 2286, 293, 2086, 36560, 11, 498, 286, 352, 281, 264, 6423, 18342, 11, 291, 393, 536, 498, 286, 25628, 11, 51692], "temperature": 0.0, "avg_logprob": -0.23819267586485982, "compression_ratio": 1.6358024691358024, "no_speech_prob": 0.12474629282951355}, {"id": 12, "seek": 8192, "start": 81.92, "end": 86.4, "text": " the request is accessible for client but the questions that were available at that time", "tokens": [50364, 264, 5308, 307, 9515, 337, 6423, 457, 264, 1651, 300, 645, 2435, 412, 300, 565, 50588], "temperature": 0.0, "avg_logprob": -0.27447659036387567, "compression_ratio": 1.8421052631578947, "no_speech_prob": 0.4480230510234833}, {"id": 13, "seek": 8192, "start": 86.4, "end": 93.48, "text": " are not available to client, now if I add one more question then that question will be available,", "tokens": [50588, 366, 406, 2435, 281, 6423, 11, 586, 498, 286, 909, 472, 544, 1168, 550, 300, 1168, 486, 312, 2435, 11, 50942], "temperature": 0.0, "avg_logprob": -0.27447659036387567, "compression_ratio": 1.8421052631578947, "no_speech_prob": 0.4480230510234833}, {"id": 14, "seek": 8192, "start": 93.48, "end": 105.76, "text": " so let's see, if I go ahead and I add a question, I add a question, this is our test question,", "tokens": [50942, 370, 718, 311, 536, 11, 498, 286, 352, 2286, 293, 286, 909, 257, 1168, 11, 286, 909, 257, 1168, 11, 341, 307, 527, 1500, 1168, 11, 51556], "temperature": 0.0, "avg_logprob": -0.27447659036387567, "compression_ratio": 1.8421052631578947, "no_speech_prob": 0.4480230510234833}, {"id": 15, "seek": 10576, "start": 105.76, "end": 118.36, "text": " save, okay, now if I go here, very low, now you can see that that question is available", "tokens": [50364, 3155, 11, 1392, 11, 586, 498, 286, 352, 510, 11, 588, 2295, 11, 586, 291, 393, 536, 300, 300, 1168, 307, 2435, 50994], "temperature": 0.0, "avg_logprob": -0.3020745595296224, "compression_ratio": 1.4310344827586208, "no_speech_prob": 0.15066489577293396}, {"id": 16, "seek": 10576, "start": 118.36, "end": 127.72, "text": " but not the questions before that, okay, so yes this is how the feature works.", "tokens": [50994, 457, 406, 264, 1651, 949, 300, 11, 1392, 11, 370, 2086, 341, 307, 577, 264, 4111, 1985, 13, 51462], "temperature": 0.0, "avg_logprob": -0.3020745595296224, "compression_ratio": 1.4310344827586208, "no_speech_prob": 0.15066489577293396}], "language": "en"}
+{
+  "text": " Hello, so right now this request with the ID of 59, here the notifications are disabled and we can see a client cannot access this request. So now if I go and you can notify clients, here I can choose whether the client should know about the existing information, by existing information I mean the questions and documents available right now in the request, yes I want the client to notify about them and I can yes notify. Okay, now if I go to the client dashboard, now you can see this request and you can see every question is here, okay, now let's do it again, we can denotify now, yes denotify, now we can see client cannot request this, client doesn't have access to this request. Now if I go again and I notify, now this time, I uncheck this, no so what this means is that client won't see the questions that are available right now in the request, okay, so if I go ahead and yes notify, if I go to the client dashboard, you can see if I reload, the request is accessible for client but the questions that were available at that time are not available to client, now if I add one more question then that question will be available, so let's see, if I go ahead and I add a question, I add a question, this is our test question, save, okay, now if I go here, very low, now you can see that that question is available but not the questions before that, okay, so yes this is how the feature works.",
+  "segments": [
+    {
+      "id": 0,
+      "seek": 0,
+      "start": 0.0,
+      "end": 7.36,
+      "text": " Hello, so right now this request with the ID of 59, here the notifications are disabled",
+      "tokens": [
+        50364, 2425, 11, 370, 558, 586, 341, 5308, 365, 264, 7348, 295, 24624, 11, 510, 264, 13426,
+        366, 15191, 50732
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.3663003162671161,
+      "compression_ratio": 1.8333333333333333,
+      "no_speech_prob": 0.7740461826324463
+    },
+    {
+      "id": 1,
+      "seek": 0,
+      "start": 7.36,
+      "end": 11.28,
+      "text": " and we can see a client cannot access this request.",
+      "tokens": [50732, 293, 321, 393, 536, 257, 6423, 2644, 2105, 341, 5308, 13, 50928],
+      "temperature": 0.0,
+      "avg_logprob": -0.3663003162671161,
+      "compression_ratio": 1.8333333333333333,
+      "no_speech_prob": 0.7740461826324463
+    },
+    {
+      "id": 2,
+      "seek": 0,
+      "start": 11.28,
+      "end": 18.0,
+      "text": " So now if I go and you can notify clients, here I can choose whether the client should",
+      "tokens": [
+        50928, 407, 586, 498, 286, 352, 293, 291, 393, 36560, 6982, 11, 510, 286, 393, 2826, 1968,
+        264, 6423, 820, 51264
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.3663003162671161,
+      "compression_ratio": 1.8333333333333333,
+      "no_speech_prob": 0.7740461826324463
+    },
+    {
+      "id": 3,
+      "seek": 0,
+      "start": 18.0,
+      "end": 23.16,
+      "text": " know about the existing information, by existing information I mean the questions and documents",
+      "tokens": [
+        51264, 458, 466, 264, 6741, 1589, 11, 538, 6741, 1589, 286, 914, 264, 1651, 293, 8512, 51522
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.3663003162671161,
+      "compression_ratio": 1.8333333333333333,
+      "no_speech_prob": 0.7740461826324463
+    },
+    {
+      "id": 4,
+      "seek": 0,
+      "start": 23.16,
+      "end": 28.16,
+      "text": " available right now in the request, yes I want the client to notify about them and I",
+      "tokens": [
+        51522, 2435, 558, 586, 294, 264, 5308, 11, 2086, 286, 528, 264, 6423, 281, 36560, 466, 552,
+        293, 286, 51772
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.3663003162671161,
+      "compression_ratio": 1.8333333333333333,
+      "no_speech_prob": 0.7740461826324463
+    },
+    {
+      "id": 5,
+      "seek": 2816,
+      "start": 28.16,
+      "end": 29.16,
+      "text": " can yes notify.",
+      "tokens": [50364, 393, 2086, 36560, 13, 50414],
+      "temperature": 0.0,
+      "avg_logprob": -0.2933560624907288,
+      "compression_ratio": 1.7375,
+      "no_speech_prob": 0.06915296614170074
+    },
+    {
+      "id": 6,
+      "seek": 2816,
+      "start": 29.16,
+      "end": 36.2,
+      "text": " Okay, now if I go to the client dashboard, now you can see this request and you can",
+      "tokens": [
+        50414, 1033, 11, 586, 498, 286, 352, 281, 264, 6423, 18342, 11, 586, 291, 393, 536, 341,
+        5308, 293, 291, 393, 50766
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.2933560624907288,
+      "compression_ratio": 1.7375,
+      "no_speech_prob": 0.06915296614170074
+    },
+    {
+      "id": 7,
+      "seek": 2816,
+      "start": 36.2,
+      "end": 48.24,
+      "text": " see every question is here, okay, now let's do it again, we can denotify now, yes denotify,",
+      "tokens": [
+        50766, 536, 633, 1168, 307, 510, 11, 1392, 11, 586, 718, 311, 360, 309, 797, 11, 321, 393,
+        1441, 310, 2505, 586, 11, 2086, 1441, 310, 2505, 11, 51368
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.2933560624907288,
+      "compression_ratio": 1.7375,
+      "no_speech_prob": 0.06915296614170074
+    },
+    {
+      "id": 8,
+      "seek": 2816,
+      "start": 48.24,
+      "end": 55.36,
+      "text": " now we can see client cannot request this, client doesn't have access to this request.",
+      "tokens": [
+        51368, 586, 321, 393, 536, 6423, 2644, 5308, 341, 11, 6423, 1177, 380, 362, 2105, 281, 341,
+        5308, 13, 51724
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.2933560624907288,
+      "compression_ratio": 1.7375,
+      "no_speech_prob": 0.06915296614170074
+    },
+    {
+      "id": 9,
+      "seek": 5536,
+      "start": 56.36,
+      "end": 64.03999999999999,
+      "text": " Now if I go again and I notify, now this time, I uncheck this, no so what this means",
+      "tokens": [
+        50414, 823, 498, 286, 352, 797, 293, 286, 36560, 11, 586, 341, 565, 11, 286, 46672, 341, 11,
+        572, 370, 437, 341, 1355, 50798
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.23819267586485982,
+      "compression_ratio": 1.6358024691358024,
+      "no_speech_prob": 0.12474629282951355
+    },
+    {
+      "id": 10,
+      "seek": 5536,
+      "start": 64.03999999999999,
+      "end": 71.28,
+      "text": " is that client won't see the questions that are available right now in the request, okay,",
+      "tokens": [
+        50798, 307, 300, 6423, 1582, 380, 536, 264, 1651, 300, 366, 2435, 558, 586, 294, 264, 5308,
+        11, 1392, 11, 51160
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.23819267586485982,
+      "compression_ratio": 1.6358024691358024,
+      "no_speech_prob": 0.12474629282951355
+    },
+    {
+      "id": 11,
+      "seek": 5536,
+      "start": 71.28,
+      "end": 81.92,
+      "text": " so if I go ahead and yes notify, if I go to the client dashboard, you can see if I reload,",
+      "tokens": [
+        51160, 370, 498, 286, 352, 2286, 293, 2086, 36560, 11, 498, 286, 352, 281, 264, 6423, 18342,
+        11, 291, 393, 536, 498, 286, 25628, 11, 51692
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.23819267586485982,
+      "compression_ratio": 1.6358024691358024,
+      "no_speech_prob": 0.12474629282951355
+    },
+    {
+      "id": 12,
+      "seek": 8192,
+      "start": 81.92,
+      "end": 86.4,
+      "text": " the request is accessible for client but the questions that were available at that time",
+      "tokens": [
+        50364, 264, 5308, 307, 9515, 337, 6423, 457, 264, 1651, 300, 645, 2435, 412, 300, 565, 50588
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.27447659036387567,
+      "compression_ratio": 1.8421052631578947,
+      "no_speech_prob": 0.4480230510234833
+    },
+    {
+      "id": 13,
+      "seek": 8192,
+      "start": 86.4,
+      "end": 93.48,
+      "text": " are not available to client, now if I add one more question then that question will be available,",
+      "tokens": [
+        50588, 366, 406, 2435, 281, 6423, 11, 586, 498, 286, 909, 472, 544, 1168, 550, 300, 1168,
+        486, 312, 2435, 11, 50942
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.27447659036387567,
+      "compression_ratio": 1.8421052631578947,
+      "no_speech_prob": 0.4480230510234833
+    },
+    {
+      "id": 14,
+      "seek": 8192,
+      "start": 93.48,
+      "end": 105.76,
+      "text": " so let's see, if I go ahead and I add a question, I add a question, this is our test question,",
+      "tokens": [
+        50942, 370, 718, 311, 536, 11, 498, 286, 352, 2286, 293, 286, 909, 257, 1168, 11, 286, 909,
+        257, 1168, 11, 341, 307, 527, 1500, 1168, 11, 51556
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.27447659036387567,
+      "compression_ratio": 1.8421052631578947,
+      "no_speech_prob": 0.4480230510234833
+    },
+    {
+      "id": 15,
+      "seek": 10576,
+      "start": 105.76,
+      "end": 118.36,
+      "text": " save, okay, now if I go here, very low, now you can see that that question is available",
+      "tokens": [
+        50364, 3155, 11, 1392, 11, 586, 498, 286, 352, 510, 11, 588, 2295, 11, 586, 291, 393, 536,
+        300, 300, 1168, 307, 2435, 50994
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.3020745595296224,
+      "compression_ratio": 1.4310344827586208,
+      "no_speech_prob": 0.15066489577293396
+    },
+    {
+      "id": 16,
+      "seek": 10576,
+      "start": 118.36,
+      "end": 127.72,
+      "text": " but not the questions before that, okay, so yes this is how the feature works.",
+      "tokens": [
+        50994, 457, 406, 264, 1651, 949, 300, 11, 1392, 11, 370, 2086, 341, 307, 577, 264, 4111,
+        1985, 13, 51462
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.3020745595296224,
+      "compression_ratio": 1.4310344827586208,
+      "no_speech_prob": 0.15066489577293396
+    }
+  ],
+  "language": "en"
+}

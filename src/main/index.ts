@@ -3,7 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { spawn } from 'child_process'
-import { readFile } from 'fs'
+import { readFileSync } from 'fs'
 
 function createWindow(): void {
   // Create the browser window.
@@ -56,6 +56,18 @@ app.whenReady().then(() => {
 
   ipcMain.handle('transcribe', async (_, filePath: string) => {
     return new Promise((resolve, reject) => {
+      const fileName = filePath
+        .split('/')
+        .pop()
+        ?.replace(/\.[^/.]+$/, '')
+      const data = readFileSync(`./transcriptions/${fileName}.json`, 'utf8')
+      if (data) {
+        const jsonData = JSON.parse(data)
+        resolve(
+          jsonData.segments.map((seg) => ({ start: seg.start, end: seg.end, text: seg.text }))
+        )
+        return
+      }
       const whisper = spawn('whisper', [
         filePath,
         '-f',
@@ -70,20 +82,11 @@ app.whenReady().then(() => {
       })
       whisper.on('close', (code) => {
         if (code === 0) {
-          const fileName = filePath
-            .split('/')
-            .pop()
-            ?.replace(/\.[^/.]+$/, '')
-
-          readFile(`./transcriptions/${fileName}.json`, 'utf8', (err, data) => {
-            if (err) {
-              reject('There was an error reading the file')
-              return
-            }
-            const jsonData = JSON.parse(data)
-            console.log(jsonData)
-            resolve(jsonData.text)
-          })
+          const data = readFileSync(`./transcriptions/${fileName}.json`, 'utf8')
+          const jsonData = JSON.parse(data)
+          resolve(
+            jsonData.segments.map((seg) => ({ start: seg.start, end: seg.end, text: seg.text }))
+          )
         } else {
           reject('There was an error transcribing the file')
         }
