@@ -5,13 +5,19 @@ export enum TranscriptionStatus {
   SUCCESS = 'success',
   ERROR = 'error'
 }
+
+export type Subtitle = {
+  start: number
+  end: number
+  text: string
+}
 type TranscriptionState = {
   transcriptionStatus: TranscriptionStatus
   setTranscriptionStatus: (status: TranscriptionStatus) => void
   subtitleGenerationProgress: number
   setSubtitleGenerationProgress: (progress: number) => void
-  subtitles: string
-  setSubtitles: (subtitles: string) => void
+  subtitles: Subtitle[]
+  setSubtitles: (subtitles: Subtitle[]) => void
 }
 
 const useTranscriptionStore = create<TranscriptionState>((set) => ({
@@ -19,7 +25,7 @@ const useTranscriptionStore = create<TranscriptionState>((set) => ({
   setTranscriptionStatus: (status): void => set({ transcriptionStatus: status }),
   subtitleGenerationProgress: 0,
   setSubtitleGenerationProgress: (progress): void => set({ subtitleGenerationProgress: progress }),
-  subtitles: '',
+  subtitles: [],
   setSubtitles: (subtitles): void => set({ subtitles })
 }))
 

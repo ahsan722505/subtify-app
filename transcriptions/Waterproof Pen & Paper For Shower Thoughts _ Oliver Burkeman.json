@@ -1,1 +1,93 @@
-{"text": " some of the best insights of shower thoughts. You can buy a waterproof pencil and pad of paper. It's sort of got the suction cup and you stick it on the shower thing. It's supposed to be for love notes, supposed to be so that you and your partner can leave each other like cute notes in the shower. Sadly, when I was in the UK, I was living with two other hairy floaks. So we just write abuse to each other and mean comments. That's its own kind of affection. Yeah, they're correct. We were in a relationship.", "segments": [{"id": 0, "seek": 0, "start": 0.0, "end": 4.72, "text": " some of the best insights of shower thoughts. You can buy a waterproof pencil and pad of paper.", "tokens": [50364, 512, 295, 264, 1151, 14310, 295, 10128, 4598, 13, 509, 393, 2256, 257, 27974, 10985, 293, 6887, 295, 3035, 13, 50600], "temperature": 0.0, "avg_logprob": -0.14324729625995342, "compression_ratio": 1.7195945945945945, "no_speech_prob": 0.017131075263023376}, {"id": 1, "seek": 0, "start": 4.72, "end": 8.16, "text": " It's sort of got the suction cup and you stick it on the shower thing. It's supposed to be for", "tokens": [50600, 467, 311, 1333, 295, 658, 264, 40431, 4414, 293, 291, 2897, 309, 322, 264, 10128, 551, 13, 467, 311, 3442, 281, 312, 337, 50772], "temperature": 0.0, "avg_logprob": -0.14324729625995342, "compression_ratio": 1.7195945945945945, "no_speech_prob": 0.017131075263023376}, {"id": 2, "seek": 0, "start": 8.16, "end": 12.56, "text": " love notes, supposed to be so that you and your partner can leave each other like cute notes in", "tokens": [50772, 959, 5570, 11, 3442, 281, 312, 370, 300, 291, 293, 428, 4975, 393, 1856, 1184, 661, 411, 4052, 5570, 294, 50992], "temperature": 0.0, "avg_logprob": -0.14324729625995342, "compression_ratio": 1.7195945945945945, "no_speech_prob": 0.017131075263023376}, {"id": 3, "seek": 0, "start": 12.56, "end": 16.72, "text": " the shower. Sadly, when I was in the UK, I was living with two other hairy floaks. So we just", "tokens": [50992, 264, 10128, 13, 29628, 11, 562, 286, 390, 294, 264, 7051, 11, 286, 390, 2647, 365, 732, 661, 42346, 2591, 5461, 13, 407, 321, 445, 51200], "temperature": 0.0, "avg_logprob": -0.14324729625995342, "compression_ratio": 1.7195945945945945, "no_speech_prob": 0.017131075263023376}, {"id": 4, "seek": 0, "start": 16.72, "end": 21.12, "text": " write abuse to each other and mean comments. That's its own kind of affection. Yeah,", "tokens": [51200, 2464, 9852, 281, 1184, 661, 293, 914, 3053, 13, 663, 311, 1080, 1065, 733, 295, 20080, 13, 865, 11, 51420], "temperature": 0.0, "avg_logprob": -0.14324729625995342, "compression_ratio": 1.7195945945945945, "no_speech_prob": 0.017131075263023376}, {"id": 5, "seek": 0, "start": 21.12, "end": 22.240000000000002, "text": " they're correct. We were in a relationship.", "tokens": [51420, 436, 434, 3006, 13, 492, 645, 294, 257, 2480, 13, 51476], "temperature": 0.0, "avg_logprob": -0.14324729625995342, "compression_ratio": 1.7195945945945945, "no_speech_prob": 0.017131075263023376}], "language": "en"}
+{
+  "text": " some of the best insights of shower thoughts. You can buy a waterproof pencil and pad of paper. It's sort of got the suction cup and you stick it on the shower thing. It's supposed to be for love notes, supposed to be so that you and your partner can leave each other like cute notes in the shower. Sadly, when I was in the UK, I was living with two other hairy floaks. So we just write abuse to each other and mean comments. That's its own kind of affection. Yeah, they're correct. We were in a relationship.",
+  "segments": [
+    {
+      "id": 0,
+      "seek": 0,
+      "start": 0.0,
+      "end": 4.72,
+      "text": " some of the best insights of shower thoughts. You can buy a waterproof pencil and pad of paper.",
+      "tokens": [
+        50364, 512, 295, 264, 1151, 14310, 295, 10128, 4598, 13, 509, 393, 2256, 257, 27974, 10985,
+        293, 6887, 295, 3035, 13, 50600
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.14324729625995342,
+      "compression_ratio": 1.7195945945945945,
+      "no_speech_prob": 0.017131075263023376
+    },
+    {
+      "id": 1,
+      "seek": 0,
+      "start": 4.72,
+      "end": 8.16,
+      "text": " It's sort of got the suction cup and you stick it on the shower thing. It's supposed to be for",
+      "tokens": [
+        50600, 467, 311, 1333, 295, 658, 264, 40431, 4414, 293, 291, 2897, 309, 322, 264, 10128,
+        551, 13, 467, 311, 3442, 281, 312, 337, 50772
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.14324729625995342,
+      "compression_ratio": 1.7195945945945945,
+      "no_speech_prob": 0.017131075263023376
+    },
+    {
+      "id": 2,
+      "seek": 0,
+      "start": 8.16,
+      "end": 12.56,
+      "text": " love notes, supposed to be so that you and your partner can leave each other like cute notes in",
+      "tokens": [
+        50772, 959, 5570, 11, 3442, 281, 312, 370, 300, 291, 293, 428, 4975, 393, 1856, 1184, 661,
+        411, 4052, 5570, 294, 50992
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.14324729625995342,
+      "compression_ratio": 1.7195945945945945,
+      "no_speech_prob": 0.017131075263023376
+    },
+    {
+      "id": 3,
+      "seek": 0,
+      "start": 12.56,
+      "end": 16.72,
+      "text": " the shower. Sadly, when I was in the UK, I was living with two other hairy floaks. So we just",
+      "tokens": [
+        50992, 264, 10128, 13, 29628, 11, 562, 286, 390, 294, 264, 7051, 11, 286, 390, 2647, 365,
+        732, 661, 42346, 2591, 5461, 13, 407, 321, 445, 51200
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.14324729625995342,
+      "compression_ratio": 1.7195945945945945,
+      "no_speech_prob": 0.017131075263023376
+    },
+    {
+      "id": 4,
+      "seek": 0,
+      "start": 16.72,
+      "end": 21.12,
+      "text": " write abuse to each other and mean comments. That's its own kind of affection. Yeah,",
+      "tokens": [
+        51200, 2464, 9852, 281, 1184, 661, 293, 914, 3053, 13, 663, 311, 1080, 1065, 733, 295,
+        20080, 13, 865, 11, 51420
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.14324729625995342,
+      "compression_ratio": 1.7195945945945945,
+      "no_speech_prob": 0.017131075263023376
+    },
+    {
+      "id": 5,
+      "seek": 0,
+      "start": 21.12,
+      "end": 22.240000000000002,
+      "text": " they're correct. We were in a relationship.",
+      "tokens": [51420, 436, 434, 3006, 13, 492, 645, 294, 257, 2480, 13, 51476],
+      "temperature": 0.0,
+      "avg_logprob": -0.14324729625995342,
+      "compression_ratio": 1.7195945945945945,
+      "no_speech_prob": 0.017131075263023376
+    }
+  ],
+  "language": "en"
+}

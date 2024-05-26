@@ -6,7 +6,7 @@ import SubtitleList from './SubtitleList/SubtitleList'
 function Subtitles(): JSX.Element {
   const status = useTranscriptionStore((state) => state.transcriptionStatus)
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full p-6">
       {status === TranscriptionStatus.IDLE && <UploadFile />}
       {status === TranscriptionStatus.LOADING && <GenerationProgress />}
       {status === TranscriptionStatus.SUCCESS && <SubtitleList />}

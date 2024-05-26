@@ -29,9 +29,9 @@ function UploadFile(): JSX.Element {
         clearInterval(intervalId)
       }
     }, interval)
-    const transcription = await window.electron.ipcRenderer.invoke('transcribe', file.path)
+    const subtitles = await window.electron.ipcRenderer.invoke('transcribe', file.path)
     setStatus(TranscriptionStatus.SUCCESS)
-    setSubtitles(transcription)
+    setSubtitles(subtitles)
   }
   return (
     <div className="w-full h-full flex flex-col items-center justify-evenly">
