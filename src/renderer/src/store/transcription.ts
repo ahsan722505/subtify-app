@@ -18,6 +18,9 @@ type TranscriptionState = {
   setSubtitleGenerationProgress: (progress: number) => void
   subtitles: Subtitle[]
   setSubtitles: (subtitles: Subtitle[]) => void
+  file: File | null
+  setFile: (file: File) => void
+  editSubtitle: (index: number, text: string) => void
 }
 
 const useTranscriptionStore = create<TranscriptionState>((set) => ({
@@ -26,7 +29,16 @@ const useTranscriptionStore = create<TranscriptionState>((set) => ({
   subtitleGenerationProgress: 0,
   setSubtitleGenerationProgress: (progress): void => set({ subtitleGenerationProgress: progress }),
   subtitles: [],
-  setSubtitles: (subtitles): void => set({ subtitles })
+  setSubtitles: (subtitles): void => set({ subtitles }),
+  file: null,
+  setFile: (file): void => set({ file }),
+  editSubtitle: (index, text): void => {
+    set((state) => {
+      const subtitles = [...state.subtitles]
+      subtitles[index].text = text
+      return { subtitles }
+    })
+  }
 }))
 
 export default useTranscriptionStore
