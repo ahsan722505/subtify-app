@@ -1,39 +1,55 @@
 import useTranscriptionStore from '@renderer/store/transcription'
-import { ClockCircleOutlined } from '@ant-design/icons'
+import SubtitleListItem from './SubtitleListItem'
+import { Button, Dropdown, MenuProps } from 'antd'
+import { SettingOutlined, DownloadOutlined } from '@ant-design/icons'
+import { downloadSubtitles } from './SubtitleList.utils'
+import { SubtitleFormat } from './SubtitleList.types'
 
 export default function SubtitleList(): JSX.Element {
   const subtitles = useTranscriptionStore((state) => state.subtitles)
-  function secondsToHms(seconds: number): string {
-    const h = Math.floor(seconds / 3600)
-    const m = Math.floor((seconds % 3600) / 60)
-    const s = seconds % 60
-
-    const hDisplay = h < 10 ? '0' + h : h
-    const mDisplay = m < 10 ? '0' + m : m
-    const sDisplay = s < 10 ? '0' + s.toFixed(1) : s.toFixed(1)
-
-    return `${h > 0 ? hDisplay + ':' : ''}${mDisplay}:${sDisplay}`
-  }
+  console.log(subtitles)
+  const items: MenuProps['items'] = [
+    {
+      key: '1',
+      label: <span className="mr-5">Download</span>,
+      icon: <DownloadOutlined className="!text-base" />,
+      children: [
+        {
+          key: '1-1',
+          label: '.SRT format',
+          onClick: (): void => {
+            downloadSubtitles(subtitles, SubtitleFormat.SRT)
+          }
+        },
+        {
+          key: '1-2',
+          label: '.VTT format',
+          onClick: (): void => {
+            downloadSubtitles(subtitles, SubtitleFormat.VTT)
+          }
+        },
+        {
+          key: '1-3',
+          label: '.TXT format',
+          onClick: (): void => {
+            downloadSubtitles(subtitles, SubtitleFormat.TXT)
+          }
+        }
+      ]
+    }
+  ]
   return (
     <div>
-      {subtitles.map((s) => (
-        <div className="flex justify-between items-center mb-5" key={s.start}>
-          <div className="w-2/3">{s.text}</div>
-          <div>
-            <div className="flex justify-between items-center">
-              <span className="text-xs mr-4">
-                <ClockCircleOutlined /> In
-              </span>
-              <span>{secondsToHms(s.start)}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-xs mr-4">
-                <ClockCircleOutlined /> Out
-              </span>
-              <span>{secondsToHms(s.end)}</span>
-            </div>
-          </div>
-        </div>
+      <div className="sticky top-0 mb-4 bg-white flex justify-between items-center py-6">
+        <p className="text-2xl font-bold">Subtitles</p>
+        <Dropdown menu={{ items }} placement="bottom">
+          <Button className="flex items-center">
+            Options <SettingOutlined />
+          </Button>
+        </Dropdown>
+      </div>
+      {subtitles.map((s, i) => (
+        <SubtitleListItem key={s.start} {...s} index={i} />
       ))}
     </div>
   )

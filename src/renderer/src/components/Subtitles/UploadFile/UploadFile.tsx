@@ -1,13 +1,13 @@
 import { Button, Upload, UploadProps } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
-import React from 'react'
 import useTranscriptionStore, { TranscriptionStatus } from '@renderer/store/transcription'
 
 function UploadFile(): JSX.Element {
-  const [file, setFile] = React.useState<File | null>(null)
   const setStatus = useTranscriptionStore((state) => state.setTranscriptionStatus)
   const setProgress = useTranscriptionStore((state) => state.setSubtitleGenerationProgress)
   const setSubtitles = useTranscriptionStore((state) => state.setSubtitles)
+  const file = useTranscriptionStore((state) => state.file)
+  const setFile = useTranscriptionStore((state) => state.setFile)
 
   const props: UploadProps = {
     accept:

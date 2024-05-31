@@ -42,6 +42,17 @@ function createWindow(): void {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   // Set app user model id for windows
+  // session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+  //   callback({
+  //     responseHeaders: Object.assign(
+  //       {
+  //         'Content-Security-Policy': ["default-src 'self' :blob"]
+  //       },
+  //       details.responseHeaders
+  //     )
+  //   })
+  // })
+
   electronApp.setAppUserModelId('com.electron')
 
   // Default open or close DevTools by F12 in development
@@ -60,18 +71,22 @@ app.whenReady().then(() => {
         .split('/')
         .pop()
         ?.replace(/\.[^/.]+$/, '')
-      const data = readFileSync(`./transcriptions/${fileName}.json`, 'utf8')
-      if (data) {
-        const jsonData = JSON.parse(data)
-        resolve(
-          jsonData.segments.map((seg) => ({ start: seg.start, end: seg.end, text: seg.text }))
-        )
-        return
+      try {
+        const data = readFileSync(`./transcriptions/${fileName}.json`, 'utf8')
+        if (data) {
+          const jsonData = JSON.parse(data)
+          resolve(
+            jsonData.segments.map((seg) => ({ start: seg.start, end: seg.end, text: seg.text }))
+          )
+          return
+        }
+      } catch (error) {
+        console.log('Cache miss, starting transcription')
       }
       const whisper = spawn('whisper', [
         filePath,
-        '-f',
-        'json',
+        // '-f',
+        // 'json',
         '-o',
         './transcriptions',
         '--language',
