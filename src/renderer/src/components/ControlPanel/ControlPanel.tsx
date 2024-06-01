@@ -6,15 +6,30 @@ import {
 } from '@ant-design/icons'
 import useTranscriptionStore from '@renderer/store/transcription'
 import React from 'react'
+import { formatTime } from '../Subtitles/SubtitleList/SubtitleList.utils'
 export default function ControlPanel(): JSX.Element {
   const file = useTranscriptionStore((state) => state.file)
   const mediaRef = React.useRef<HTMLVideoElement | HTMLAudioElement | null>(null)
   const [isMediaPlaying, setMediaPlaying] = React.useState(false)
+  const [currentTime, setCurrentTime] = React.useState(0)
+  const [duration, setDuration] = React.useState(0)
 
   React.useEffect(() => {
+    const handleUpdateCurrentTime = (): void => setCurrentTime(mediaRef.current?.currentTime || 0)
+    const handleUpdateDuration = (): void => setDuration(mediaRef.current?.duration || 0)
+    const handleMediaEnded = (): void => setMediaPlaying(false)
     if (file) {
       mediaRef.current = document.getElementById('media') as HTMLVideoElement
-      mediaRef.current.addEventListener('ended', () => setMediaPlaying(false))
+      mediaRef.current.addEventListener('ended', handleMediaEnded)
+      mediaRef.current.addEventListener('timeupdate', handleUpdateCurrentTime)
+      mediaRef.current.addEventListener('loadedmetadata', handleUpdateDuration)
+    }
+    return () => {
+      if (mediaRef.current) {
+        mediaRef.current.removeEventListener('timeupdate', handleUpdateCurrentTime)
+        mediaRef.current.removeEventListener('loadedmetadata', handleUpdateDuration)
+        mediaRef.current.removeEventListener('ended', handleMediaEnded)
+      }
     }
   }, [file])
 
@@ -47,27 +62,32 @@ export default function ControlPanel(): JSX.Element {
     <div className="w-full h-full flex justify-center items-center">
       <StepBackwardFilled
         onClick={handelRewindMedia}
-        className="text-6xl text-black-500 cursor-pointer"
+        className="text-5xl text-black-500 cursor-pointer"
       />
 
       {!isMediaPlaying && (
         <PlayCircleFilled
           onClick={handelPlayMedia}
-          className="text-6xl text-black-500 cursor-pointer"
+          className="text-5xl text-black-500 cursor-pointer"
         />
       )}
 
       {isMediaPlaying && (
         <PauseCircleFilled
           onClick={handelPauseMedia}
-          className="text-6xl text-black-500 cursor-pointer"
+          className="text-5xl text-black-500 cursor-pointer"
         />
       )}
 
       <StepForwardFilled
         onClick={handelForwardMedia}
-        className="text-6xl text-black-500 cursor-pointer"
+        className="text-5xl text-black-500 cursor-pointer"
       />
+      <div className="ml-4">
+        {formatTime(currentTime)}
+        <span className="mx-2">/</span>
+        {formatTime(duration)}
+      </div>
     </div>
   )
 }
