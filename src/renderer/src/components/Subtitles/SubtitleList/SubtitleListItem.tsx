@@ -1,6 +1,10 @@
 import useTranscriptionStore, { Subtitle } from '@renderer/store/transcription'
 import { ClockCircleOutlined } from '@ant-design/icons'
 import { formatTime } from './SubtitleList.utils'
+import { useDebouncedCallback } from '@renderer/hooks/useDebouncedCallback'
+import React from 'react'
+import { Input } from 'antd'
+const { TextArea } = Input
 
 export default function SubtitleListItem({
   end,
@@ -9,13 +13,18 @@ export default function SubtitleListItem({
   index
 }: Subtitle & { index: number }): JSX.Element {
   const editSubtitle = useTranscriptionStore((state) => state.editSubtitle)
-  const handleEdit = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleEdit = useDebouncedCallback((e: React.ChangeEvent<HTMLTextAreaElement>): void => {
     editSubtitle(index, e.target.value)
-  }
+  })
 
   return (
     <div className="flex justify-between items-center mb-5">
-      <input value={text} onChange={handleEdit} className="w-2/3 outline-none" />
+      <TextArea
+        onChange={handleEdit}
+        defaultValue={text}
+        className="w-2/3 border-none focus:ring-0 text-base overflow-hidden"
+        autoSize
+      />
       <div>
         <div className="flex justify-between items-center">
           <span className="text-xs mr-4">
