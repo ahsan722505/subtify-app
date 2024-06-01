@@ -21,6 +21,10 @@ type TranscriptionState = {
   file: File | null
   setFile: (file: File) => void
   editSubtitle: (index: number, text: string) => void
+  mediaCurrentTime: number
+  mediaDuration: number
+  setMediaCurrentTime: (time: number) => void
+  setMediaDuration: (duration: number) => void
 }
 
 const useTranscriptionStore = create<TranscriptionState>((set) => ({
@@ -38,7 +42,11 @@ const useTranscriptionStore = create<TranscriptionState>((set) => ({
       subtitles[index].text = text
       return { subtitles }
     })
-  }
+  },
+  mediaCurrentTime: 0,
+  mediaDuration: 0,
+  setMediaCurrentTime: (time): void => set({ mediaCurrentTime: time }),
+  setMediaDuration: (duration): void => set({ mediaDuration: duration })
 }))
 
 export default useTranscriptionStore
