@@ -40,7 +40,7 @@ export default function SubtitleList(): JSX.Element {
   ]
   return (
     <div>
-      <div className="sticky top-0 mb-4 bg-white flex justify-between items-center py-6">
+      <div className="sticky top-0 mb-4 bg-white flex justify-between items-center py-6 z-50">
         <p className="text-2xl font-bold">Subtitles</p>
         <Dropdown menu={{ items }} placement="bottom">
           <Button className="flex items-center">
