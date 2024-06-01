@@ -85,8 +85,8 @@ app.whenReady().then(() => {
       }
       const whisper = spawn('whisper', [
         filePath,
-        // '-f',
-        // 'json',
+        '-f',
+        'json',
         '-o',
         './transcriptions',
         '--language',

@@ -7,7 +7,7 @@ import { SubtitleFormat } from './SubtitleList.types'
 
 export default function SubtitleList(): JSX.Element {
   const subtitles = useTranscriptionStore((state) => state.subtitles)
-  console.log(subtitles)
+  console.log('re-rendering', subtitles)
   const items: MenuProps['items'] = [
     {
       key: '1',

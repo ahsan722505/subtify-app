@@ -11,7 +11,7 @@ function generateSRT(subtitles: Subtitle[]): string {
     .join('\n')
 }
 
-function generateVTT(subtitles: Subtitle[]): string {
+export function generateVTT(subtitles: Subtitle[]): string {
   return (
     'WEBVTT\n\n' +
     subtitles
