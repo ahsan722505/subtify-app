@@ -11,11 +11,17 @@ export default function ControlPanel(): JSX.Element {
   const file = useTranscriptionStore((state) => state.file)
   const mediaRef = React.useRef<HTMLVideoElement | HTMLAudioElement | null>(null)
   const [isMediaPlaying, setMediaPlaying] = React.useState(false)
-  const [currentTime, setCurrentTime] = React.useState(0)
-  const [duration, setDuration] = React.useState(0)
+  const currentTime = useTranscriptionStore((state) => state.mediaCurrentTime)
+  const duration = useTranscriptionStore((state) => state.mediaDuration)
+  const setCurrentTime = useTranscriptionStore((state) => state.setMediaCurrentTime)
+  const setDuration = useTranscriptionStore((state) => state.setMediaDuration)
+  console.log('re-rendering', currentTime, duration)
 
   React.useEffect(() => {
-    const handleUpdateCurrentTime = (): void => setCurrentTime(mediaRef.current?.currentTime || 0)
+    const handleUpdateCurrentTime = (): void => {
+      setCurrentTime(mediaRef.current?.currentTime || 0)
+      handleUpdateDuration()
+    }
     const handleUpdateDuration = (): void => setDuration(mediaRef.current?.duration || 0)
     const handleMediaEnded = (): void => setMediaPlaying(false)
     if (file) {

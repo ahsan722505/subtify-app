@@ -4,6 +4,7 @@ import { formatTime } from './SubtitleList.utils'
 import { useDebouncedCallback } from '@renderer/hooks/useDebouncedCallback'
 import React from 'react'
 import { Input } from 'antd'
+import clsx from 'clsx'
 const { TextArea } = Input
 
 export default function SubtitleListItem({
@@ -16,13 +17,35 @@ export default function SubtitleListItem({
   const handleEdit = useDebouncedCallback((e: React.ChangeEvent<HTMLTextAreaElement>): void => {
     editSubtitle(index, e.target.value)
   })
+  const subtitleRef = React.useRef<HTMLDivElement>(null)
+  const currentTime = useTranscriptionStore((state) => state.mediaCurrentTime)
+  const currentlyPlaying =
+    +currentTime.toFixed(2) >= +start.toFixed(2) && +currentTime.toFixed(2) < +end.toFixed(2)
+
+  React.useEffect(() => {
+    if (currentlyPlaying && subtitleRef.current) {
+      subtitleRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [currentlyPlaying])
+
+  const handleSeek = (): void => {
+    const media = document.getElementById('media') as HTMLVideoElement
+    media.currentTime = start
+  }
 
   return (
-    <div className="flex justify-between items-center mb-5">
+    <div
+      onClick={handleSeek}
+      ref={subtitleRef}
+      className={clsx(
+        'flex justify-between items-center mb-5 pr-2',
+        currentlyPlaying && '!bg-gray-300'
+      )}
+    >
       <TextArea
         onChange={handleEdit}
         defaultValue={text}
-        className="w-2/3 border-none focus:ring-0 text-base overflow-hidden"
+        className="w-2/3 border-none focus:ring-0 text-base overflow-hidden bg-inherit focus:bg-inherit hover:bg-inherit"
         autoSize
       />
       <div>
