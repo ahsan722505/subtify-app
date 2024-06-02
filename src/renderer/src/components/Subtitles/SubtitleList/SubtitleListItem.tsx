@@ -3,8 +3,8 @@ import { ClockCircleOutlined } from '@ant-design/icons'
 import { formatTime } from './SubtitleList.utils'
 import { useDebouncedCallback } from '@renderer/hooks/useDebouncedCallback'
 import React from 'react'
-import { Input } from 'antd'
 import clsx from 'clsx'
+import { Input } from 'antd'
 const { TextArea } = Input
 
 export default function SubtitleListItem({
