@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, protocol, net } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -41,17 +41,11 @@ function createWindow(): void {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  // Set app user model id for windows
-  // session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
-  //   callback({
-  //     responseHeaders: Object.assign(
-  //       {
-  //         'Content-Security-Policy': ["default-src 'self' :blob"]
-  //       },
-  //       details.responseHeaders
-  //     )
-  //   })
-  // })
+  protocol.handle('serve-file', (request) => {
+    const filePath = request.url.slice('file-serve://'.length)
+    console.log('------------', filePath)
+    return net.fetch('file://' + filePath)
+  })
 
   electronApp.setAppUserModelId('com.electron')
 

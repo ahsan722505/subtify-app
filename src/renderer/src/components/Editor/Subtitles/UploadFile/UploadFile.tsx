@@ -1,23 +1,30 @@
 import { Button, Upload, UploadProps } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
-import useTranscriptionStore, { TranscriptionStatus } from '@renderer/store/transcription'
+import useAppStore, { TranscriptionStatus } from '@renderer/store/store'
+import { useProjectStore } from '@renderer/hooks/useProjectStore'
 
 function UploadFile(): JSX.Element {
-  const setStatus = useTranscriptionStore((state) => state.setTranscriptionStatus)
-  const setProgress = useTranscriptionStore((state) => state.setSubtitleGenerationProgress)
-  const setSubtitles = useTranscriptionStore((state) => state.setSubtitles)
-  const file = useTranscriptionStore((state) => state.file)
-  const setFile = useTranscriptionStore((state) => state.setFile)
+  const setStatus = useAppStore((state) => state.setTranscriptionStatus)
+  const setProgress = useAppStore((state) => state.setSubtitleGenerationProgress)
+  const setSubtitles = useAppStore((state) => state.setSubtitles)
+  const setMediaPath = useAppStore((state) => state.setMediaPath)
+  const setMediaName = useAppStore((state) => state.setMediaName)
+  const mediaPath = useProjectStore((state) => state.mediaPath)
+  console.log(mediaPath)
 
   const props: UploadProps = {
     accept:
       'audio/mp3, audio/wav, audio/mpeg, audio/ogg, audio/flac, audio/aac, audio/aiff, audio/wma, audio/opus, audio/webm, video/mp4, video/ogg, video/webm',
-    customRequest: async ({ file }) => setFile(file as File),
+    customRequest: async ({ file }) => {
+      const typecastedFile = file as File
+      setMediaPath(typecastedFile.path)
+      setMediaName(typecastedFile.name)
+    },
     showUploadList: false
   }
 
   const handleCreateSubtitles = async (): Promise<void> => {
-    if (!file) return
+    if (!mediaPath) return
     setStatus(TranscriptionStatus.LOADING)
     let progress = 0
     const estimatedTime = 60000 // 1 minute
@@ -29,7 +36,7 @@ function UploadFile(): JSX.Element {
         clearInterval(intervalId)
       }
     }, interval)
-    const subtitles = await window.electron.ipcRenderer.invoke('transcribe', file.path)
+    const subtitles = await window.electron.ipcRenderer.invoke('transcribe', mediaPath)
     setStatus(TranscriptionStatus.SUCCESS)
     setSubtitles(subtitles)
   }
@@ -40,7 +47,7 @@ function UploadFile(): JSX.Element {
           Upload audio/video file
         </Button>
       </Upload>
-      <Button onClick={handleCreateSubtitles} disabled={!file}>
+      <Button onClick={handleCreateSubtitles} disabled={!mediaPath}>
         Create Subtitles
       </Button>
     </div>
