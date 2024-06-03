@@ -1,10 +1,11 @@
 import UploadFile from './UploadFile/UploadFile'
 import GenerationProgress from './GenerationProgress/GenerationProgress'
-import useTranscriptionStore, { TranscriptionStatus } from '@renderer/store/transcription'
 import SubtitleList from './SubtitleList/SubtitleList'
+import { useProjectStore } from '@renderer/hooks/useProjectStore'
+import { TranscriptionStatus } from '@renderer/store/store'
 
 function Subtitles(): JSX.Element {
-  const status = useTranscriptionStore((state) => state.transcriptionStatus)
+  const status = useProjectStore((state) => state.transcriptionStatus)
   return (
     <div className="w-full h-full p-6">
       {status === TranscriptionStatus.IDLE && <UploadFile />}

@@ -1,8 +1,8 @@
-import useTranscriptionStore from '@renderer/store/transcription'
+import { useProjectStore } from '@renderer/hooks/useProjectStore'
 import { Progress } from 'antd'
 
 export default function GenerationProgress(): JSX.Element {
-  const progress = useTranscriptionStore((state) => state.subtitleGenerationProgress)
+  const progress = useProjectStore((state) => state.subtitleGenerationProgress)
   return (
     <div className="w-full h-full flex justify-center items-center flex-col">
       <Progress percent={progress} type="circle" />
