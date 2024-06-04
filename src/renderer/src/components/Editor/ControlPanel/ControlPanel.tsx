@@ -4,18 +4,18 @@ import {
   StepForwardFilled,
   StepBackwardFilled
 } from '@ant-design/icons'
-import useTranscriptionStore from '@renderer/store/transcription'
 import React from 'react'
 import { formatTime } from '../Subtitles/SubtitleList/SubtitleList.utils'
+import { useProjectStore } from '@renderer/hooks/useProjectStore'
+import useAppStore from '@renderer/store/store'
 export default function ControlPanel(): JSX.Element {
-  const file = useTranscriptionStore((state) => state.file)
+  const mediaPath = useProjectStore((state) => state.mediaPath)
   const mediaRef = React.useRef<HTMLVideoElement | HTMLAudioElement | null>(null)
   const [isMediaPlaying, setMediaPlaying] = React.useState(false)
-  const currentTime = useTranscriptionStore((state) => state.mediaCurrentTime)
-  const duration = useTranscriptionStore((state) => state.mediaDuration)
-  const setCurrentTime = useTranscriptionStore((state) => state.setMediaCurrentTime)
-  const setDuration = useTranscriptionStore((state) => state.setMediaDuration)
-  console.log('re-rendering', currentTime, duration)
+  const currentTime = useProjectStore((state) => state.mediaCurrentTime)
+  const duration = useProjectStore((state) => state.mediaDuration)
+  const setCurrentTime = useAppStore((state) => state.setMediaCurrentTime)
+  const setDuration = useAppStore((state) => state.setMediaDuration)
 
   React.useEffect(() => {
     const handleUpdateCurrentTime = (): void => {
@@ -24,7 +24,7 @@ export default function ControlPanel(): JSX.Element {
     }
     const handleUpdateDuration = (): void => setDuration(mediaRef.current?.duration || 0)
     const handleMediaEnded = (): void => setMediaPlaying(false)
-    if (file) {
+    if (mediaPath) {
       mediaRef.current = document.getElementById('media') as HTMLVideoElement
       mediaRef.current.addEventListener('ended', handleMediaEnded)
       mediaRef.current.addEventListener('timeupdate', handleUpdateCurrentTime)
@@ -37,7 +37,7 @@ export default function ControlPanel(): JSX.Element {
         mediaRef.current.removeEventListener('ended', handleMediaEnded)
       }
     }
-  }, [file])
+  }, [mediaPath])
 
   const handelPlayMedia = (): void => {
     if (!mediaRef.current) return

@@ -1,13 +1,13 @@
-import useTranscriptionStore from '@renderer/store/transcription'
 import SubtitleListItem from './SubtitleListItem'
 import { Button, Dropdown, MenuProps } from 'antd'
 import { SettingOutlined, DownloadOutlined } from '@ant-design/icons'
 import { downloadSubtitles } from './SubtitleList.utils'
 import { SubtitleFormat } from './SubtitleList.types'
+import { useProjectStore } from '@renderer/hooks/useProjectStore'
 
 export default function SubtitleList(): JSX.Element {
-  const subtitles = useTranscriptionStore((state) => state.subtitles)
-  console.log('re-rendering', subtitles)
+  const subtitles = useProjectStore((state) => state.subtitles)
+
   const items: MenuProps['items'] = [
     {
       key: '1',

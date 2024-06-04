@@ -1,4 +1,4 @@
-import { Subtitle } from '@renderer/store/transcription'
+import { Subtitle } from '@renderer/store/store'
 import { SubtitleFormat } from './SubtitleList.types'
 
 function generateSRT(subtitles: Subtitle[]): string {

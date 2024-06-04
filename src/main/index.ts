@@ -15,7 +15,8 @@ function createWindow(): void {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      webSecurity: false
     }
   })
 
@@ -41,18 +42,6 @@ function createWindow(): void {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  // Set app user model id for windows
-  // session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
-  //   callback({
-  //     responseHeaders: Object.assign(
-  //       {
-  //         'Content-Security-Policy': ["default-src 'self' :blob"]
-  //       },
-  //       details.responseHeaders
-  //     )
-  //   })
-  // })
-
   electronApp.setAppUserModelId('com.electron')
 
   // Default open or close DevTools by F12 in development
