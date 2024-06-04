@@ -1,7 +1,8 @@
-import { Button, Upload, UploadProps } from 'antd'
+import { Button, Upload, UploadProps, message } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
 import useAppStore, { TranscriptionStatus } from '@renderer/store/store'
 import { useProjectStore } from '@renderer/hooks/useProjectStore'
+import { generateVideoThumbnail, isVideo } from '../../Media/Media.utils'
 
 function UploadFile(): JSX.Element {
   const setStatus = useAppStore((state) => state.setTranscriptionStatus)
@@ -10,15 +11,23 @@ function UploadFile(): JSX.Element {
   const setMediaPath = useAppStore((state) => state.setMediaPath)
   const setMediaName = useAppStore((state) => state.setMediaName)
   const mediaPath = useProjectStore((state) => state.mediaPath)
-  console.log(mediaPath)
+  const setMediaThumbnail = useAppStore((state) => state.setMediaThumbnail)
+  const setMediaType = useAppStore((state) => state.setMediaType)
 
   const props: UploadProps = {
     accept:
       'audio/mp3, audio/wav, audio/mpeg, audio/ogg, audio/flac, audio/aac, audio/aiff, audio/wma, audio/opus, audio/webm, video/mp4, video/ogg, video/webm',
     customRequest: async ({ file }) => {
       const typecastedFile = file as File
-      setMediaPath(typecastedFile.path)
-      setMediaName(typecastedFile.name)
+      if (!typecastedFile.type.startsWith('video') && !typecastedFile.type.startsWith('audio'))
+        message.error('File format is not supported.')
+      else {
+        setMediaPath(typecastedFile.path)
+        setMediaName(typecastedFile.name)
+        setMediaType(typecastedFile.type)
+        if (isVideo(typecastedFile.type))
+          setMediaThumbnail(await generateVideoThumbnail(`file://${typecastedFile.path}`))
+      }
     },
     showUploadList: false
   }
