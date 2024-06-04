@@ -1,10 +1,11 @@
-import useTranscriptionStore, { Subtitle } from '@renderer/store/transcription'
 import { ClockCircleOutlined } from '@ant-design/icons'
 import { formatTime } from './SubtitleList.utils'
 import { useDebouncedCallback } from '@renderer/hooks/useDebouncedCallback'
 import React from 'react'
 import clsx from 'clsx'
 import { Input } from 'antd'
+import useAppStore, { Subtitle } from '@renderer/store/store'
+import { useProjectStore } from '@renderer/hooks/useProjectStore'
 const { TextArea } = Input
 
 export default function SubtitleListItem({
@@ -13,12 +14,12 @@ export default function SubtitleListItem({
   text,
   index
 }: Subtitle & { index: number }): JSX.Element {
-  const editSubtitle = useTranscriptionStore((state) => state.editSubtitle)
+  const editSubtitle = useAppStore((state) => state.editSubtitle)
   const handleEdit = useDebouncedCallback((e: React.ChangeEvent<HTMLTextAreaElement>): void => {
     editSubtitle(index, e.target.value)
   })
   const subtitleRef = React.useRef<HTMLDivElement>(null)
-  const currentTime = useTranscriptionStore((state) => state.mediaCurrentTime)
+  const currentTime = useProjectStore((state) => state.mediaCurrentTime)
   const currentlyPlaying =
     +currentTime.toFixed(2) >= +start.toFixed(2) && +currentTime.toFixed(2) < +end.toFixed(2)
 
