@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, protocol, net } from 'electron'
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -42,12 +42,6 @@ function createWindow(): void {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  protocol.handle('serve-file', (request) => {
-    const filePath = request.url.slice('file-serve://'.length)
-    console.log('------------', filePath)
-    return net.fetch('file://' + filePath)
-  })
-
   electronApp.setAppUserModelId('com.electron')
 
   // Default open or close DevTools by F12 in development
