@@ -24,6 +24,7 @@ export type Project = {
   mediaDuration: number
   transcriptionStatus: TranscriptionStatus
   subtitleGenerationProgress: number
+  mediaType: string | null
 }
 
 type State = {
@@ -38,6 +39,10 @@ type State = {
   setMediaDuration: (duration: number) => void
   setMediaPath: (mediaPath: string) => void
   setMediaName: (mediaName: string) => void
+  setProjectName: (name: string) => void
+  setCurrentProjectIndex: (index: number | null) => void
+  setMediaThumbnail: (thumbnail: string) => void
+  setMediaType: (mediaType: string) => void
 }
 
 const useAppStore = create<State>()(
@@ -112,6 +117,33 @@ const useAppStore = create<State>()(
           if (state.currentProjectIndex === null) return state
           const projects = [...state.projects]
           projects[state.currentProjectIndex].mediaName = mediaName
+          return { projects }
+        })
+      },
+      setProjectName: (name): void => {
+        set((state) => {
+          if (state.currentProjectIndex === null) return state
+          const projects = [...state.projects]
+          projects[state.currentProjectIndex].name = name
+          return { projects }
+        })
+      },
+      setCurrentProjectIndex: (index): void => {
+        set({ currentProjectIndex: index })
+      },
+      setMediaThumbnail: (thumbnail): void => {
+        set((state) => {
+          if (state.currentProjectIndex === null) return state
+          const projects = [...state.projects]
+          projects[state.currentProjectIndex].mediaThumbnail = thumbnail
+          return { projects }
+        })
+      },
+      setMediaType: (mediaType): void => {
+        set((state) => {
+          if (state.currentProjectIndex === null) return state
+          const projects = [...state.projects]
+          projects[state.currentProjectIndex].mediaType = mediaType
           return { projects }
         })
       }
