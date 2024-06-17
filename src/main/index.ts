@@ -1,9 +1,9 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
-import { join } from 'path'
+import path, { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { spawn } from 'child_process'
-import { readFileSync } from 'fs'
+import fs from 'fs'
 
 function createWindow(): void {
   // Create the browser window.
@@ -61,7 +61,7 @@ app.whenReady().then(() => {
         .pop()
         ?.replace(/\.[^/.]+$/, '')
       try {
-        const data = readFileSync(`./transcriptions/${fileName}.json`, 'utf8')
+        const data = fs.readFileSync(`./transcriptions/${fileName}.json`, 'utf8')
         if (data) {
           const jsonData = JSON.parse(data)
           resolve(
@@ -86,7 +86,7 @@ app.whenReady().then(() => {
       })
       whisper.on('close', (code) => {
         if (code === 0) {
-          const data = readFileSync(`./transcriptions/${fileName}.json`, 'utf8')
+          const data = fs.readFileSync(`./transcriptions/${fileName}.json`, 'utf8')
           const jsonData = JSON.parse(data)
           resolve(
             jsonData.segments.map((seg) => ({ start: seg.start, end: seg.end, text: seg.text }))
@@ -96,6 +96,24 @@ app.whenReady().then(() => {
         }
       })
     })
+  })
+
+  ipcMain.handle('save-thumbnail', async (_, dataURL) => {
+    try {
+      const base64Data = dataURL.replace(/^data:image\/png;base64,/, '')
+      const thumbnailsDir = path.join(app.getPath('userData'), 'thumbnails')
+
+      // Ensure the thumbnails directory exists
+      if (!fs.existsSync(thumbnailsDir)) {
+        fs.mkdirSync(thumbnailsDir)
+      }
+
+      const filePath = path.join(thumbnailsDir, `thumbnail-${Date.now()}.png`)
+      fs.writeFileSync(filePath, base64Data, 'base64')
+      return filePath
+    } catch (error) {
+      throw new Error('Failed to save thumbnail')
+    }
   })
 
   createWindow()
