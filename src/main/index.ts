@@ -56,45 +56,25 @@ app.whenReady().then(() => {
 
   ipcMain.handle('transcribe', async (_, filePath: string) => {
     return new Promise((resolve, reject) => {
-      const fileName = filePath
-        .split('/')
-        .pop()
-        ?.replace(/\.[^/.]+$/, '')
-      try {
-        const data = fs.readFileSync(`./transcriptions/${fileName}.json`, 'utf8')
-        if (data) {
-          const jsonData = JSON.parse(data)
-          resolve(
-            jsonData.segments.map((seg) => ({ start: seg.start, end: seg.end, text: seg.text }))
-          )
-          return
-        }
-      } catch (error) {
-        console.log('Cache miss, starting transcription')
-      }
-      const whisper = spawn('whisper', [
-        filePath,
-        '-f',
-        'json',
-        '-o',
-        './transcriptions',
-        '--language',
-        'en'
-      ])
-      whisper.stdout.on('data', (data) => {
-        console.log(`stdout: ${data}`)
+      const pythonProcess = spawn('python3', ['./transcription.py'])
+
+      let dataString = ''
+
+      pythonProcess.stdout.on('data', (data) => {
+        dataString += data.toString()
       })
-      whisper.on('close', (code) => {
-        if (code === 0) {
-          const data = fs.readFileSync(`./transcriptions/${fileName}.json`, 'utf8')
-          const jsonData = JSON.parse(data)
-          resolve(
-            jsonData.segments.map((seg) => ({ start: seg.start, end: seg.end, text: seg.text }))
-          )
-        } else {
-          reject('There was an error transcribing the file')
-        }
+
+      pythonProcess.stderr.on('data', (data) => {
+        reject(`stderr: ${data}`)
       })
+
+      pythonProcess.stdout.on('end', () => {
+        const data = JSON.parse(dataString)
+        resolve(data.map((s) => ({ start: s.start, end: s.end, text: s.text })))
+      })
+
+      pythonProcess.stdin.write(JSON.stringify({ filePath }))
+      pythonProcess.stdin.end()
     })
   })
 
