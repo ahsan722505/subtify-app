@@ -1,12 +1,11 @@
 import { Button } from 'antd'
-import { PlusOutlined, PlaySquareFilled } from '@ant-design/icons'
+import { PlusOutlined } from '@ant-design/icons'
 import useAppStore, { TranscriptionStatus } from '@renderer/store/store'
-import { formatTime } from '../Editor/Subtitles/SubtitleList/SubtitleList.utils'
+import ProjectListItem from './ProjectListItem'
 
 export default function Projects(): JSX.Element {
   const projects = useAppStore((state) => state.projects)
   const createNewProject = useAppStore((state) => state.createNewProject)
-  const setCurrentProjectIndex = useAppStore((state) => state.setCurrentProjectIndex)
   const handleCreateNewProject = (): void => {
     createNewProject({
       mediaCurrentTime: 0,
@@ -37,25 +36,7 @@ export default function Projects(): JSX.Element {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects.map((project, i) => (
-          <div
-            key={project.id}
-            className="border p-4 rounded-lg shadow-lg cursor-pointer"
-            onClick={() => setCurrentProjectIndex(i)}
-          >
-            <div className="flex justify-center">
-              {project.mediaThumbnail ? (
-                <img
-                  src={`file://${project.mediaThumbnail}`}
-                  alt={project.name}
-                  className="w-full h-48 object-cover rounded-md"
-                />
-              ) : (
-                <PlaySquareFilled className="text-9xl text-gray-300 h-48" />
-              )}
-            </div>
-            <h2 className="mt-4 text-lg font-semibold">{project.name}</h2>
-            <p className="text-gray-500">{formatTime(project.mediaDuration)}</p>
-          </div>
+          <ProjectListItem key={project.id} index={i} project={project} />
         ))}
       </div>
     </div>

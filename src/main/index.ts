@@ -116,6 +116,18 @@ app.whenReady().then(() => {
     }
   })
 
+  ipcMain.handle('delete-thumbnail', async (_, thumbnailPath) => {
+    try {
+      if (fs.existsSync(thumbnailPath)) {
+        fs.unlinkSync(thumbnailPath)
+        return
+      }
+      throw new Error('File does not exist')
+    } catch (error) {
+      throw new Error('Failed to delete thumbnail')
+    }
+  })
+
   createWindow()
 
   app.on('activate', function () {

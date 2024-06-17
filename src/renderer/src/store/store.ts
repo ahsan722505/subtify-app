@@ -43,11 +43,12 @@ type State = {
   setCurrentProjectIndex: (index: number | null) => void
   setMediaThumbnail: (thumbnail: string) => void
   setMediaType: (mediaType: string) => void
+  deleteProject: (id: number) => Promise<void>
 }
 
 const useAppStore = create<State>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       projects: [],
       currentProjectIndex: null,
       setTranscriptionStatus: (status): void => {
@@ -146,6 +147,14 @@ const useAppStore = create<State>()(
           projects[state.currentProjectIndex].mediaType = mediaType
           return { projects }
         })
+      },
+      deleteProject: async (id): Promise<void> => {
+        const state = get()
+        const project = state.projects.find((project) => project.id === id)
+        if (project?.mediaThumbnail)
+          await window.electron.ipcRenderer.invoke('delete-thumbnail', project.mediaThumbnail)
+        const projects = state.projects.filter((project) => project.id !== id)
+        set({ projects })
       }
     }),
     {
