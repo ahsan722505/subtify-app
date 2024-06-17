@@ -45,7 +45,7 @@ export default function Projects(): JSX.Element {
             <div className="flex justify-center">
               {project.mediaThumbnail ? (
                 <img
-                  src={project.mediaThumbnail}
+                  src={`file://${project.mediaThumbnail}`}
                   alt={project.name}
                   className="w-full h-48 object-cover rounded-md"
                 />
