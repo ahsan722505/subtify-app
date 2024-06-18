@@ -1,5 +1,6 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createJSONStorage, persist } from 'zustand/middleware'
+import localforage from 'localforage'
 export enum TranscriptionStatus {
   IDLE = 'idle',
   LOADING = 'loading',
@@ -44,6 +45,18 @@ type State = {
   setMediaThumbnail: (thumbnail: string) => void
   setMediaType: (mediaType: string) => void
   deleteProject: (id: number) => Promise<void>
+}
+
+const storage = {
+  getItem: async (name: string): Promise<string | null> => {
+    return await localforage.getItem(name)
+  },
+  setItem: async (name: string, value: string): Promise<string> => {
+    return await localforage.setItem(name, value)
+  },
+  removeItem: async (name: string): Promise<void> => {
+    return await localforage.removeItem(name)
+  }
 }
 
 const useAppStore = create<State>()(
@@ -158,7 +171,8 @@ const useAppStore = create<State>()(
       }
     }),
     {
-      name: 'app-store'
+      name: 'app-store',
+      storage: createJSONStorage(() => storage)
     }
   )
 )
