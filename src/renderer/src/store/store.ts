@@ -32,9 +32,9 @@ type State = {
   projects: Project[]
   currentProjectIndex: number | null
   createNewProject: (project: Project) => void
-  setTranscriptionStatus: (status: TranscriptionStatus) => void
-  setSubtitleGenerationProgress: (progress: number) => void
-  setSubtitles: (subtitles: Subtitle[]) => void
+  setTranscriptionStatus: (status: TranscriptionStatus, projectIndex: number) => void
+  setSubtitleGenerationProgress: (progress: number, projectIndex: number) => void
+  setSubtitles: (subtitles: Subtitle[], projectIndex: number) => void
   editSubtitle: (index: number, text: string) => void
   setMediaCurrentTime: (time: number) => void
   setMediaDuration: (duration: number) => void
@@ -64,27 +64,24 @@ const useAppStore = create<State>()(
     (set, get) => ({
       projects: [],
       currentProjectIndex: null,
-      setTranscriptionStatus: (status): void => {
+      setTranscriptionStatus: (status, projectIndex): void => {
         set((state) => {
-          if (state.currentProjectIndex === null) return state
           const projects = [...state.projects]
-          projects[state.currentProjectIndex].transcriptionStatus = status
+          projects[projectIndex].transcriptionStatus = status
           return { projects }
         })
       },
-      setSubtitleGenerationProgress: (progress): void => {
+      setSubtitleGenerationProgress: (progress, projectIndex): void => {
         set((state) => {
-          if (state.currentProjectIndex === null) return state
           const projects = [...state.projects]
-          projects[state.currentProjectIndex].subtitleGenerationProgress = progress
+          projects[projectIndex].subtitleGenerationProgress = progress
           return { projects }
         })
       },
-      setSubtitles: (subtitles): void => {
+      setSubtitles: (subtitles, projectIndex): void => {
         set((state) => {
-          if (state.currentProjectIndex === null) return state
           const projects = [...state.projects]
-          projects[state.currentProjectIndex].subtitles = subtitles
+          projects[projectIndex].subtitles = subtitles
           return { projects }
         })
       },
