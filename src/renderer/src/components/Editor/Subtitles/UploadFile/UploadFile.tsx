@@ -11,6 +11,7 @@ function UploadFile(): JSX.Element {
   const setMediaPath = useAppStore((state) => state.setMediaPath)
   const setMediaName = useAppStore((state) => state.setMediaName)
   const mediaPath = useProjectStore((state) => state.mediaPath)
+  const currentProjectIndex = useAppStore((state) => state.currentProjectIndex)
   const setMediaThumbnail = useAppStore((state) => state.setMediaThumbnail)
   const setMediaType = useAppStore((state) => state.setMediaType)
 
@@ -33,21 +34,21 @@ function UploadFile(): JSX.Element {
   }
 
   const handleCreateSubtitles = async (): Promise<void> => {
-    if (!mediaPath) return
-    setStatus(TranscriptionStatus.LOADING)
+    if (!mediaPath || !currentProjectIndex) return
+    setStatus(TranscriptionStatus.LOADING, currentProjectIndex)
     let progress = 0
     const estimatedTime = 60000 // 1 minute
     const interval = estimatedTime / 100
     const intervalId = setInterval(() => {
       progress += 1
-      setProgress(progress)
+      setProgress(progress, currentProjectIndex)
       if (progress === 95) {
         clearInterval(intervalId)
       }
     }, interval)
     const subtitles = await window.electron.ipcRenderer.invoke('transcribe', mediaPath)
-    setStatus(TranscriptionStatus.SUCCESS)
-    setSubtitles(subtitles)
+    setStatus(TranscriptionStatus.SUCCESS, currentProjectIndex)
+    setSubtitles(subtitles, currentProjectIndex)
   }
   return (
     <div className="w-full h-full flex flex-col items-center justify-evenly">
