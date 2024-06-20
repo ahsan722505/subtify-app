@@ -52,7 +52,7 @@ app.whenReady().then(() => {
   })
 
   // IPC test
-  ipcMain.on('ping', () => console.log('Pong'))
+  ipcMain.on('ping', () => console.log('pong'))
 
   ipcMain.handle('transcribe', async (_, filePath: string) => {
     return new Promise((resolve, reject) => {
