@@ -1,1 +1,5 @@
+Whisper-Faster/_models filter=lfs diff=lfs merge=lfs -text
+Whisper-Faster/whisper-faster-linux filter=lfs diff=lfs merge=lfs -text
+Whisper-Faster/whisper-faster-mac filter=lfs diff=lfs merge=lfs -text
+Whisper-Faster/whisper-faster-windows.exe filter=lfs diff=lfs merge=lfs -text
 Whisper-Faster/_models/faster-whisper-small/model.bin filter=lfs diff=lfs merge=lfs -text

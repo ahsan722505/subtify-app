@@ -13,6 +13,11 @@ asarUnpack:
   - resources/**
 win:
   executableName: subtify
+  extraFiles:
+    - from: Whisper-Faster/_models
+      to: resources/Whisper-Faster/_models
+    - from: Whisper-Faster/whisper-faster-windows.exe
+      to: resources/Whisper-Faster/whisper-faster-windows.exe
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
@@ -20,6 +25,11 @@ nsis:
   createDesktopShortcut: always
 mac:
   entitlementsInherit: build/entitlements.mac.plist
+  extraFiles:
+    - from: Whisper-Faster/_models
+      to: resources/Whisper-Faster/_models
+    - from: Whisper-Faster/whisper-faster-mac
+      to: resources/Whisper-Faster/whisper-faster-mac
   extendInfo:
     - NSCameraUsageDescription: Application requests access to the device's camera.
     - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
@@ -29,6 +39,11 @@ mac:
 dmg:
   artifactName: ${name}-${version}.${ext}
 linux:
+  extraFiles:
+    - from: Whisper-Faster/_models
+      to: resources/Whisper-Faster/_models
+    - from: Whisper-Faster/whisper-faster-linux
+      to: resources/Whisper-Faster/whisper-faster-linux
   target:
     - deb
   maintainer: electronjs.org
