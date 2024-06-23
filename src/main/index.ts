@@ -4,6 +4,11 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { spawn } from 'child_process'
 import fs from 'fs'
+import download from 'download'
+import extract from 'extract-zip'
+import { RepoDesignation, downloadFile, listFiles } from '@huggingface/hub'
+
+let browserWindow: BrowserWindow | null = null
 
 function createWindow(): void {
   // Create the browser window.
@@ -38,16 +43,63 @@ function createWindow(): void {
   }
 }
 
+async function downloadWhisperModel(): Promise<void> {
+  const modelsDir = path.join(app.getPath('userData'), '_models', 'faster-whisper-small')
+  if (fs.existsSync(modelsDir)) return
+  console.log('Downloading whisper model')
+  fs.mkdirSync(modelsDir, { recursive: true })
+  const repo: RepoDesignation = { type: 'model', name: 'Systran/faster-whisper-small' }
+  for await (const fileInfo of listFiles({
+    repo
+  })) {
+    const buffer = await (await downloadFile({ repo, path: fileInfo.path }))?.arrayBuffer()
+    if (!buffer) throw new Error('Failed to download model')
+    const filePath = path.join(modelsDir, fileInfo.path)
+    fs.writeFileSync(filePath, Buffer.from(buffer))
+  }
+}
+
+async function downloadWhisperExecutable(): Promise<void> {
+  const whisperExecutableDir = path.join(app.getPath('userData'), 'Whisper-Faster')
+  if (fs.existsSync(whisperExecutableDir)) return
+  console.log('Downloading whisper executable')
+  const assetUrl =
+    'https://github.com/Purfview/whisper-standalone-win/releases/download/faster-whisper/'
+  const assetFileName =
+    process.platform === 'linux'
+      ? 'Whisper-Faster_r189.1_linux.zip'
+      : process.platform === 'win32'
+        ? 'Whisper-Faster_r192.3_windows.zip'
+        : 'Whisper-Faster_r186.1_macOS-x86-64.zip'
+  const downloadUrl = assetUrl + assetFileName
+  const downloadPath = app.getPath('userData')
+  await download(downloadUrl, downloadPath)
+  const zipFilePath = path.join(downloadPath, assetFileName)
+  await extract(zipFilePath, { dir: downloadPath })
+  fs.unlinkSync(zipFilePath)
+}
+
+async function downloadWhisperFiles(): Promise<void> {
+  try {
+    await Promise.all([downloadWhisperExecutable(), downloadWhisperModel()])
+    browserWindow?.webContents.send('model-files-downloaded')
+  } catch (error) {
+    console.error('Failed to download whisper files', error)
+  }
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.electron')
+  downloadWhisperFiles()
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
   app.on('browser-window-created', (_, window) => {
+    browserWindow = window
     optimizer.watchWindowShortcuts(window)
   })
 
@@ -56,25 +108,39 @@ app.whenReady().then(() => {
 
   ipcMain.handle('transcribe', async (_, filePath: string) => {
     return new Promise((resolve, reject) => {
-      const pythonProcess = spawn('python3', ['./transcription.py'])
-
-      let dataString = ''
-
-      pythonProcess.stdout.on('data', (data) => {
-        dataString += data.toString()
+      const whisperPath = path.join(app.getPath('userData'), 'Whisper-Faster', 'whisper-faster')
+      const processId = Math.floor(Math.random() * 1000000)
+      const outputDir = path.join(app.getPath('userData'), processId.toString())
+      fs.mkdirSync(outputDir, { recursive: true })
+      const whisper = spawn(whisperPath, [
+        filePath,
+        '-f',
+        'json',
+        '-o',
+        outputDir,
+        '--language',
+        'en',
+        '--model',
+        'small',
+        '--model_dir',
+        path.join(app.getPath('userData'), '_models')
+      ])
+      whisper.on('close', (code) => {
+        if (code === 0) {
+          const files = fs.readdirSync(outputDir)
+          if (files.length === 0) {
+            reject('There was an error transcribing the file')
+          }
+          const data = fs.readFileSync(path.join(outputDir, files[0]), 'utf8')
+          const jsonData = JSON.parse(data)
+          resolve(
+            jsonData.segments.map((seg) => ({ start: seg.start, end: seg.end, text: seg.text }))
+          )
+          fs.rm(outputDir, { recursive: true, force: true }, () => {})
+        } else {
+          reject('There was an error transcribing the file')
+        }
       })
-
-      pythonProcess.stderr.on('data', (data) => {
-        reject(`stderr: ${data}`)
-      })
-
-      pythonProcess.stdout.on('end', () => {
-        const data = JSON.parse(dataString)
-        resolve(data.map((s) => ({ start: s.start, end: s.end, text: s.text })))
-      })
-
-      pythonProcess.stdin.write(JSON.stringify({ filePath }))
-      pythonProcess.stdin.end()
     })
   })
 

@@ -31,6 +31,7 @@ export type Project = {
 type State = {
   projects: Project[]
   currentProjectIndex: number | null
+  modelFilesDownloaded: boolean
   createNewProject: (project: Project) => void
   setTranscriptionStatus: (status: TranscriptionStatus, projectIndex: number) => void
   setSubtitleGenerationProgress: (progress: number, projectIndex: number) => void
@@ -45,6 +46,7 @@ type State = {
   setMediaThumbnail: (thumbnail: string) => void
   setMediaType: (mediaType: string) => void
   deleteProject: (id: number) => Promise<void>
+  setModelFilesDownloaded: (downloaded: boolean) => void
 }
 
 const storage = {
@@ -64,6 +66,7 @@ const useAppStore = create<State>()(
     (set, get) => ({
       projects: [],
       currentProjectIndex: null,
+      modelFilesDownloaded: false,
       setTranscriptionStatus: (status, projectIndex): void => {
         set((state) => {
           const projects = [...state.projects]
@@ -165,6 +168,9 @@ const useAppStore = create<State>()(
           await window.electron.ipcRenderer.invoke('delete-thumbnail', project.mediaThumbnail)
         const projects = state.projects.filter((project) => project.id !== id)
         set({ projects })
+      },
+      setModelFilesDownloaded: (downloaded): void => {
+        set({ modelFilesDownloaded: downloaded })
       }
     }),
     {
