@@ -1,5 +1,5 @@
 {
-  "name": "transcribe-app",
+  "name": "subtify",
   "version": "1.0.0",
   "description": "An Electron application with React and TypeScript",
   "main": "./out/main/index.js",
@@ -23,8 +23,11 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.0",
     "@electron-toolkit/utils": "^3.0.0",
+    "@huggingface/hub": "^0.15.1",
     "antd": "^5.17.2",
     "clsx": "^2.1.1",
+    "download": "^8.0.0",
+    "extract-zip": "^2.0.1",
     "localforage": "^1.10.0",
     "zustand": "^4.5.2"
   },

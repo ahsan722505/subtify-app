@@ -34,7 +34,7 @@ function UploadFile(): JSX.Element {
   }
 
   const handleCreateSubtitles = async (): Promise<void> => {
-    if (!mediaPath || !currentProjectIndex) return
+    if (!mediaPath || currentProjectIndex === null) return
     setStatus(TranscriptionStatus.LOADING, currentProjectIndex)
     let progress = 0
     const estimatedTime = 60000 // 1 minute
@@ -47,6 +47,7 @@ function UploadFile(): JSX.Element {
       }
     }, interval)
     const subtitles = await window.electron.ipcRenderer.invoke('transcribe', mediaPath)
+    clearInterval(intervalId)
     setStatus(TranscriptionStatus.SUCCESS, currentProjectIndex)
     setSubtitles(subtitles, currentProjectIndex)
   }
