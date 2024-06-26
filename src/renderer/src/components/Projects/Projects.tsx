@@ -10,7 +10,7 @@ export default function Projects(): JSX.Element {
     createNewProject({
       mediaCurrentTime: 0,
       mediaDuration: 0,
-      name: 'New Project',
+      name: 'Untitled Project',
       subtitles: [],
       id: new Date().getTime(),
       mediaThumbnail: null,
