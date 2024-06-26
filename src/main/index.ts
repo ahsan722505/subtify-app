@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { spawn } from 'child_process'
 import fs from 'fs'
+import { autoUpdater } from 'electron-updater'
 
 function createWindow(): void {
   // Create the browser window.
@@ -19,8 +20,6 @@ function createWindow(): void {
       webSecurity: false
     }
   })
-
-  console.log('hello')
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -45,6 +44,8 @@ function createWindow(): void {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.electron')
+
+  autoUpdater.checkForUpdatesAndNotify()
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -88,6 +89,8 @@ app.whenReady().then(() => {
         'en',
         '--model',
         'small',
+        '--device',
+        'cpu',
         '--model_dir',
         join(whisperPath, '_models')
       ])
