@@ -6,6 +6,31 @@ import { spawn } from 'child_process'
 import fs from 'fs'
 import { autoUpdater } from 'electron-updater'
 
+let win: BrowserWindow | null = null
+
+enum AppUpdatesLifecycle {
+  Checking = 'checking',
+  UPTODATE = 'up-to-date',
+  DOWNLOADING = 'downloading',
+  DOWNLOADED = 'downloaded'
+}
+
+function sendUpdatesStatusToWindow(status: AppUpdatesLifecycle): void {
+  win?.webContents.send('update-status', status)
+}
+
+autoUpdater.on('update-not-available', () => {
+  sendUpdatesStatusToWindow(AppUpdatesLifecycle.UPTODATE)
+})
+
+autoUpdater.on('download-progress', (progressObj) => {
+  sendUpdatesStatusToWindow(AppUpdatesLifecycle.DOWNLOADING)
+  win?.webContents.send('downloaded-updates-percentage', progressObj.percent)
+})
+autoUpdater.on('update-downloaded', () => {
+  sendUpdatesStatusToWindow(AppUpdatesLifecycle.DOWNLOADED)
+})
+
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -45,12 +70,16 @@ function createWindow(): void {
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.electron')
 
-  autoUpdater.checkForUpdatesAndNotify()
+  setTimeout(() => {
+    if (is.dev) sendUpdatesStatusToWindow(AppUpdatesLifecycle.UPTODATE)
+    else autoUpdater.checkForUpdatesAndNotify()
+  }, 5000)
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
   app.on('browser-window-created', (_, window) => {
+    win = window
     optimizer.watchWindowShortcuts(window)
   })
 
