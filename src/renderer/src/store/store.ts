@@ -37,20 +37,17 @@ export type Project = {
   mediaCurrentTime: number
   mediaDuration: number
   transcriptionStatus: TranscriptionStatus
-  subtitleGenerationProgress: number
   mediaType: string | null
 }
 
 type State = {
   projects: Project[]
   currentProjectIndex: number | null
-  modelFilesDownloaded: boolean
   currentNavItem: navItems
   appUpdateStatus: AppUpdatesLifecycle
   downloadedUpdatesPercentage: number
   createNewProject: (project: Project) => void
   setTranscriptionStatus: (status: TranscriptionStatus, projectIndex: number) => void
-  setSubtitleGenerationProgress: (progress: number, projectIndex: number) => void
   setSubtitles: (subtitles: Subtitle[], projectIndex: number) => void
   editSubtitle: (index: number, text: string) => void
   setMediaCurrentTime: (time: number) => void
@@ -62,7 +59,6 @@ type State = {
   setMediaThumbnail: (thumbnail: string) => void
   setMediaType: (mediaType: string) => void
   deleteProject: (id: number) => Promise<void>
-  setModelFilesDownloaded: (downloaded: boolean) => void
   setCurrentNavItem: (navItem: navItems) => void
   setAppUpdateStatus: (status: AppUpdatesLifecycle) => void
   setDownloadedUpdatesPercentage: (percentage: number) => void
@@ -93,13 +89,6 @@ const useAppStore = create<State>()(
         set((state) => {
           const projects = [...state.projects]
           projects[projectIndex].transcriptionStatus = status
-          return { projects }
-        })
-      },
-      setSubtitleGenerationProgress: (progress, projectIndex): void => {
-        set((state) => {
-          const projects = [...state.projects]
-          projects[projectIndex].subtitleGenerationProgress = progress
           return { projects }
         })
       },
@@ -190,9 +179,6 @@ const useAppStore = create<State>()(
           await window.electron.ipcRenderer.invoke('delete-thumbnail', project.mediaThumbnail)
         const projects = state.projects.filter((project) => project.id !== id)
         set({ projects })
-      },
-      setModelFilesDownloaded: (downloaded): void => {
-        set({ modelFilesDownloaded: downloaded })
       },
       setCurrentNavItem: (navItem): void => {
         set({ currentNavItem: navItem })
