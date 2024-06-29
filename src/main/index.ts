@@ -5,6 +5,7 @@ import icon from '../../resources/icon.png?asset'
 import { spawn } from 'child_process'
 import fs from 'fs'
 import { autoUpdater } from 'electron-updater'
+import srtParser2 from 'srt-parser-2'
 
 let win: BrowserWindow | null = null
 
@@ -113,7 +114,7 @@ app.whenReady().then(() => {
       const whisper = spawn(executablePath, [
         filePath,
         '-f',
-        'json',
+        'srt',
         '-o',
         outputDir,
         '--language',
@@ -122,6 +123,9 @@ app.whenReady().then(() => {
         'small',
         '--device',
         'cpu',
+        '--sentence',
+        '--max_line_width',
+        '42',
         '--model_dir',
         join(whisperPath, '_models')
       ])
@@ -132,9 +136,10 @@ app.whenReady().then(() => {
             reject('There was an error transcribing the file')
           }
           const data = fs.readFileSync(join(outputDir, files[0]), 'utf8')
-          const jsonData = JSON.parse(data)
+          const parser = new srtParser2()
+          const srt_array = parser.fromSrt(data)
           resolve(
-            jsonData.segments.map((seg) => ({ start: seg.start, end: seg.end, text: seg.text }))
+            srt_array.map((s) => ({ start: s.startSeconds, end: s.endSeconds, text: s.text }))
           )
           fs.rm(outputDir, { recursive: true, force: true }, () => {})
         } else {

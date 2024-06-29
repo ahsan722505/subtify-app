@@ -16,7 +16,7 @@ export default function AppUpdates(): JSX.Element {
       {appUpdateStatus === AppUpdatesLifecycle.DOWNLOADING && (
         <div>
           <h1>Downloading updates please do not close the app....</h1>
-          <Progress percent={downloadedUpdatesPercentage} status="active" />
+          <Progress percent={Math.floor(downloadedUpdatesPercentage)} status="active" />
         </div>
       )}
       {appUpdateStatus === AppUpdatesLifecycle.DOWNLOADED && (
