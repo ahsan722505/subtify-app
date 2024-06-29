@@ -1,16 +1,44 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, screen } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { spawn } from 'child_process'
 import fs from 'fs'
 import { autoUpdater } from 'electron-updater'
+import srtParser2 from 'srt-parser-2'
+
+let win: BrowserWindow | null = null
+
+enum AppUpdatesLifecycle {
+  Checking = 'checking',
+  UPTODATE = 'up-to-date',
+  DOWNLOADING = 'downloading',
+  DOWNLOADED = 'downloaded'
+}
+
+function sendUpdatesStatusToWindow(status: AppUpdatesLifecycle): void {
+  win?.webContents.send('update-status', status)
+}
+
+autoUpdater.on('update-not-available', () => {
+  sendUpdatesStatusToWindow(AppUpdatesLifecycle.UPTODATE)
+})
+
+autoUpdater.on('download-progress', (progressObj) => {
+  sendUpdatesStatusToWindow(AppUpdatesLifecycle.DOWNLOADING)
+  win?.webContents.send('downloaded-updates-percentage', progressObj.percent)
+})
+autoUpdater.on('update-downloaded', () => {
+  sendUpdatesStatusToWindow(AppUpdatesLifecycle.DOWNLOADED)
+})
 
 function createWindow(): void {
   // Create the browser window.
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize
+
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width,
+    height,
     show: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
@@ -45,12 +73,16 @@ function createWindow(): void {
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.electron')
 
-  autoUpdater.checkForUpdatesAndNotify()
+  setTimeout(() => {
+    if (is.dev) sendUpdatesStatusToWindow(AppUpdatesLifecycle.UPTODATE)
+    else autoUpdater.checkForUpdatesAndNotify()
+  }, 5000)
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
   app.on('browser-window-created', (_, window) => {
+    win = window
     optimizer.watchWindowShortcuts(window)
   })
 
@@ -82,7 +114,7 @@ app.whenReady().then(() => {
       const whisper = spawn(executablePath, [
         filePath,
         '-f',
-        'json',
+        'srt',
         '-o',
         outputDir,
         '--language',
@@ -91,6 +123,9 @@ app.whenReady().then(() => {
         'small',
         '--device',
         'cpu',
+        '--sentence',
+        '--max_line_width',
+        '42',
         '--model_dir',
         join(whisperPath, '_models')
       ])
@@ -101,9 +136,10 @@ app.whenReady().then(() => {
             reject('There was an error transcribing the file')
           }
           const data = fs.readFileSync(join(outputDir, files[0]), 'utf8')
-          const jsonData = JSON.parse(data)
+          const parser = new srtParser2()
+          const srt_array = parser.fromSrt(data)
           resolve(
-            jsonData.segments.map((seg) => ({ start: seg.start, end: seg.end, text: seg.text }))
+            srt_array.map((s) => ({ start: s.startSeconds, end: s.endSeconds, text: s.text }))
           )
           fs.rm(outputDir, { recursive: true, force: true }, () => {})
         } else {

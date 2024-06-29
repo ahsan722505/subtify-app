@@ -1,6 +1,19 @@
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import localforage from 'localforage'
+
+export enum navItems {
+  myProjects = 'My Projects',
+  appUpdates = 'App Updates'
+}
+
+export enum AppUpdatesLifecycle {
+  Checking = 'checking',
+  UPTODATE = 'up-to-date',
+  DOWNLOADING = 'downloading',
+  DOWNLOADED = 'downloaded'
+}
+
 export enum TranscriptionStatus {
   IDLE = 'idle',
   LOADING = 'loading',
@@ -24,17 +37,17 @@ export type Project = {
   mediaCurrentTime: number
   mediaDuration: number
   transcriptionStatus: TranscriptionStatus
-  subtitleGenerationProgress: number
   mediaType: string | null
 }
 
 type State = {
   projects: Project[]
   currentProjectIndex: number | null
-  modelFilesDownloaded: boolean
+  currentNavItem: navItems
+  appUpdateStatus: AppUpdatesLifecycle
+  downloadedUpdatesPercentage: number
   createNewProject: (project: Project) => void
   setTranscriptionStatus: (status: TranscriptionStatus, projectIndex: number) => void
-  setSubtitleGenerationProgress: (progress: number, projectIndex: number) => void
   setSubtitles: (subtitles: Subtitle[], projectIndex: number) => void
   editSubtitle: (index: number, text: string) => void
   setMediaCurrentTime: (time: number) => void
@@ -46,7 +59,9 @@ type State = {
   setMediaThumbnail: (thumbnail: string) => void
   setMediaType: (mediaType: string) => void
   deleteProject: (id: number) => Promise<void>
-  setModelFilesDownloaded: (downloaded: boolean) => void
+  setCurrentNavItem: (navItem: navItems) => void
+  setAppUpdateStatus: (status: AppUpdatesLifecycle) => void
+  setDownloadedUpdatesPercentage: (percentage: number) => void
 }
 
 const storage = {
@@ -67,17 +82,13 @@ const useAppStore = create<State>()(
       projects: [],
       currentProjectIndex: null,
       modelFilesDownloaded: false,
+      currentNavItem: navItems.myProjects,
+      appUpdateStatus: AppUpdatesLifecycle.Checking,
+      downloadedUpdatesPercentage: 0,
       setTranscriptionStatus: (status, projectIndex): void => {
         set((state) => {
           const projects = [...state.projects]
           projects[projectIndex].transcriptionStatus = status
-          return { projects }
-        })
-      },
-      setSubtitleGenerationProgress: (progress, projectIndex): void => {
-        set((state) => {
-          const projects = [...state.projects]
-          projects[projectIndex].subtitleGenerationProgress = progress
           return { projects }
         })
       },
@@ -169,13 +180,25 @@ const useAppStore = create<State>()(
         const projects = state.projects.filter((project) => project.id !== id)
         set({ projects })
       },
-      setModelFilesDownloaded: (downloaded): void => {
-        set({ modelFilesDownloaded: downloaded })
+      setCurrentNavItem: (navItem): void => {
+        set({ currentNavItem: navItem })
+      },
+      setAppUpdateStatus: (status): void => {
+        set({ appUpdateStatus: status })
+      },
+      setDownloadedUpdatesPercentage: (percentage): void => {
+        set({ downloadedUpdatesPercentage: percentage })
       }
     }),
     {
       name: 'app-store',
-      storage: createJSONStorage(() => storage)
+      storage: createJSONStorage(() => storage),
+      partialize: (state) =>
+        Object.fromEntries(
+          Object.entries(state).filter(
+            ([key]) => key !== 'appUpdateStatus' && key !== 'downloadedUpdatesPercentage'
+          )
+        )
     }
   )
 )

@@ -1,6 +1,6 @@
 {
   "name": "subtify",
-  "version": "1.0.5",
+  "version": "1.0.1",
   "description": "An Electron application with React and TypeScript",
   "main": "./out/main/index.js",
   "author": "example.com",
@@ -30,6 +30,7 @@
     "electron-updater": "^6.2.1",
     "extract-zip": "^2.0.1",
     "localforage": "^1.10.0",
+    "srt-parser-2": "^1.2.3",
     "tsc": "^2.0.4",
     "zustand": "^4.5.2"
   },

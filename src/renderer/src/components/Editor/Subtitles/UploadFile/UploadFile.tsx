@@ -6,7 +6,6 @@ import { generateVideoThumbnail, isVideo } from '../../Media/Media.utils'
 
 function UploadFile(): JSX.Element {
   const setStatus = useAppStore((state) => state.setTranscriptionStatus)
-  const setProgress = useAppStore((state) => state.setSubtitleGenerationProgress)
   const setSubtitles = useAppStore((state) => state.setSubtitles)
   const setMediaPath = useAppStore((state) => state.setMediaPath)
   const setMediaName = useAppStore((state) => state.setMediaName)
@@ -36,18 +35,7 @@ function UploadFile(): JSX.Element {
   const handleCreateSubtitles = async (): Promise<void> => {
     if (!mediaPath || currentProjectIndex === null) return
     setStatus(TranscriptionStatus.LOADING, currentProjectIndex)
-    let progress = 0
-    const estimatedTime = 60000 // 1 minute
-    const interval = estimatedTime / 100
-    const intervalId = setInterval(() => {
-      progress += 1
-      setProgress(progress, currentProjectIndex)
-      if (progress === 95) {
-        clearInterval(intervalId)
-      }
-    }, interval)
     const subtitles = await window.electron.ipcRenderer.invoke('transcribe', mediaPath)
-    clearInterval(intervalId)
     setStatus(TranscriptionStatus.SUCCESS, currentProjectIndex)
     setSubtitles(subtitles, currentProjectIndex)
   }
