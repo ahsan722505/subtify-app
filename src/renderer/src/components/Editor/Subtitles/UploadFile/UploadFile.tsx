@@ -13,14 +13,24 @@ function UploadFile(): JSX.Element {
   const currentProjectIndex = useAppStore((state) => state.currentProjectIndex)
   const setMediaThumbnail = useAppStore((state) => state.setMediaThumbnail)
   const setMediaType = useAppStore((state) => state.setMediaType)
+  const supportedFormats = [
+    'audio/mp3',
+    'audio/wav',
+    'audio/mpeg',
+    'audio/ogg',
+    'audio/flac',
+    'audio/aac',
+    'audio/webm',
+    'video/mp4',
+    'video/webm'
+  ]
 
   const props: UploadProps = {
-    accept:
-      'audio/mp3, audio/wav, audio/mpeg, audio/ogg, audio/flac, audio/aac, audio/aiff, audio/wma, audio/opus, audio/webm, video/mp4, video/ogg, video/webm',
+    accept: supportedFormats.join(', '),
     customRequest: async ({ file }) => {
       const typecastedFile = file as File
-      if (!typecastedFile.type.startsWith('video') && !typecastedFile.type.startsWith('audio'))
-        message.error('File format is not supported.')
+      const type = typecastedFile.type
+      if (!supportedFormats.includes(type)) message.error('File format is not supported.')
       else {
         setMediaPath(typecastedFile.path)
         setMediaName(typecastedFile.name)

@@ -18,6 +18,8 @@ win:
       to: resources/Whisper-Faster/_models
     - from: Whisper-Faster/whisper-faster-windows.exe
       to: resources/Whisper-Faster/whisper-faster-windows.exe
+    - from: ffmpeg/win32/ffmpeg.exe
+      to: resources/ffmpeg/win32/ffmpeg.exe
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
@@ -44,6 +46,8 @@ linux:
       to: resources/Whisper-Faster/_models
     - from: Whisper-Faster/whisper-faster-linux
       to: resources/Whisper-Faster/whisper-faster-linux
+    - from: ffmpeg/linux/ffmpeg
+      to: resources/ffmpeg/linux/ffmpeg
   target:
     - deb
   maintainer: electronjs.org

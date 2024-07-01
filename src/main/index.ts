@@ -89,6 +89,75 @@ app.whenReady().then(() => {
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
 
+  ipcMain.handle(
+    'export-video',
+    async (
+      _,
+      data: { filePath: string; burnSubtitles: boolean; subtitles: string; mediaType: string }
+    ) => {
+      return new Promise((resolve, reject) => {
+        const { burnSubtitles, filePath, subtitles, mediaType } = data
+        const isWebm = mediaType === 'video/webm'
+
+        const ffmpegPath = join(
+          is.dev ? '' : process.resourcesPath,
+          'ffmpeg',
+          process.platform,
+          'ffmpeg'
+        )
+
+        const processId = Math.floor(Math.random() * 1000000)
+
+        const inputPath = join(
+          app.getPath('userData'),
+          processId.toString(),
+          `subtitles.${isWebm ? 'vtt' : 'srt'}`
+        )
+        fs.mkdirSync(join(app.getPath('userData'), processId.toString()), { recursive: true })
+        fs.writeFileSync(inputPath, subtitles)
+
+        const outputPath = join(
+          app.getPath('downloads'),
+          `subtify-${processId}.${isWebm && !burnSubtitles ? 'webm' : 'mp4'}`
+        )
+
+        let args: string[] = []
+        if (burnSubtitles) {
+          args = ['-i', filePath, '-vf', `subtitles=${inputPath}`, '-c:a', 'copy', outputPath]
+        } else {
+          args = [
+            '-i',
+            filePath,
+            '-i',
+            inputPath,
+            '-c',
+            'copy',
+            '-c:s',
+            isWebm ? 'webvtt' : 'mov_text',
+            outputPath
+          ]
+        }
+
+        const ffmpeg = spawn(ffmpegPath, args)
+        ffmpeg.stderr.on('data', (data) => {
+          console.log(data.toString())
+        })
+        ffmpeg.on('close', (code) => {
+          if (code === 0) {
+            resolve(outputPath)
+          } else {
+            reject('There was an error exporting the video')
+          }
+          fs.rm(
+            join(app.getPath('userData'), processId.toString()),
+            { recursive: true, force: true },
+            () => {}
+          )
+        })
+      })
+    }
+  )
+
   ipcMain.handle('transcribe', async (_, filePath: string) => {
     return new Promise((resolve, reject) => {
       let executableName = ''
