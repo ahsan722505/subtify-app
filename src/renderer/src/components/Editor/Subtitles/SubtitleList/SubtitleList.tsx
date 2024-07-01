@@ -4,14 +4,17 @@ import { SettingOutlined, DownloadOutlined } from '@ant-design/icons'
 import { downloadSubtitles } from './SubtitleList.utils'
 import { SubtitleFormat } from './SubtitleList.types'
 import { useProjectStore } from '@renderer/hooks/useProjectStore'
+import ExportVideo from './ExportVideo'
+import { isVideo } from '../../Media/Media.utils'
 
 export default function SubtitleList(): JSX.Element {
   const subtitles = useProjectStore((state) => state.subtitles)
+  const mediaType = useProjectStore((state) => state.mediaType)
 
   const items: MenuProps['items'] = [
     {
       key: '1',
-      label: <span className="mr-5">Download</span>,
+      label: <span className="mr-5">Export Subtitles</span>,
       icon: <DownloadOutlined className="!text-base" />,
       children: [
         {
@@ -38,6 +41,12 @@ export default function SubtitleList(): JSX.Element {
       ]
     }
   ]
+  if (isVideo(mediaType || ''))
+    items.push({
+      key: '2',
+      label: <ExportVideo />,
+      icon: <DownloadOutlined className="!text-base" />
+    })
   return (
     <div>
       <div className="sticky top-0 mb-4 bg-white flex justify-between items-center py-6 z-50">

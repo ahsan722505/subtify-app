@@ -1,7 +1,7 @@
 import { Subtitle } from '@renderer/store/store'
 import { SubtitleFormat } from './SubtitleList.types'
 
-function generateSRT(subtitles: Subtitle[]): string {
+export function generateSRT(subtitles: Subtitle[]): string {
   return subtitles
     .map((subtitle, index) => {
       const start = formatTime(subtitle.start, SubtitleFormat.SRT)

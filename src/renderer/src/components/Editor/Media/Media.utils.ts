@@ -18,3 +18,5 @@ export async function generateVideoThumbnail(videoPath: string): Promise<string>
 }
 
 export const isVideo = (mimeType: string): boolean => mimeType.startsWith('video')
+
+export const isAudio = (mimeType: string): boolean => mimeType.startsWith('audio')
