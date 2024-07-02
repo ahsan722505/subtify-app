@@ -123,7 +123,11 @@ app.whenReady().then(() => {
 
         let args: string[] = []
         if (burnSubtitles) {
-          args = ['-i', filePath, '-vf', `subtitles=${inputPath}`, '-c:a', 'copy', outputPath]
+          const subtitlesPath =
+            process.platform === 'win32'
+              ? inputPath.replaceAll('\\', '\\\\\\\\').replace(':', '\\\\:')
+              : inputPath
+          args = ['-i', filePath, '-vf', `subtitles=${subtitlesPath}`, '-c:a', 'copy', outputPath]
         } else {
           args = [
             '-i',
