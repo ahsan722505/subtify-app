@@ -162,65 +162,70 @@ app.whenReady().then(() => {
     }
   )
 
-  ipcMain.handle('transcribe', async (_, filePath: string) => {
-    return new Promise((resolve, reject) => {
-      let executableName = ''
-      switch (process.platform) {
-        case 'win32':
-          executableName = 'whisper-faster-windows.exe'
-          break
-        case 'darwin':
-          executableName = 'whisper-faster-mac'
-          break
-        case 'linux':
-          executableName = 'whisper-faster-linux'
-          break
-        default:
-          reject('Unsupported platform')
-          return
-      }
-      const whisperPath = join(is.dev ? '' : process.resourcesPath, 'Whisper-Faster')
-      const executablePath = join(whisperPath, executableName)
-      const processId = Math.floor(Math.random() * 1000000)
-      const outputDir = join(app.getPath('userData'), processId.toString())
-      fs.mkdirSync(outputDir, { recursive: true })
-      const whisper = spawn(executablePath, [
-        filePath,
-        '-f',
-        'srt',
-        '-o',
-        outputDir,
-        '--language',
-        'en',
-        '--model',
-        'small',
-        '--device',
-        'cpu',
-        '--sentence',
-        '--max_line_width',
-        '42',
-        '--model_dir',
-        join(whisperPath, '_models')
-      ])
-      whisper.on('close', (code) => {
-        if (code === 0) {
-          const files = fs.readdirSync(outputDir)
-          if (files.length === 0) {
+  ipcMain.handle(
+    'transcribe',
+    async (_, data: { filePath: string; language: string | null; translate: boolean }) => {
+      return new Promise((resolve, reject) => {
+        const { filePath, language, translate } = data
+        let executableName = ''
+        switch (process.platform) {
+          case 'win32':
+            executableName = 'whisper-faster-windows.exe'
+            break
+          case 'darwin':
+            executableName = 'whisper-faster-mac'
+            break
+          case 'linux':
+            executableName = 'whisper-faster-linux'
+            break
+          default:
+            reject('Unsupported platform')
+            return
+        }
+        const whisperPath = join(is.dev ? '' : process.resourcesPath, 'Whisper-Faster')
+        const executablePath = join(whisperPath, executableName)
+        const processId = Math.floor(Math.random() * 1000000)
+        const outputDir = join(app.getPath('userData'), processId.toString())
+        fs.mkdirSync(outputDir, { recursive: true })
+        const args = [
+          filePath,
+          '-f',
+          'srt',
+          '-o',
+          outputDir,
+          '--model',
+          'small',
+          '--device',
+          'cpu',
+          '--sentence',
+          '--max_line_width',
+          '42',
+          '--model_dir',
+          join(whisperPath, '_models')
+        ]
+        if (language) args.push('--language', language)
+        if (translate && language !== 'English') args.push('--task', 'translate')
+        const whisper = spawn(executablePath, args)
+        whisper.on('close', (code) => {
+          if (code === 0) {
+            const files = fs.readdirSync(outputDir)
+            if (files.length === 0) {
+              reject('There was an error transcribing the file')
+            }
+            const data = fs.readFileSync(join(outputDir, files[0]), 'utf8')
+            const parser = new srtParser2()
+            const srt_array = parser.fromSrt(data)
+            resolve(
+              srt_array.map((s) => ({ start: s.startSeconds, end: s.endSeconds, text: s.text }))
+            )
+            fs.rm(outputDir, { recursive: true, force: true }, () => {})
+          } else {
             reject('There was an error transcribing the file')
           }
-          const data = fs.readFileSync(join(outputDir, files[0]), 'utf8')
-          const parser = new srtParser2()
-          const srt_array = parser.fromSrt(data)
-          resolve(
-            srt_array.map((s) => ({ start: s.startSeconds, end: s.endSeconds, text: s.text }))
-          )
-          fs.rm(outputDir, { recursive: true, force: true }, () => {})
-        } else {
-          reject('There was an error transcribing the file')
-        }
+        })
       })
-    })
-  })
+    }
+  )
 
   ipcMain.handle('save-thumbnail', async (_, dataURL) => {
     try {
