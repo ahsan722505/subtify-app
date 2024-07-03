@@ -5,3 +5,4 @@ out
 *.log*
 Whisper-Faster/
 ffmpeg/
+.env
