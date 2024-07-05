@@ -206,6 +206,9 @@ app.whenReady().then(() => {
         if (language) args.push('--language', language)
         if (translate && language !== 'English') args.push('--task', 'translate')
         const whisper = spawn(executablePath, args)
+        whisper.stdout.on('data', (data) => {
+          console.log(data.toString())
+        })
         whisper.on('close', (code) => {
           if (code === 0) {
             const files = fs.readdirSync(outputDir)
