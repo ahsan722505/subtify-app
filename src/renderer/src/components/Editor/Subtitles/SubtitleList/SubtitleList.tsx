@@ -10,6 +10,7 @@ import { isVideo } from '../../Media/Media.utils'
 export default function SubtitleList(): JSX.Element {
   const subtitles = useProjectStore((state) => state.subtitles)
   const mediaType = useProjectStore((state) => state.mediaType)
+  const currentTime = useProjectStore((state) => state.mediaCurrentTime)
 
   const items: MenuProps['items'] = [
     {
@@ -58,7 +59,15 @@ export default function SubtitleList(): JSX.Element {
         </Dropdown>
       </div>
       {subtitles.map((s, i) => (
-        <SubtitleListItem key={s.start} {...s} index={i} />
+        <SubtitleListItem
+          currentlyPlaying={
+            +currentTime.toFixed(2) >= +s.start.toFixed(2) &&
+            +currentTime.toFixed(2) < +s.end.toFixed(2)
+          }
+          key={s.start}
+          {...s}
+          index={i}
+        />
       ))}
     </div>
   )

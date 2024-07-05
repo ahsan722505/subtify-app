@@ -5,23 +5,20 @@ import React from 'react'
 import clsx from 'clsx'
 import { Input } from 'antd'
 import useAppStore, { Subtitle } from '@renderer/store/store'
-import { useProjectStore } from '@renderer/hooks/useProjectStore'
 const { TextArea } = Input
 
-export default function SubtitleListItem({
+export default React.memo(function SubtitleListItem({
   end,
   start,
   text,
-  index
-}: Subtitle & { index: number }): JSX.Element {
+  index,
+  currentlyPlaying
+}: Subtitle & { index: number; currentlyPlaying: boolean }): JSX.Element {
   const editSubtitle = useAppStore((state) => state.editSubtitle)
   const handleEdit = useDebouncedCallback((e: React.ChangeEvent<HTMLTextAreaElement>): void => {
     editSubtitle(index, e.target.value)
   })
   const subtitleRef = React.useRef<HTMLDivElement>(null)
-  const currentTime = useProjectStore((state) => state.mediaCurrentTime)
-  const currentlyPlaying =
-    +currentTime.toFixed(2) >= +start.toFixed(2) && +currentTime.toFixed(2) < +end.toFixed(2)
 
   React.useEffect(() => {
     if (currentlyPlaying && subtitleRef.current) {
@@ -65,4 +62,4 @@ export default function SubtitleListItem({
       </div>
     </div>
   )
-}
+})
