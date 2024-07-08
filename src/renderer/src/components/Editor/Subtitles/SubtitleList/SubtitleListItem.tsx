@@ -15,14 +15,16 @@ export default React.memo(function SubtitleListItem({
   currentlyPlaying
 }: Subtitle & { index: number; currentlyPlaying: boolean }): JSX.Element {
   const editSubtitle = useAppStore((state) => state.editSubtitle)
+  const setCurrentSubtitleIndex = useAppStore((state) => state.setCurrentSubtitleIndex)
   const handleEdit = useDebouncedCallback((e: React.ChangeEvent<HTMLTextAreaElement>): void => {
     editSubtitle(index, e.target.value)
   })
   const subtitleRef = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
-    if (currentlyPlaying && subtitleRef.current) {
-      subtitleRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    if (currentlyPlaying) {
+      setCurrentSubtitleIndex(index)
+      subtitleRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
   }, [currentlyPlaying])
 

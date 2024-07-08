@@ -17,7 +17,8 @@ export default function Projects(): JSX.Element {
       transcriptionStatus: TranscriptionStatus.IDLE,
       mediaName: null,
       mediaPath: null,
-      mediaType: null
+      mediaType: null,
+      currentSubtitleIndex: null
     })
   }
 

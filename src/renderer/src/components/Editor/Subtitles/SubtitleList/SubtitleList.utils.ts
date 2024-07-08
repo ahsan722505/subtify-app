@@ -60,3 +60,7 @@ export function formatTime(seconds: number, format?: SubtitleFormat): string {
   const hours = parseInt(uiDisplayFormat.slice(0, hoursEndIndex))
   return hours > 0 ? uiDisplayFormat : uiDisplayFormat.slice(hoursEndIndex + 1)
 }
+
+export function isSubtitlePlaying(currentTime: number, start: number, end: number): boolean {
+  return +currentTime.toFixed(2) >= +start.toFixed(2) && +currentTime.toFixed(2) < +end.toFixed(2)
+}

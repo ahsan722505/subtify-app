@@ -38,6 +38,7 @@ export type Project = {
   mediaDuration: number
   transcriptionStatus: TranscriptionStatus
   mediaType: string | null
+  currentSubtitleIndex: number | null
 }
 
 type State = {
@@ -62,6 +63,7 @@ type State = {
   setCurrentNavItem: (navItem: navItems) => void
   setAppUpdateStatus: (status: AppUpdatesLifecycle) => void
   setDownloadedUpdatesPercentage: (percentage: number) => void
+  setCurrentSubtitleIndex: (index: number | null) => void
 }
 
 const storage = {
@@ -188,6 +190,14 @@ const useAppStore = create<State>()(
       },
       setDownloadedUpdatesPercentage: (percentage): void => {
         set({ downloadedUpdatesPercentage: percentage })
+      },
+      setCurrentSubtitleIndex: (index): void => {
+        set((state) => {
+          if (state.currentProjectIndex === null) return state
+          const projects = [...state.projects]
+          projects[state.currentProjectIndex].currentSubtitleIndex = index
+          return { projects }
+        })
       }
     }),
     {

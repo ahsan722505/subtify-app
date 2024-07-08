@@ -29,8 +29,10 @@
     "download": "^8.0.0",
     "electron-updater": "^6.2.1",
     "extract-zip": "^2.0.1",
+    "konva": "^9.3.13",
     "localforage": "^1.10.0",
     "posthog-js": "^1.143.0",
+    "react-konva": "^18.2.10",
     "srt-parser-2": "^1.2.3",
     "tsc": "^2.0.4",
     "zustand": "^4.5.2"
