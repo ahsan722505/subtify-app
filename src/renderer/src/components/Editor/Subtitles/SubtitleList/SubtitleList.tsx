@@ -1,7 +1,7 @@
 import SubtitleListItem from './SubtitleListItem'
 import { Button, Dropdown, MenuProps } from 'antd'
 import { SettingOutlined, DownloadOutlined } from '@ant-design/icons'
-import { downloadSubtitles } from './SubtitleList.utils'
+import { downloadSubtitles, isSubtitlePlaying } from './SubtitleList.utils'
 import { SubtitleFormat } from './SubtitleList.types'
 import { useProjectStore } from '@renderer/hooks/useProjectStore'
 import ExportVideo from './ExportVideo'
@@ -60,10 +60,7 @@ export default function SubtitleList(): JSX.Element {
       </div>
       {subtitles.map((s, i) => (
         <SubtitleListItem
-          currentlyPlaying={
-            +currentTime.toFixed(2) >= +s.start.toFixed(2) &&
-            +currentTime.toFixed(2) < +s.end.toFixed(2)
-          }
+          currentlyPlaying={isSubtitlePlaying(currentTime, s.start, s.end)}
           key={s.start}
           {...s}
           index={i}
