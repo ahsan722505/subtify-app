@@ -1,23 +1,16 @@
+import { useProjectStore } from '@renderer/hooks/useProjectStore'
+import useAppStore from '@renderer/store/store'
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 import React from 'react'
 import { Layer, Stage, StageProps, Text, Transformer } from 'react-konva'
 
 export default React.memo(function CanvasEditor(
-  props: StageProps & { subtitle: string }
+  props: StageProps & { subtitle: string | null }
 ): JSX.Element {
+  const setSubtitleStyleProps = useAppStore((state) => state.setSubtitleStyleProps)
+  const subtitleStyleProps = useProjectStore((state) => state.subtitleStyleProps)
   const [isSelected, setIsSelected] = React.useState(false)
-  const [subtitleNode, setSubtitleNode] = React.useState<Konva.TextConfig>(() => ({
-    text: props.subtitle,
-    fill: 'white',
-    fontSize: 24,
-    id: 'subtitle',
-    x: 0,
-    y: props.height! / 2,
-    align: 'center',
-    width: props.width
-  }))
-  console.log('pro', subtitleNode)
   const subtitleNodeRef = React.useRef<Konva.Text>(null)
   const trRef = React.useRef<Konva.Transformer>(null)
 
@@ -28,27 +21,6 @@ export default React.memo(function CanvasEditor(
       trRef.current?.getLayer()?.batchDraw()
     }
   }, [isSelected])
-
-  React.useEffect(() => {
-    setSubtitleNode((state) => ({
-      ...state,
-      text: props.subtitle
-    }))
-  }, [props.subtitle])
-
-  // React.useEffect(() => {
-  //   if (props.width && props.height && subtitleNodeRef.current) {
-  //     const adjustedSubtitleWidth = Math.min(props.width, subtitleNodeRef.current.textWidth)
-  //     const adjustedX = (props.width - adjustedSubtitleWidth) / 2
-  //     const adjustedY = (props.height - subtitleNodeRef.current.height()) / 2
-  //     setSubtitleNode((state) => ({
-  //       ...state,
-  //       x: adjustedX,
-  //       y: adjustedY,
-  //       width: adjustedSubtitleWidth
-  //     }))
-  //   }
-  // }, [])
 
   React.useEffect(() => {
     const handleDeselectionOutsideCanvas = (e: MouseEvent): void => {
@@ -72,43 +44,43 @@ export default React.memo(function CanvasEditor(
   return (
     <Stage {...props} onMouseDown={checkDeselect} onTouchStart={checkDeselect}>
       <Layer id="canvas-editor">
-        <Text
-          onClick={handleNodeClick}
-          onTap={handleNodeClick}
-          ref={subtitleNodeRef}
-          {...subtitleNode}
-          draggable
-          onDragEnd={(e) => {
-            setSubtitleNode({
-              ...subtitleNode,
-              x: e.target.x(),
-              y: e.target.y()
-            })
-          }}
-          onTransformEnd={() => {
-            // transformer is changing scale of the node
-            // and NOT its width or height
-            // but in the store we have only width and height
-            // to match the data better we will reset scale on transform end
-            const node = subtitleNodeRef.current!
-            const scaleX = node.scaleX()
-            const scaleY = node.scaleY()
+        {props.subtitle && (
+          <Text
+            onClick={handleNodeClick}
+            onTap={handleNodeClick}
+            ref={subtitleNodeRef}
+            text={props.subtitle}
+            {...(subtitleStyleProps || {})}
+            draggable
+            onDragEnd={(e) => {
+              setSubtitleStyleProps({
+                ...subtitleStyleProps,
+                x: e.target.x(),
+                y: e.target.y()
+              })
+            }}
+            onTransformEnd={() => {
+              // transformer is changing scale of the node
+              // and NOT its width or height
+              // but in the store we have only width and height
+              // to match the data better we will reset scale on transform end
+              const node = subtitleNodeRef.current!
+              const scaleX = node.scaleX()
+              const scaleY = node.scaleY()
 
-            // we will reset it back
-            node.scaleX(1)
-            node.scaleY(1)
-            setSubtitleNode({
-              ...subtitleNode,
-              x: node.x(),
-              y: node.y(),
-              // set minimal value
-              width: Math.max(10, node.width() * scaleX),
-              fontSize: Math.max(5, node.fontSize() * scaleY)
-              // fontSize: node.fontSize()
-              // height: Math.max(node.height() * scaleY)
-            })
-          }}
-        />
+              // we will reset it back
+              node.scaleX(1)
+              node.scaleY(1)
+              setSubtitleStyleProps({
+                ...subtitleStyleProps,
+                x: node.x(),
+                y: node.y(),
+                width: Math.max(10, node.width() * scaleX),
+                fontSize: Math.max(5, node.fontSize() * scaleY)
+              })
+            }}
+          />
+        )}
         {isSelected && (
           <Transformer
             ref={trRef}

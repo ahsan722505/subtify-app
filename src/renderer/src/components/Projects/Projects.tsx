@@ -18,7 +18,8 @@ export default function Projects(): JSX.Element {
       mediaName: null,
       mediaPath: null,
       mediaType: null,
-      currentSubtitleIndex: null
+      currentSubtitleIndex: null,
+      subtitleStyleProps: null
     })
   }
 

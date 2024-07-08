@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import localforage from 'localforage'
+import Konva from 'konva'
 
 export enum navItems {
   myProjects = 'My Projects',
@@ -39,6 +40,7 @@ export type Project = {
   transcriptionStatus: TranscriptionStatus
   mediaType: string | null
   currentSubtitleIndex: number | null
+  subtitleStyleProps: Konva.TextConfig | null
 }
 
 type State = {
@@ -64,6 +66,8 @@ type State = {
   setAppUpdateStatus: (status: AppUpdatesLifecycle) => void
   setDownloadedUpdatesPercentage: (percentage: number) => void
   setCurrentSubtitleIndex: (index: number | null) => void
+  initializeSubtitleStyleProps: (props: Konva.TextConfig) => void
+  setSubtitleStyleProps: (props: Konva.TextConfig) => void
 }
 
 const storage = {
@@ -196,6 +200,23 @@ const useAppStore = create<State>()(
           if (state.currentProjectIndex === null) return state
           const projects = [...state.projects]
           projects[state.currentProjectIndex].currentSubtitleIndex = index
+          return { projects }
+        })
+      },
+      initializeSubtitleStyleProps: (props): void => {
+        set((state) => {
+          if (state.currentProjectIndex === null) return state
+          const projects = [...state.projects]
+          const project = projects[state.currentProjectIndex]
+          if (!project.subtitleStyleProps) project.subtitleStyleProps = props
+          return { projects }
+        })
+      },
+      setSubtitleStyleProps: (props): void => {
+        set((state) => {
+          if (state.currentProjectIndex === null) return state
+          const projects = [...state.projects]
+          projects[state.currentProjectIndex].subtitleStyleProps = props
           return { projects }
         })
       }
