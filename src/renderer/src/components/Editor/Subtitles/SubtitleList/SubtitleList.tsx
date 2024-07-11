@@ -1,7 +1,14 @@
 import SubtitleListItem from './SubtitleListItem'
 import { Button, Dropdown, MenuProps } from 'antd'
 import { SettingOutlined, DownloadOutlined } from '@ant-design/icons'
-import { downloadSubtitles, isSubtitlePlaying } from './SubtitleList.utils'
+import {
+  downloadSubtitles,
+  generateASS,
+  generateSRT,
+  generateTXT,
+  generateVTT,
+  isSubtitlePlaying
+} from './SubtitleList.utils'
 import { SubtitleFormat } from './SubtitleList.types'
 import { useProjectStore } from '@renderer/hooks/useProjectStore'
 import ExportVideo from './ExportVideo'
@@ -11,6 +18,9 @@ export default function SubtitleList(): JSX.Element {
   const subtitles = useProjectStore((state) => state.subtitles)
   const mediaType = useProjectStore((state) => state.mediaType)
   const currentTime = useProjectStore((state) => state.mediaCurrentTime)
+  const canvasWidth = useProjectStore((state) => state.canvasWidth)
+  const canvasHeight = useProjectStore((state) => state.canvasHeight)
+  const subtitleStyleProps = useProjectStore((state) => state.subtitleStyleProps)
 
   const items: MenuProps['items'] = [
     {
@@ -22,23 +32,35 @@ export default function SubtitleList(): JSX.Element {
           key: '1-1',
           label: '.SRT format',
           onClick: (): void => {
-            downloadSubtitles(subtitles, SubtitleFormat.SRT)
+            downloadSubtitles(generateSRT(subtitles), SubtitleFormat.SRT)
           }
         },
         {
           key: '1-2',
           label: '.VTT format',
           onClick: (): void => {
-            downloadSubtitles(subtitles, SubtitleFormat.VTT)
+            downloadSubtitles(generateVTT(subtitles), SubtitleFormat.VTT)
           }
         },
         {
           key: '1-3',
           label: '.TXT format',
           onClick: (): void => {
-            downloadSubtitles(subtitles, SubtitleFormat.TXT)
+            downloadSubtitles(generateTXT(subtitles), SubtitleFormat.TXT)
           }
-        }
+        },
+        isVideo(mediaType || '')
+          ? {
+              key: '1-4',
+              label: '.ASS format',
+              onClick: (): void => {
+                downloadSubtitles(
+                  generateASS(canvasWidth, canvasHeight, subtitleStyleProps!, subtitles),
+                  SubtitleFormat.ASS
+                )
+              }
+            }
+          : null
       ]
     }
   ]

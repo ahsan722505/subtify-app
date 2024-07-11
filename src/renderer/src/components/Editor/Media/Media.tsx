@@ -14,11 +14,11 @@ function Media(): JSX.Element {
   const currentSubtitleIndex = useProjectStore((state) => state.currentSubtitleIndex)
   const subtitles = useProjectStore((state) => state.subtitles)
   const initializeSubtitleStyleProps = useAppStore((state) => state.initializeSubtitleStyleProps)
+  const setCanvasWidth = useAppStore((state) => state.setCanvasWidth)
+  const setCanvasHeight = useAppStore((state) => state.setCanvasHeight)
+  const canvasWidth = useProjectStore((state) => state.canvasWidth)
+  const canvasHeight = useProjectStore((state) => state.canvasHeight)
   const mediaRef = React.useRef<HTMLVideoElement | null>(null)
-  const [canvasWidth, setCanvasWidth] = React.useState<number>(0)
-  const [canvasHeight, setCanvasHeight] = React.useState<number>(0)
-
-  console.log('sub', currentSubtitleIndex)
 
   React.useEffect(() => {
     if (mediaRef.current) {

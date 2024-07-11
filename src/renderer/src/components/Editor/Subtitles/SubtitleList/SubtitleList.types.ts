@@ -1,5 +1,6 @@
 export enum SubtitleFormat {
   SRT = 'srt',
   VTT = 'vtt',
-  TXT = 'txt'
+  TXT = 'txt',
+  ASS = 'ass'
 }

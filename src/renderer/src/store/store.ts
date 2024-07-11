@@ -41,6 +41,8 @@ export type Project = {
   mediaType: string | null
   currentSubtitleIndex: number | null
   subtitleStyleProps: Konva.TextConfig | null
+  canvasWidth: number
+  canvasHeight: number
 }
 
 type State = {
@@ -68,6 +70,8 @@ type State = {
   setCurrentSubtitleIndex: (index: number | null) => void
   initializeSubtitleStyleProps: (props: Konva.TextConfig) => void
   setSubtitleStyleProps: (props: Konva.TextConfig) => void
+  setCanvasWidth: (width: number) => void
+  setCanvasHeight: (height: number) => void
 }
 
 const storage = {
@@ -217,6 +221,22 @@ const useAppStore = create<State>()(
           if (state.currentProjectIndex === null) return state
           const projects = [...state.projects]
           projects[state.currentProjectIndex].subtitleStyleProps = props
+          return { projects }
+        })
+      },
+      setCanvasWidth: (width): void => {
+        set((state) => {
+          if (state.currentProjectIndex === null) return state
+          const projects = [...state.projects]
+          projects[state.currentProjectIndex].canvasWidth = width
+          return { projects }
+        })
+      },
+      setCanvasHeight: (height): void => {
+        set((state) => {
+          if (state.currentProjectIndex === null) return state
+          const projects = [...state.projects]
+          projects[state.currentProjectIndex].canvasHeight = height
           return { projects }
         })
       }
