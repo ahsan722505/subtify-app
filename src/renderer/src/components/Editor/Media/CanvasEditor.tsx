@@ -95,9 +95,7 @@ export default React.memo(function CanvasEditor(
                 y: node.y(),
                 width: Math.max(10, node.width() * scaleX),
                 fontSize: Math.max(5, node.fontSize() * scaleY),
-                rotation: node.rotation(),
-                scaleX: 1,
-                scaleY: 1
+                rotation: node.rotation()
               })
             }}
           />
