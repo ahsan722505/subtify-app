@@ -19,7 +19,9 @@ export default function Projects(): JSX.Element {
       mediaPath: null,
       mediaType: null,
       currentSubtitleIndex: null,
-      subtitleStyleProps: null
+      subtitleStyleProps: null,
+      canvasWidth: 0,
+      canvasHeight: 0
     })
   }
 

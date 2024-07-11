@@ -3,7 +3,7 @@ import React from 'react'
 import { Switch } from 'antd'
 import { InfoCircleFilled } from '@ant-design/icons'
 import { useProjectStore } from '@renderer/hooks/useProjectStore'
-import { generateSRT, generateVTT } from './SubtitleList.utils'
+import { generateASS, generateVTT } from './SubtitleList.utils'
 
 export default function ExportVideo(): JSX.Element {
   const subtitles = useProjectStore((state) => state.subtitles)
@@ -12,6 +12,9 @@ export default function ExportVideo(): JSX.Element {
   const [burnSubtitles, setBurnSubtitles] = React.useState(false)
   const [loading, setLoading] = React.useState(false)
   const mediaType = useProjectStore((state) => state.mediaType)
+  const canvasWidth = useProjectStore((state) => state.canvasWidth)
+  const canvasHeight = useProjectStore((state) => state.canvasHeight)
+  const subtitleStyleProps = useProjectStore((state) => state.subtitleStyleProps)
 
   const handleExportVideo = async (): Promise<void> => {
     setLoading(true)
@@ -20,7 +23,9 @@ export default function ExportVideo(): JSX.Element {
       await window.electron.ipcRenderer.invoke('export-video', {
         filePath,
         burnSubtitles,
-        subtitles: isWebm ? generateVTT(subtitles) : generateSRT(subtitles),
+        subtitles: isWebm
+          ? generateVTT(subtitles)
+          : generateASS(canvasWidth, canvasHeight, subtitleStyleProps!, subtitles),
         mediaType
       })
       message.success('Video exported successfully. Please Check your downloads folder.')

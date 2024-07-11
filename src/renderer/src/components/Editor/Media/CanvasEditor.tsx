@@ -14,6 +14,9 @@ export default React.memo(function CanvasEditor(
   const subtitleNodeRef = React.useRef<Konva.Text>(null)
   const trRef = React.useRef<Konva.Transformer>(null)
 
+  console.log('style props', subtitleStyleProps)
+  console.log('canvas', props)
+
   React.useEffect(() => {
     if (isSelected) {
       // we need to attach transformer manually
@@ -51,6 +54,18 @@ export default React.memo(function CanvasEditor(
             ref={subtitleNodeRef}
             text={props.subtitle}
             {...(subtitleStyleProps || {})}
+            sceneFunc={function (context, shape) {
+              const typecastedShape = shape as Konva.Text
+              const diff = typecastedShape.width() - typecastedShape.getTextWidth()
+              context.fillStyle = 'rgb(0,0,0)'
+              context.fillRect(
+                diff / 2,
+                0,
+                typecastedShape.getTextWidth(),
+                typecastedShape.height()
+              )
+              typecastedShape._sceneFunc(context)
+            }}
             draggable
             onDragEnd={(e) => {
               setSubtitleStyleProps({
@@ -65,8 +80,11 @@ export default React.memo(function CanvasEditor(
               // but in the store we have only width and height
               // to match the data better we will reset scale on transform end
               const node = subtitleNodeRef.current!
+
               const scaleX = node.scaleX()
               const scaleY = node.scaleY()
+
+              console.log('node', node)
 
               // we will reset it back
               node.scaleX(1)
@@ -76,7 +94,10 @@ export default React.memo(function CanvasEditor(
                 x: node.x(),
                 y: node.y(),
                 width: Math.max(10, node.width() * scaleX),
-                fontSize: Math.max(5, node.fontSize() * scaleY)
+                fontSize: Math.max(5, node.fontSize() * scaleY),
+                rotation: node.rotation(),
+                scaleX: 1,
+                scaleY: 1
               })
             }}
           />
