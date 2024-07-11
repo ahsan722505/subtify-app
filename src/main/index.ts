@@ -101,7 +101,6 @@ app.whenReady().then(() => {
       }
     ) => {
       return new Promise((resolve, reject) => {
-        console.log('export-video', data)
         const { burnSubtitles, filePath, subtitleMetadata, mediaType } = data
         const isWebm = mediaType === 'video/webm'
 

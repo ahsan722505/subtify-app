@@ -14,9 +14,6 @@ export default React.memo(function CanvasEditor(
   const subtitleNodeRef = React.useRef<Konva.Text>(null)
   const trRef = React.useRef<Konva.Transformer>(null)
 
-  console.log('style props', subtitleStyleProps)
-  console.log('canvas', props)
-
   React.useEffect(() => {
     if (isSelected) {
       // we need to attach transformer manually
@@ -83,8 +80,6 @@ export default React.memo(function CanvasEditor(
 
               const scaleX = node.scaleX()
               const scaleY = node.scaleY()
-
-              console.log('node', node)
 
               // we will reset it back
               node.scaleX(1)

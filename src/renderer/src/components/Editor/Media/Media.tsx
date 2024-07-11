@@ -20,8 +20,6 @@ function Media(): JSX.Element {
   const canvasHeight = useProjectStore((state) => state.canvasHeight)
   const mediaRef = React.useRef<HTMLVideoElement | null>(null)
 
-  console.log('sub', currentSubtitleIndex)
-
   React.useEffect(() => {
     if (mediaRef.current) {
       mediaRef.current.currentTime = currentTime
