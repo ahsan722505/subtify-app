@@ -25,19 +25,12 @@ export function generateVTT(subtitles: Subtitle[]): string {
   )
 }
 
-function generateTXT(subtitles: Subtitle[]): string {
+export function generateTXT(subtitles: Subtitle[]): string {
   return subtitles.map((subtitle) => `${subtitle.text}\n`).join('')
 }
 
-export function downloadSubtitles(subtitles: Subtitle[], format: SubtitleFormat): void {
-  const content =
-    format === SubtitleFormat.SRT
-      ? generateSRT(subtitles)
-      : format === SubtitleFormat.VTT
-        ? generateVTT(subtitles)
-        : generateTXT(subtitles)
-
-  const blob = new Blob([content], { type: 'text/plain' })
+export function downloadSubtitles(subtitles: string, format: SubtitleFormat): void {
+  const blob = new Blob([subtitles], { type: 'text/plain' })
   const url = URL.createObjectURL(blob)
 
   const a = document.createElement('a')
@@ -106,7 +99,7 @@ PlayResY: ${canvasHeight}
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default, Arial, ${fontSize}, &H00FFFFFF, &H000000FF, &H00000000, &HFF000000, 0, 0, 0, 0, 100, 100, 1, ${-rotation!}, 3, 1, 0, 2, 0, 0, 0, 1
+Style: Default, Arial, ${fontSize}, &H00FFFFFF, &H000000FF, &H00000000, &HFF000000, 0, 0, 0, 0, 100, 100, 0, ${-rotation!}, 3, 1, 0, 2, 0, 0, 0, 1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -126,7 +119,7 @@ ${subtitles
     const rotatedCenterX = x! + (offsetX * cosAngle - offsetY * sinAngle)
     const rotatedCenterY = y! + (offsetX * sinAngle + offsetY * cosAngle)
 
-    return `Dialogue: 0,${start},${end},Default,,0,0,0,,{\\an5\\pos(${rotatedCenterX},${rotatedCenterY})}${subtitle.text}`
+    return `Dialogue: 0,${start},${end},Default,,0,0,0,,{\\an5\\pos(${rotatedCenterX},${rotatedCenterY})}${konvaTextNode.textArr.map((t) => t.text).join('\\N')}`
   })
   .join('\n')}
 `

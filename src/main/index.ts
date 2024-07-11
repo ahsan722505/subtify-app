@@ -93,11 +93,16 @@ app.whenReady().then(() => {
     'export-video',
     async (
       _,
-      data: { filePath: string; burnSubtitles: boolean; subtitles: string; mediaType: string }
+      data: {
+        filePath: string
+        burnSubtitles: boolean
+        subtitleMetadata: { text: string; type: string }
+        mediaType: string
+      }
     ) => {
       return new Promise((resolve, reject) => {
         console.log('export-video', data)
-        const { burnSubtitles, filePath, subtitles, mediaType } = data
+        const { burnSubtitles, filePath, subtitleMetadata, mediaType } = data
         const isWebm = mediaType === 'video/webm'
 
         const ffmpegPath = join(
@@ -112,10 +117,10 @@ app.whenReady().then(() => {
         const inputPath = join(
           app.getPath('userData'),
           processId.toString(),
-          `subtitles.${isWebm ? 'vtt' : 'ass'}`
+          `subtitles.${subtitleMetadata.type}`
         )
         fs.mkdirSync(join(app.getPath('userData'), processId.toString()), { recursive: true })
-        fs.writeFileSync(inputPath, subtitles)
+        fs.writeFileSync(inputPath, subtitleMetadata.text)
 
         const outputPath = join(
           app.getPath('downloads'),
