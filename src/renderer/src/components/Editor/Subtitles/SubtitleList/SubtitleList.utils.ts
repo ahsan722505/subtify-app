@@ -143,3 +143,10 @@ export function getHeadlessKonvaTextNode(
   stage.add(layer)
   return text
 }
+
+export function matchStrings(s1: string, s2: string): boolean {
+  return (
+    s1.trim().toLowerCase().includes(s2.trim().toLowerCase()) ||
+    s2.trim().toLowerCase().includes(s1.trim().toLowerCase())
+  )
+}

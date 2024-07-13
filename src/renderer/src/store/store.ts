@@ -1,7 +1,7 @@
 import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
-import localforage from 'localforage'
 import Konva from 'konva'
+import indexedDBService from '@renderer/database/IndexedDBService'
+import { PROJECTS_LIMIT } from '@renderer/constants'
 
 export enum navItems {
   myProjects = 'My Projects',
@@ -29,7 +29,7 @@ export type Subtitle = {
 }
 
 export type Project = {
-  id: number
+  id: IDBValidKey
   name: string
   mediaThumbnail: string | null
   subtitles: Subtitle[]
@@ -51,9 +51,14 @@ type State = {
   currentNavItem: navItems
   appUpdateStatus: AppUpdatesLifecycle
   downloadedUpdatesPercentage: number
+  loadingProjects: boolean
+  pageNumber: number
+  totalProjects: number
+  projectsSearchFilter: string
+  fetchProjects: (pageNumber: number, limit: number, searchFilter: string) => Promise<void>
   createNewProject: (project: Project) => void
-  setTranscriptionStatus: (status: TranscriptionStatus, projectIndex: number) => void
-  setSubtitles: (subtitles: Subtitle[], projectIndex: number) => void
+  setTranscriptionStatus: (status: TranscriptionStatus, projectId: IDBValidKey) => void
+  setSubtitles: (subtitles: Subtitle[], projectId: IDBValidKey) => void
   editSubtitle: (index: number, text: string) => void
   setMediaCurrentTime: (time: number) => void
   setMediaDuration: (duration: number) => void
@@ -63,7 +68,7 @@ type State = {
   setCurrentProjectIndex: (index: number | null) => void
   setMediaThumbnail: (thumbnail: string) => void
   setMediaType: (mediaType: string) => void
-  deleteProject: (id: number) => Promise<void>
+  deleteProject: (id: IDBValidKey) => Promise<void>
   setCurrentNavItem: (navItem: navItems) => void
   setAppUpdateStatus: (status: AppUpdatesLifecycle) => void
   setDownloadedUpdatesPercentage: (percentage: number) => void
@@ -72,186 +77,229 @@ type State = {
   setSubtitleStyleProps: (props: Konva.TextConfig) => void
   setCanvasWidth: (width: number) => void
   setCanvasHeight: (height: number) => void
+  setPageNumber: (pageNumber: number) => void
+  setTotalProjects: (totalProjects: number) => void
+  setProjectsSearchFilter: (filter: string) => void
 }
 
-const storage = {
-  getItem: async (name: string): Promise<string | null> => {
-    return await localforage.getItem(name)
+const useAppStore = create<State>()((set, get) => ({
+  projects: [],
+  currentProjectIndex: null,
+  currentNavItem: navItems.myProjects,
+  appUpdateStatus: AppUpdatesLifecycle.Checking,
+  downloadedUpdatesPercentage: 0,
+  loadingProjects: false,
+  pageNumber: 1,
+  totalProjects: 0,
+  projectsSearchFilter: '',
+  setProjectsSearchFilter: (filter): void => {
+    set({ projectsSearchFilter: filter })
   },
-  setItem: async (name: string, value: string): Promise<string> => {
-    return await localforage.setItem(name, value)
+  setTotalProjects: (totalProjects): void => {
+    set({ totalProjects })
   },
-  removeItem: async (name: string): Promise<void> => {
-    return await localforage.removeItem(name)
-  }
-}
-
-const useAppStore = create<State>()(
-  persist(
-    (set, get) => ({
-      projects: [],
-      currentProjectIndex: null,
-      modelFilesDownloaded: false,
-      currentNavItem: navItems.myProjects,
-      appUpdateStatus: AppUpdatesLifecycle.Checking,
-      downloadedUpdatesPercentage: 0,
-      setTranscriptionStatus: (status, projectIndex): void => {
-        set((state) => {
-          const projects = [...state.projects]
-          projects[projectIndex].transcriptionStatus = status
-          return { projects }
-        })
-      },
-      setSubtitles: (subtitles, projectIndex): void => {
-        set((state) => {
-          const projects = [...state.projects]
-          projects[projectIndex].subtitles = subtitles
-          return { projects }
-        })
-      },
-      editSubtitle: (index, text): void => {
-        set((state) => {
-          if (state.currentProjectIndex === null) return state
-          const projects = [...state.projects]
-          projects[state.currentProjectIndex].subtitles[index].text = text
-          return { projects }
-        })
-      },
-      setMediaCurrentTime: (time): void => {
-        set((state) => {
-          if (state.currentProjectIndex === null) return state
-          const projects = [...state.projects]
-          projects[state.currentProjectIndex].mediaCurrentTime = time
-          return { projects }
-        })
-      },
-      setMediaDuration: (duration): void => {
-        set((state) => {
-          if (state.currentProjectIndex === null) return state
-          const projects = [...state.projects]
-          projects[state.currentProjectIndex].mediaDuration = duration
-          return { projects }
-        })
-      },
-      createNewProject: (project): void => {
-        set((state) => {
-          const projects = [...state.projects, project]
-          return { projects, currentProjectIndex: projects.length - 1 }
-        })
-      },
-      setMediaPath: (mediaPath): void => {
-        set((state) => {
-          if (state.currentProjectIndex === null) return state
-          const projects = [...state.projects]
-          projects[state.currentProjectIndex].mediaPath = mediaPath
-          return { projects }
-        })
-      },
-      setMediaName: (mediaName): void => {
-        set((state) => {
-          if (state.currentProjectIndex === null) return state
-          const projects = [...state.projects]
-          projects[state.currentProjectIndex].mediaName = mediaName
-          return { projects }
-        })
-      },
-      setProjectName: (name): void => {
-        set((state) => {
-          if (state.currentProjectIndex === null) return state
-          const projects = [...state.projects]
-          projects[state.currentProjectIndex].name = name
-          return { projects }
-        })
-      },
-      setCurrentProjectIndex: (index): void => {
-        set({ currentProjectIndex: index })
-      },
-      setMediaThumbnail: (thumbnail): void => {
-        set((state) => {
-          if (state.currentProjectIndex === null) return state
-          const projects = [...state.projects]
-          projects[state.currentProjectIndex].mediaThumbnail = thumbnail
-          return { projects }
-        })
-      },
-      setMediaType: (mediaType): void => {
-        set((state) => {
-          if (state.currentProjectIndex === null) return state
-          const projects = [...state.projects]
-          projects[state.currentProjectIndex].mediaType = mediaType
-          return { projects }
-        })
-      },
-      deleteProject: async (id): Promise<void> => {
-        const state = get()
-        const project = state.projects.find((project) => project.id === id)
-        if (project?.mediaThumbnail)
-          await window.electron.ipcRenderer.invoke('delete-thumbnail', project.mediaThumbnail)
-        const projects = state.projects.filter((project) => project.id !== id)
-        set({ projects })
-      },
-      setCurrentNavItem: (navItem): void => {
-        set({ currentNavItem: navItem })
-      },
-      setAppUpdateStatus: (status): void => {
-        set({ appUpdateStatus: status })
-      },
-      setDownloadedUpdatesPercentage: (percentage): void => {
-        set({ downloadedUpdatesPercentage: percentage })
-      },
-      setCurrentSubtitleIndex: (index): void => {
-        set((state) => {
-          if (state.currentProjectIndex === null) return state
-          const projects = [...state.projects]
-          projects[state.currentProjectIndex].currentSubtitleIndex = index
-          return { projects }
-        })
-      },
-      initializeSubtitleStyleProps: (props): void => {
-        set((state) => {
-          if (state.currentProjectIndex === null) return state
-          const projects = [...state.projects]
-          const project = projects[state.currentProjectIndex]
-          if (!project.subtitleStyleProps) project.subtitleStyleProps = props
-          return { projects }
-        })
-      },
-      setSubtitleStyleProps: (props): void => {
-        set((state) => {
-          if (state.currentProjectIndex === null) return state
-          const projects = [...state.projects]
-          projects[state.currentProjectIndex].subtitleStyleProps = props
-          return { projects }
-        })
-      },
-      setCanvasWidth: (width): void => {
-        set((state) => {
-          if (state.currentProjectIndex === null) return state
-          const projects = [...state.projects]
-          projects[state.currentProjectIndex].canvasWidth = width
-          return { projects }
-        })
-      },
-      setCanvasHeight: (height): void => {
-        set((state) => {
-          if (state.currentProjectIndex === null) return state
-          const projects = [...state.projects]
-          projects[state.currentProjectIndex].canvasHeight = height
-          return { projects }
-        })
-      }
-    }),
-    {
-      name: 'app-store',
-      storage: createJSONStorage(() => storage),
-      partialize: (state) =>
-        Object.fromEntries(
-          Object.entries(state).filter(
-            ([key]) => key !== 'appUpdateStatus' && key !== 'downloadedUpdatesPercentage'
-          )
-        )
+  setPageNumber: (pageNumber): void => {
+    set({ pageNumber })
+  },
+  fetchProjects: async (pageNumber, limit, searchFilter): Promise<void> => {
+    set({ loadingProjects: true })
+    const projects = await indexedDBService.getProjects(pageNumber, limit, searchFilter)
+    set({ projects, loadingProjects: false })
+  },
+  setTranscriptionStatus: async (status, projectId): Promise<void> => {
+    console.log(status, projectId)
+    const project = await indexedDBService.getProject(projectId)
+    await indexedDBService.updateProject({ ...project, transcriptionStatus: status })
+    const projects = get().projects.map((project) => {
+      if (project.id === projectId) return { ...project, transcriptionStatus: status }
+      return project
+    })
+    set({ projects })
+  },
+  setSubtitles: async (subtitles, projectId): Promise<void> => {
+    const project = await indexedDBService.getProject(projectId)
+    await indexedDBService.updateProject({
+      ...project,
+      subtitles,
+      transcriptionStatus: TranscriptionStatus.SUCCESS
+    })
+    const projects = get().projects.map((project) => {
+      if (project.id === projectId)
+        return { ...project, subtitles, transcriptionStatus: TranscriptionStatus.SUCCESS }
+      return project
+    })
+    set({ projects })
+  },
+  editSubtitle: (index, text): void => {
+    set((state) => {
+      if (state.currentProjectIndex === null) return state
+      const projects = [...state.projects]
+      const project = projects[state.currentProjectIndex]
+      project.subtitles[index].text = text
+      indexedDBService.updateProject(project)
+      return { projects }
+    })
+  },
+  setMediaCurrentTime: (time): void => {
+    set((state) => {
+      if (state.currentProjectIndex === null) return state
+      const projects = [...state.projects]
+      const project = projects[state.currentProjectIndex]
+      project.mediaCurrentTime = time
+      indexedDBService.updateProject(project)
+      return { projects }
+    })
+  },
+  setMediaDuration: (duration): void => {
+    set((state) => {
+      if (state.currentProjectIndex === null) return state
+      const projects = [...state.projects]
+      const project = projects[state.currentProjectIndex]
+      project.mediaDuration = duration
+      indexedDBService.updateProject(project)
+      return { projects }
+    })
+  },
+  createNewProject: async (project): Promise<void> => {
+    const state = get()
+    const projects = [project, ...state.projects].slice(0, PROJECTS_LIMIT)
+    await indexedDBService.addProject(project)
+    set({
+      projects,
+      currentProjectIndex: 0,
+      pageNumber: 1,
+      totalProjects: state.totalProjects + 1,
+      projectsSearchFilter: ''
+    })
+  },
+  setMediaPath: (mediaPath): void => {
+    set((state) => {
+      if (state.currentProjectIndex === null) return state
+      const projects = [...state.projects]
+      const project = projects[state.currentProjectIndex]
+      project.mediaPath = mediaPath
+      indexedDBService.updateProject(project)
+      return { projects }
+    })
+  },
+  setMediaName: (mediaName): void => {
+    set((state) => {
+      if (state.currentProjectIndex === null) return state
+      const projects = [...state.projects]
+      const project = projects[state.currentProjectIndex]
+      project.mediaName = mediaName
+      indexedDBService.updateProject(project)
+      return { projects }
+    })
+  },
+  setProjectName: (name): void => {
+    set((state) => {
+      if (state.currentProjectIndex === null) return state
+      const projects = [...state.projects]
+      const project = projects[state.currentProjectIndex]
+      project.name = name
+      indexedDBService.updateProject(project)
+      return { projects }
+    })
+  },
+  setCurrentProjectIndex: (index): void => {
+    set({ currentProjectIndex: index })
+  },
+  setMediaThumbnail: (thumbnail): void => {
+    set((state) => {
+      if (state.currentProjectIndex === null) return state
+      const projects = [...state.projects]
+      const project = projects[state.currentProjectIndex]
+      project.mediaThumbnail = thumbnail
+      indexedDBService.updateProject(project)
+      return { projects }
+    })
+  },
+  setMediaType: (mediaType): void => {
+    set((state) => {
+      if (state.currentProjectIndex === null) return state
+      const projects = [...state.projects]
+      const project = projects[state.currentProjectIndex]
+      project.mediaType = mediaType
+      indexedDBService.updateProject(project)
+      return { projects }
+    })
+  },
+  deleteProject: async (id): Promise<void> => {
+    const state = get()
+    const project = state.projects.find((project) => project.id === id)
+    if (project?.mediaThumbnail)
+      await window.electron.ipcRenderer.invoke('delete-thumbnail', project.mediaThumbnail)
+    const projects = state.projects.filter((project) => project.id !== id)
+    await indexedDBService.deleteProject(id)
+    if (projects.length === 0) {
+      const previousPage = Math.max(1, state.pageNumber - 1)
+      state.fetchProjects(previousPage, PROJECTS_LIMIT, state.projectsSearchFilter)
+      state.setPageNumber(previousPage)
+    } else {
+      state.fetchProjects(state.pageNumber, PROJECTS_LIMIT, state.projectsSearchFilter)
     }
-  )
-)
+    state.setTotalProjects(Math.max(0, state.totalProjects - 1))
+  },
+  setCurrentNavItem: (navItem): void => {
+    set({ currentNavItem: navItem })
+  },
+  setAppUpdateStatus: (status): void => {
+    set({ appUpdateStatus: status })
+  },
+  setDownloadedUpdatesPercentage: (percentage): void => {
+    set({ downloadedUpdatesPercentage: percentage })
+  },
+  setCurrentSubtitleIndex: (index): void => {
+    set((state) => {
+      if (state.currentProjectIndex === null) return state
+      const projects = [...state.projects]
+      const project = projects[state.currentProjectIndex]
+      project.currentSubtitleIndex = index
+      indexedDBService.updateProject(project)
+      return { projects }
+    })
+  },
+  initializeSubtitleStyleProps: (props): void => {
+    set((state) => {
+      if (state.currentProjectIndex === null) return state
+      const projects = [...state.projects]
+      const project = projects[state.currentProjectIndex]
+      if (!project.subtitleStyleProps) project.subtitleStyleProps = props
+      indexedDBService.updateProject(project)
+      return { projects }
+    })
+  },
+  setSubtitleStyleProps: (props): void => {
+    set((state) => {
+      if (state.currentProjectIndex === null) return state
+      const projects = [...state.projects]
+      const project = projects[state.currentProjectIndex]
+      project.subtitleStyleProps = props
+      indexedDBService.updateProject(project)
+      return { projects }
+    })
+  },
+  setCanvasWidth: (width): void => {
+    set((state) => {
+      if (state.currentProjectIndex === null) return state
+      const projects = [...state.projects]
+      const project = projects[state.currentProjectIndex]
+      project.canvasWidth = width
+      indexedDBService.updateProject(project)
+      return { projects }
+    })
+  },
+  setCanvasHeight: (height): void => {
+    set((state) => {
+      if (state.currentProjectIndex === null) return state
+      const projects = [...state.projects]
+      const project = projects[state.currentProjectIndex]
+      project.canvasHeight = height
+      indexedDBService.updateProject(project)
+      return { projects }
+    })
+  }
+}))
 
 export default useAppStore
