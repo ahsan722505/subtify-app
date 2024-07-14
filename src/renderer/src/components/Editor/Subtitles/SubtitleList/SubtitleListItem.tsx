@@ -5,6 +5,7 @@ import React from 'react'
 import clsx from 'clsx'
 import { Input } from 'antd'
 import useAppStore, { Subtitle } from '@renderer/store/store'
+import { DeleteFilled } from '@ant-design/icons'
 const { TextArea } = Input
 
 export default React.memo(function SubtitleListItem({
@@ -37,12 +38,10 @@ export default React.memo(function SubtitleListItem({
     <div
       onClick={handleSeek}
       ref={subtitleRef}
-      className={clsx(
-        'flex justify-between items-center mb-5 pr-2',
-        currentlyPlaying && '!bg-gray-300'
-      )}
+      className={clsx('flex justify-between items-center pr-2', currentlyPlaying && '!bg-gray-300')}
     >
       <TextArea
+        placeholder="New Text"
         onChange={handleEdit}
         defaultValue={text}
         className="w-2/3 border-none focus:ring-0 text-base overflow-hidden bg-inherit focus:bg-inherit hover:bg-inherit"
@@ -62,6 +61,7 @@ export default React.memo(function SubtitleListItem({
           <span>{formatTime(end)}</span>
         </div>
       </div>
+      <DeleteFilled className="text-red-500 cursor-pointer" />
     </div>
   )
 })

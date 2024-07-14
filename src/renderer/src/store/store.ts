@@ -80,6 +80,7 @@ type State = {
   setPageNumber: (pageNumber: number) => void
   setTotalProjects: (totalProjects: number) => void
   setProjectsSearchFilter: (filter: string) => void
+  insertSubtitleLine: (index: number) => void
 }
 
 const useAppStore = create<State>()((set, get) => ({
@@ -135,6 +136,7 @@ const useAppStore = create<State>()((set, get) => ({
       if (state.currentProjectIndex === null) return state
       const projects = [...state.projects]
       const project = projects[state.currentProjectIndex]
+      project.subtitles = project.subtitles.slice()
       project.subtitles[index].text = text
       indexedDBService.updateProject(project)
       return { projects }
@@ -296,6 +298,19 @@ const useAppStore = create<State>()((set, get) => ({
       const projects = [...state.projects]
       const project = projects[state.currentProjectIndex]
       project.canvasHeight = height
+      indexedDBService.updateProject(project)
+      return { projects }
+    })
+  },
+  insertSubtitleLine: (index): void => {
+    set((state) => {
+      if (state.currentProjectIndex === null) return state
+      const projects = [...state.projects]
+      const project = projects[state.currentProjectIndex]
+      project.subtitles = project.subtitles.slice()
+      project.subtitles.splice(index, 0, { start: 0, end: 0, text: '' })
+      project.subtitles[index].start = project.subtitles[index - 1].end
+      project.subtitles[index].end = project.subtitles[index + 1].start
       indexedDBService.updateProject(project)
       return { projects }
     })

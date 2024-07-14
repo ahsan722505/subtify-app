@@ -13,6 +13,7 @@ import { SubtitleFormat } from './SubtitleList.types'
 import { useProjectStore } from '@renderer/hooks/useProjectStore'
 import ExportVideo from './ExportVideo'
 import { isVideo } from '../../Media/Media.utils'
+import SubtitlesMedian from './SubtitlesMedian'
 
 export default function SubtitleList(): JSX.Element {
   const subtitles = useProjectStore((state) => state.subtitles)
@@ -21,6 +22,8 @@ export default function SubtitleList(): JSX.Element {
   const canvasWidth = useProjectStore((state) => state.canvasWidth)
   const canvasHeight = useProjectStore((state) => state.canvasHeight)
   const subtitleStyleProps = useProjectStore((state) => state.subtitleStyleProps)
+
+  console.log('SubtitleList', subtitles)
 
   const items: MenuProps['items'] = [
     {
@@ -81,12 +84,15 @@ export default function SubtitleList(): JSX.Element {
         </Dropdown>
       </div>
       {subtitles.map((s, i) => (
-        <SubtitleListItem
-          currentlyPlaying={isSubtitlePlaying(currentTime, s.start, s.end)}
-          key={s.start}
-          {...s}
-          index={i}
-        />
+        <>
+          <SubtitleListItem
+            currentlyPlaying={isSubtitlePlaying(currentTime, s.start, s.end)}
+            key={s.start}
+            {...s}
+            index={i}
+          />
+          <SubtitlesMedian key={s.start} index={i} />
+        </>
       ))}
     </div>
   )
