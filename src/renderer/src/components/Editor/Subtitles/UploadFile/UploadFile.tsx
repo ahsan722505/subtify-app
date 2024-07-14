@@ -16,6 +16,7 @@ function UploadFile(): JSX.Element {
   const setMediaName = useAppStore((state) => state.setMediaName)
   const mediaPath = useProjectStore((state) => state.mediaPath)
   const currentProjectIndex = useAppStore((state) => state.currentProjectIndex)
+  const projects = useAppStore((state) => state.projects)
   const setMediaThumbnail = useAppStore((state) => state.setMediaThumbnail)
   const setMediaType = useAppStore((state) => state.setMediaType)
   const supportedFormats = [
@@ -49,14 +50,14 @@ function UploadFile(): JSX.Element {
 
   const handleCreateSubtitles = async (): Promise<void> => {
     if (!mediaPath || currentProjectIndex === null) return
-    setStatus(TranscriptionStatus.LOADING, currentProjectIndex)
+    const projectId = projects[currentProjectIndex].id
+    setStatus(TranscriptionStatus.LOADING, projectId)
     const subtitles = await window.electron.ipcRenderer.invoke('transcribe', {
       filePath: mediaPath,
       language,
       translate
     })
-    setStatus(TranscriptionStatus.SUCCESS, currentProjectIndex)
-    setSubtitles(subtitles, currentProjectIndex)
+    setSubtitles(subtitles, projectId)
   }
 
   return (

@@ -33,7 +33,7 @@ export default function ProjectListItem({
   ]
   return (
     <div
-      key={project.id}
+      key={+project.id}
       className="border p-4 rounded-lg shadow-lg cursor-pointer"
       onClick={() => setCurrentProjectIndex(index)}
     >
