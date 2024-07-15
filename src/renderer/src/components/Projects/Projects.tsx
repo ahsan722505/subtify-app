@@ -4,7 +4,6 @@ import useAppStore, { TranscriptionStatus } from '@renderer/store/store'
 import ProjectListItem from './ProjectListItem'
 import { PROJECTS_LIMIT } from '@renderer/constants'
 import { useDebouncedCallback } from '@renderer/hooks/useDebouncedCallback'
-import { generateUniqueId } from '../Editor/Subtitles/SubtitleList/SubtitleList.utils'
 
 export default function Projects(): JSX.Element {
   const projects = useAppStore((state) => state.projects)
@@ -21,7 +20,7 @@ export default function Projects(): JSX.Element {
       mediaDuration: 0,
       name: 'Untitled Project',
       subtitles: [],
-      id: generateUniqueId(),
+      id: new Date().getTime(),
       mediaThumbnail: null,
       transcriptionStatus: TranscriptionStatus.IDLE,
       mediaName: null,
@@ -30,7 +29,8 @@ export default function Projects(): JSX.Element {
       currentSubtitleIndex: null,
       subtitleStyleProps: null,
       canvasWidth: 0,
-      canvasHeight: 0
+      canvasHeight: 0,
+      generatedSubtitlesPercentage: 0
     })
   }
 
@@ -65,7 +65,7 @@ export default function Projects(): JSX.Element {
       {projects.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project, i) => (
-            <ProjectListItem key={+project.id} index={i} project={project} />
+            <ProjectListItem key={project.id as string} index={i} project={project} />
           ))}
         </div>
       ) : loadingProjects ? (

@@ -15,6 +15,35 @@ enum AppUpdatesLifecycle {
   DOWNLOADING = 'downloading',
   DOWNLOADED = 'downloaded'
 }
+type Subtitle = {
+  start: number
+  end: number
+  text: string
+  id: string
+}
+type SubtitleGenerationProgressPayload = {
+  type: 'progress' | 'completed' | 'error'
+  projectId: IDBValidKey
+  subtitles?: Subtitle[]
+  duration?: number
+}
+
+function hmsToSecondsOnly(str: string): number {
+  const p = str.split(':')
+  let s = 0
+  let m = 1
+
+  while (p.length > 0) {
+    s += m * parseInt(p.pop()!, 10)
+    m *= 60
+  }
+
+  return s
+}
+
+function sendSubtitleGenerationProgress(payload: SubtitleGenerationProgressPayload): void {
+  win?.webContents.send('subtitle-generation-progress', payload)
+}
 
 function generateUniqueId(): string {
   return Math.random().toString(16).slice(2)
@@ -173,73 +202,88 @@ app.whenReady().then(() => {
 
   ipcMain.handle(
     'transcribe',
-    async (_, data: { filePath: string; language: string | null; translate: boolean }) => {
-      return new Promise((resolve, reject) => {
-        const { filePath, language, translate } = data
-        let executableName = ''
-        switch (process.platform) {
-          case 'win32':
-            executableName = 'whisper-faster-windows.exe'
-            break
-          case 'darwin':
-            executableName = 'whisper-faster-mac'
-            break
-          case 'linux':
-            executableName = 'whisper-faster-linux'
-            break
-          default:
-            reject('Unsupported platform')
-            return
-        }
-        const whisperPath = join(is.dev ? '' : process.resourcesPath, 'Whisper-Faster')
-        const executablePath = join(whisperPath, executableName)
-        const processId = Math.floor(Math.random() * 1000000)
-        const outputDir = join(app.getPath('userData'), processId.toString())
-        fs.mkdirSync(outputDir, { recursive: true })
-        const args = [
-          filePath,
-          '-f',
-          'srt',
-          '-o',
-          outputDir,
-          '--model',
-          'small',
-          '--device',
-          'cpu',
-          '--sentence',
-          '--max_line_width',
-          '42',
-          '--model_dir',
-          join(whisperPath, '_models')
-        ]
-        if (language) args.push('--language', language)
-        if (translate && language !== 'English') args.push('--task', 'translate')
-        const whisper = spawn(executablePath, args)
-        whisper.stdout.on('data', (data) => {
-          console.log(data.toString())
-        })
-        whisper.on('close', (code) => {
-          if (code === 0) {
-            const files = fs.readdirSync(outputDir)
-            if (files.length === 0) {
-              reject('There was an error transcribing the file')
-            }
-            const data = fs.readFileSync(join(outputDir, files[0]), 'utf8')
-            const parser = new srtParser2()
-            const srt_array = parser.fromSrt(data)
-            resolve(
-              srt_array.map((s) => ({
-                start: s.startSeconds,
-                end: s.endSeconds,
-                text: s.text,
-                id: generateUniqueId()
-              }))
-            )
-            fs.rm(outputDir, { recursive: true, force: true }, () => {})
-          } else {
-            reject('There was an error transcribing the file')
+    async (
+      _,
+      data: {
+        filePath: string
+        language: string | null
+        translate: boolean
+        projectId: IDBValidKey
+      }
+    ) => {
+      const { filePath, language, translate, projectId } = data
+      let executableName = ''
+      switch (process.platform) {
+        case 'win32':
+          executableName = 'whisper-faster-windows.exe'
+          break
+        case 'darwin':
+          executableName = 'whisper-faster-mac'
+          break
+        case 'linux':
+          executableName = 'whisper-faster-linux'
+          break
+        default:
+          return
+      }
+      const whisperPath = join(is.dev ? '' : process.resourcesPath, 'Whisper-Faster')
+      const executablePath = join(whisperPath, executableName)
+      const processId = Math.floor(Math.random() * 1000000)
+      const outputDir = join(app.getPath('userData'), processId.toString())
+      fs.mkdirSync(outputDir, { recursive: true })
+      const args = [
+        filePath,
+        '-f',
+        'srt',
+        '-o',
+        outputDir,
+        '--model',
+        'small',
+        '--device',
+        'cpu',
+        '--sentence',
+        '--max_line_width',
+        '42',
+        '--model_dir',
+        join(whisperPath, '_models')
+      ]
+      if (language) args.push('--language', language)
+      if (translate && language !== 'English') args.push('--task', 'translate')
+      const whisper = spawn(executablePath, args)
+      whisper.stdout.on('data', (data) => {
+        const str = data.toString()
+        const duration = str.slice(1, str.indexOf(']')).split('-->')[1]?.trim()
+        const seconds = hmsToSecondsOnly(duration || '')
+        if (seconds)
+          sendSubtitleGenerationProgress({
+            projectId,
+            type: 'progress',
+            duration: hmsToSecondsOnly(duration)
+          })
+      })
+      whisper.on('close', (code) => {
+        if (code === 0) {
+          const files = fs.readdirSync(outputDir)
+          if (files.length === 0) {
+            sendSubtitleGenerationProgress({ projectId, type: 'error' })
           }
-        })
+          const data = fs.readFileSync(join(outputDir, files[0]), 'utf8')
+          const parser = new srtParser2()
+          const srt_array = parser.fromSrt(data)
+          sendSubtitleGenerationProgress({
+            projectId,
+            type: 'completed',
+            subtitles: srt_array.map((s) => ({
+              start: s.startSeconds,
+              end: s.endSeconds,
+              text: s.text,
+              id: generateUniqueId()
+            }))
+          })
+          fs.rm(outputDir, { recursive: true, force: true }, () => {})
+        } else {
+          sendSubtitleGenerationProgress({ projectId, type: 'error' })
+        }
       })
     }
   )
