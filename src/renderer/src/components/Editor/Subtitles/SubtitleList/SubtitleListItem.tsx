@@ -21,7 +21,7 @@ export default React.memo(function SubtitleListItem({
   const subtitleRef = React.useRef<HTMLDivElement>(null)
   const [localText, setLocalText] = React.useState(globalText)
   const debounced = useDebouncedCallback((value) => {
-    editSubtitle(start, value)
+    editSubtitle(id, value)
   }, 1000)
 
   React.useEffect(() => {

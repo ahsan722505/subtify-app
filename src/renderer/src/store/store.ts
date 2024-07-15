@@ -61,7 +61,7 @@ type State = {
   createNewProject: (project: Project) => void
   setTranscriptionStatus: (status: TranscriptionStatus, projectId: IDBValidKey) => void
   setSubtitles: (subtitles: Subtitle[], projectId: IDBValidKey) => void
-  editSubtitle: (start: number, text: string) => void
+  editSubtitle: (id: string, text: string) => void
   setMediaCurrentTime: (time: number) => void
   setMediaDuration: (duration: number) => void
   setMediaPath: (mediaPath: string) => void
@@ -135,13 +135,13 @@ const useAppStore = create<State>()((set, get) => ({
     })
     set({ projects })
   },
-  editSubtitle: (start, text): void => {
+  editSubtitle: (id, text): void => {
     set((state) => {
       if (state.currentProjectIndex === null) return state
       const projects = [...state.projects]
       const project = projects[state.currentProjectIndex]
       project.subtitles = project.subtitles.slice()
-      const index = project.subtitles.findIndex((subtitle) => subtitle.start === start)
+      const index = project.subtitles.findIndex((subtitle) => subtitle.id === id)
       project.subtitles[index].text = text
       indexedDBService.updateProject(project)
       return { projects }
