@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import Konva from 'konva'
 import indexedDBService from '@renderer/database/IndexedDBService'
 import { PROJECTS_LIMIT } from '@renderer/constants'
+import { generateUniqueId } from '@renderer/components/Editor/Subtitles/SubtitleList/SubtitleList.utils'
 
 export enum navItems {
   myProjects = 'My Projects',
@@ -26,6 +27,7 @@ export type Subtitle = {
   start: number
   end: number
   text: string
+  id: string
 }
 
 export type Project = {
@@ -59,7 +61,7 @@ type State = {
   createNewProject: (project: Project) => void
   setTranscriptionStatus: (status: TranscriptionStatus, projectId: IDBValidKey) => void
   setSubtitles: (subtitles: Subtitle[], projectId: IDBValidKey) => void
-  editSubtitle: (index: number, text: string) => void
+  editSubtitle: (start: number, text: string) => void
   setMediaCurrentTime: (time: number) => void
   setMediaDuration: (duration: number) => void
   setMediaPath: (mediaPath: string) => void
@@ -72,7 +74,7 @@ type State = {
   setCurrentNavItem: (navItem: navItems) => void
   setAppUpdateStatus: (status: AppUpdatesLifecycle) => void
   setDownloadedUpdatesPercentage: (percentage: number) => void
-  setCurrentSubtitleIndex: (index: number | null) => void
+  setCurrentSubtitleIndex: (id: string) => void
   initializeSubtitleStyleProps: (props: Konva.TextConfig) => void
   setSubtitleStyleProps: (props: Konva.TextConfig) => void
   setCanvasWidth: (width: number) => void
@@ -80,9 +82,9 @@ type State = {
   setPageNumber: (pageNumber: number) => void
   setTotalProjects: (totalProjects: number) => void
   setProjectsSearchFilter: (filter: string) => void
-  insertSubtitleLine: (index: number) => void
-  deleteSubtitleLine: (index: number) => void
-  mergeSubtitleLines: (index1: number, index2: number) => void
+  insertSubtitleLine: (id: string) => void
+  deleteSubtitleLine: (id: string) => void
+  mergeSubtitleLines: (id: string) => void
 }
 
 const useAppStore = create<State>()((set, get) => ({
@@ -133,12 +135,13 @@ const useAppStore = create<State>()((set, get) => ({
     })
     set({ projects })
   },
-  editSubtitle: (index, text): void => {
+  editSubtitle: (start, text): void => {
     set((state) => {
       if (state.currentProjectIndex === null) return state
       const projects = [...state.projects]
       const project = projects[state.currentProjectIndex]
       project.subtitles = project.subtitles.slice()
+      const index = project.subtitles.findIndex((subtitle) => subtitle.start === start)
       project.subtitles[index].text = text
       indexedDBService.updateProject(project)
       return { projects }
@@ -254,15 +257,15 @@ const useAppStore = create<State>()((set, get) => ({
   setDownloadedUpdatesPercentage: (percentage): void => {
     set({ downloadedUpdatesPercentage: percentage })
   },
-  setCurrentSubtitleIndex: (index): void => {
-    set((state) => {
-      if (state.currentProjectIndex === null) return state
-      const projects = [...state.projects]
-      const project = projects[state.currentProjectIndex]
-      project.currentSubtitleIndex = index
-      indexedDBService.updateProject(project)
-      return { projects }
-    })
+  setCurrentSubtitleIndex: async (id): Promise<void> => {
+    const state = get()
+    if (state.currentProjectIndex === null) return
+    const projects = [...state.projects]
+    const project = projects[state.currentProjectIndex]
+    const index = project.subtitles.findIndex((subtitle) => subtitle.id === id)
+    project.currentSubtitleIndex = index
+    indexedDBService.updateProject(project)
+    set({ projects })
   },
   initializeSubtitleStyleProps: (props): void => {
     set((state) => {
@@ -304,36 +307,40 @@ const useAppStore = create<State>()((set, get) => ({
       return { projects }
     })
   },
-  insertSubtitleLine: (index): void => {
+  insertSubtitleLine: (id): void => {
     set((state) => {
       if (state.currentProjectIndex === null) return state
       const projects = [...state.projects]
       const project = projects[state.currentProjectIndex]
       project.subtitles = project.subtitles.slice()
-      project.subtitles.splice(index, 0, { start: 0, end: 0, text: '' })
+      const index = project.subtitles.findIndex((subtitle) => subtitle.id === id) + 1
+      project.subtitles.splice(index, 0, { start: 0, end: 0, text: '', id: generateUniqueId() })
       project.subtitles[index].start = project.subtitles[index - 1].end
       project.subtitles[index].end = project.subtitles[index + 1]?.start || project.mediaDuration
       indexedDBService.updateProject(project)
       return { projects }
     })
   },
-  deleteSubtitleLine: (index): void => {
+  deleteSubtitleLine: (id): void => {
     set((state) => {
       if (state.currentProjectIndex === null) return state
       const projects = [...state.projects]
       const project = projects[state.currentProjectIndex]
       project.subtitles = project.subtitles.slice()
+      const index = project.subtitles.findIndex((subtitle) => subtitle.id === id)
       project.subtitles.splice(index, 1)
       indexedDBService.updateProject(project)
       return { projects }
     })
   },
-  mergeSubtitleLines: (index1, index2): void => {
+  mergeSubtitleLines: (id): void => {
     set((state) => {
       if (state.currentProjectIndex === null) return state
       const projects = [...state.projects]
       const project = projects[state.currentProjectIndex]
       project.subtitles = project.subtitles.slice()
+      const index1 = project.subtitles.findIndex((subtitle) => subtitle.id === id)
+      const index2 = index1 + 1
       project.subtitles[index1].end = project.subtitles[index2].end
       project.subtitles[index1].text =
         project.subtitles[index1].text + ' ' + project.subtitles[index2].text

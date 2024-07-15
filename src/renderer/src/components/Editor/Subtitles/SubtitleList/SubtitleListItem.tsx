@@ -12,16 +12,16 @@ export default React.memo(function SubtitleListItem({
   end,
   start,
   text: globalText,
-  index,
-  currentlyPlaying
-}: Subtitle & { index: number; currentlyPlaying: boolean }): JSX.Element {
+  currentlyPlaying,
+  id
+}: Subtitle & { currentlyPlaying: boolean }): JSX.Element {
   const editSubtitle = useAppStore((state) => state.editSubtitle)
   const setCurrentSubtitleIndex = useAppStore((state) => state.setCurrentSubtitleIndex)
   const deleteSubtitleLine = useAppStore((state) => state.deleteSubtitleLine)
   const subtitleRef = React.useRef<HTMLDivElement>(null)
   const [localText, setLocalText] = React.useState(globalText)
   const debounced = useDebouncedCallback((value) => {
-    editSubtitle(index, value)
+    editSubtitle(start, value)
   }, 1000)
 
   React.useEffect(() => {
@@ -31,7 +31,7 @@ export default React.memo(function SubtitleListItem({
 
   React.useEffect(() => {
     if (currentlyPlaying) {
-      setCurrentSubtitleIndex(index)
+      setCurrentSubtitleIndex(id)
       subtitleRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
   }, [currentlyPlaying])
@@ -43,8 +43,10 @@ export default React.memo(function SubtitleListItem({
 
   const handleDeleteSubtitle = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>): void => {
     e.stopPropagation()
-    deleteSubtitleLine(index)
+    deleteSubtitleLine(id)
   }
+
+  console.log('re-rendering', id)
   return (
     <div
       onClick={handleSeek}

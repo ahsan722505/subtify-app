@@ -20,7 +20,6 @@ export default function SubtitleList(): JSX.Element {
   const mediaType = useProjectStore((state) => state.mediaType)
   const currentTime = useProjectStore((state) => state.mediaCurrentTime)
   const canvasWidth = useProjectStore((state) => state.canvasWidth)
-  const mediaDuration = useProjectStore((state) => state.mediaDuration)
   const canvasHeight = useProjectStore((state) => state.canvasHeight)
   const subtitleStyleProps = useProjectStore((state) => state.subtitleStyleProps)
 
@@ -83,17 +82,15 @@ export default function SubtitleList(): JSX.Element {
         </Dropdown>
       </div>
       {subtitles.map((s, i) => (
-        <div key={s.start}>
+        <div key={s.id}>
           <SubtitleListItem
             currentlyPlaying={isSubtitlePlaying(currentTime, s.start, s.end)}
             {...s}
-            index={i}
           />
           <SubtitlesMedian
-            currentEnd={subtitles[i].end}
-            nextStart={subtitles[i + 1]?.start || mediaDuration}
-            currentIndex={i}
-            lastIndex={subtitles.length - 1}
+            id={subtitles[i].id}
+            disableInsert={subtitles[i].end === subtitles[i + 1]?.start}
+            disableMerge={i === subtitles.length - 1}
           />
         </div>
       ))}

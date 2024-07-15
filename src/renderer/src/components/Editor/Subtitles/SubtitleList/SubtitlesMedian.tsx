@@ -3,30 +3,27 @@ import clsx from 'clsx'
 import React from 'react'
 
 export default React.memo(function SubtitlesMedian({
-  currentIndex,
-  currentEnd,
-  nextStart,
-  lastIndex
+  id,
+  disableInsert,
+  disableMerge
 }: {
-  currentIndex: number
-  currentEnd: number
-  nextStart: number
-  lastIndex: number
+  id: string
+  disableInsert: boolean
+  disableMerge: boolean
 }): JSX.Element {
   const insertSubtitleLine = useAppStore((state) => state.insertSubtitleLine)
   const mergeSubtitleLines = useAppStore((state) => state.mergeSubtitleLines)
 
-  const disableInsert = currentEnd === nextStart
-  const disableMerge = currentIndex === lastIndex
-
   const handleInsert = (): void => {
     if (disableInsert) return
-    insertSubtitleLine(currentIndex + 1)
+    insertSubtitleLine(id)
   }
   const handleMerge = (): void => {
     if (disableMerge) return
-    mergeSubtitleLines(currentIndex, currentIndex + 1)
+    mergeSubtitleLines(id)
   }
+
+  console.log('ree-rendering', id)
 
   return (
     <div className="py-[10px] opacity-0 hover:opacity-100 cursor-pointer relative">

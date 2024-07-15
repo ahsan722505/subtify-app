@@ -150,3 +150,20 @@ export function matchStrings(s1: string, s2: string): boolean {
     s2.trim().toLowerCase().includes(s1.trim().toLowerCase())
   )
 }
+
+export function generateUniqueId(): string {
+  return Math.random().toString(16).slice(2)
+}
+
+export async function findSubtitleIndexByIdInWorker(
+  subtitles: Subtitle[],
+  id: string
+): Promise<number> {
+  return new Promise((resolve) => {
+    const worker = new Worker(new URL('./SubtitleList.worker.ts', import.meta.url))
+    worker.onmessage = (event): void => {
+      resolve(event.data)
+    }
+    worker.postMessage({ subtitles, id })
+  })
+}

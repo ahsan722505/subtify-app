@@ -4,6 +4,7 @@ import useAppStore, { TranscriptionStatus } from '@renderer/store/store'
 import ProjectListItem from './ProjectListItem'
 import { PROJECTS_LIMIT } from '@renderer/constants'
 import { useDebouncedCallback } from '@renderer/hooks/useDebouncedCallback'
+import { generateUniqueId } from '../Editor/Subtitles/SubtitleList/SubtitleList.utils'
 
 export default function Projects(): JSX.Element {
   const projects = useAppStore((state) => state.projects)
@@ -20,7 +21,7 @@ export default function Projects(): JSX.Element {
       mediaDuration: 0,
       name: 'Untitled Project',
       subtitles: [],
-      id: new Date().getTime(),
+      id: generateUniqueId(),
       mediaThumbnail: null,
       transcriptionStatus: TranscriptionStatus.IDLE,
       mediaName: null,
