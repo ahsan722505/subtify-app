@@ -11,7 +11,6 @@ function UploadFile(): JSX.Element {
   const [language, setLanguage] = React.useState<string | null>(null)
   const [translate, setTranslate] = React.useState<boolean>(false)
   const setStatus = useAppStore((state) => state.setTranscriptionStatus)
-  const setSubtitles = useAppStore((state) => state.setSubtitles)
   const setMediaPath = useAppStore((state) => state.setMediaPath)
   const setMediaName = useAppStore((state) => state.setMediaName)
   const mediaPath = useProjectStore((state) => state.mediaPath)
@@ -52,12 +51,12 @@ function UploadFile(): JSX.Element {
     if (!mediaPath || currentProjectIndex === null) return
     const projectId = projects[currentProjectIndex].id
     setStatus(TranscriptionStatus.LOADING, projectId)
-    const subtitles = await window.electron.ipcRenderer.invoke('transcribe', {
+    window.electron.ipcRenderer.invoke('transcribe', {
       filePath: mediaPath,
       language,
-      translate
+      translate,
+      projectId
     })
-    setSubtitles(subtitles, projectId)
   }
 
   return (

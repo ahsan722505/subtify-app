@@ -45,6 +45,7 @@ export type Project = {
   subtitleStyleProps: Konva.TextConfig | null
   canvasWidth: number
   canvasHeight: number
+  generatedSubtitlesPercentage: number
 }
 
 type State = {
@@ -85,6 +86,7 @@ type State = {
   insertSubtitleLine: (id: string) => void
   deleteSubtitleLine: (id: string) => void
   mergeSubtitleLines: (id: string) => void
+  setGeneratedSubtitlesPercentage: (duration: number, projectId: IDBValidKey) => void
 }
 
 const useAppStore = create<State>()((set, get) => ({
@@ -112,7 +114,6 @@ const useAppStore = create<State>()((set, get) => ({
     set({ projects, loadingProjects: false })
   },
   setTranscriptionStatus: async (status, projectId): Promise<void> => {
-    console.log(status, projectId)
     const project = await indexedDBService.getProject(projectId)
     await indexedDBService.updateProject({ ...project, transcriptionStatus: status })
     const projects = get().projects.map((project) => {
@@ -348,6 +349,16 @@ const useAppStore = create<State>()((set, get) => ({
       indexedDBService.updateProject(project)
       return { projects }
     })
+  },
+  setGeneratedSubtitlesPercentage: async (duration, projectId): Promise<void> => {
+    const project = await indexedDBService.getProject(projectId)
+    const percentage = (duration / project.mediaDuration) * 100
+    await indexedDBService.updateProject({ ...project, generatedSubtitlesPercentage: percentage })
+    const projects = get().projects.map((project) => {
+      if (project.id === projectId) return { ...project, generatedSubtitlesPercentage: percentage }
+      return project
+    })
+    set({ projects })
   }
 }))
 
