@@ -1,26 +1,33 @@
 import { ClockCircleOutlined } from '@ant-design/icons'
 import { formatTime } from './SubtitleList.utils'
-import { useDebouncedCallback } from '@renderer/hooks/useDebouncedCallback'
 import React from 'react'
 import clsx from 'clsx'
 import { Input } from 'antd'
 import useAppStore, { Subtitle } from '@renderer/store/store'
 import { DeleteFilled } from '@ant-design/icons'
+import { useDebouncedCallback } from 'use-debounce'
 const { TextArea } = Input
 
 export default React.memo(function SubtitleListItem({
   end,
   start,
-  text,
+  text: globalText,
   index,
   currentlyPlaying
 }: Subtitle & { index: number; currentlyPlaying: boolean }): JSX.Element {
   const editSubtitle = useAppStore((state) => state.editSubtitle)
   const setCurrentSubtitleIndex = useAppStore((state) => state.setCurrentSubtitleIndex)
-  const handleEdit = useDebouncedCallback((e: React.ChangeEvent<HTMLTextAreaElement>): void => {
-    editSubtitle(index, e.target.value)
-  })
+  const deleteSubtitleLine = useAppStore((state) => state.deleteSubtitleLine)
   const subtitleRef = React.useRef<HTMLDivElement>(null)
+  const [localText, setLocalText] = React.useState(globalText)
+  const debounced = useDebouncedCallback((value) => {
+    editSubtitle(index, value)
+  }, 1000)
+
+  React.useEffect(() => {
+    // If the global text changes, update the local text
+    setLocalText(globalText)
+  }, [globalText])
 
   React.useEffect(() => {
     if (currentlyPlaying) {
@@ -34,6 +41,10 @@ export default React.memo(function SubtitleListItem({
     media.currentTime = start
   }
 
+  const handleDeleteSubtitle = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>): void => {
+    e.stopPropagation()
+    deleteSubtitleLine(index)
+  }
   return (
     <div
       onClick={handleSeek}
@@ -42,26 +53,34 @@ export default React.memo(function SubtitleListItem({
     >
       <TextArea
         placeholder="New Text"
-        onChange={handleEdit}
-        defaultValue={text}
+        onChange={(e) => {
+          setLocalText(e.target.value)
+          debounced(e.target.value)
+        }}
+        value={localText}
         className="w-2/3 border-none focus:ring-0 text-base overflow-hidden bg-inherit focus:bg-inherit hover:bg-inherit"
         autoSize
       />
-      <div>
-        <div className="flex justify-between items-center">
-          <span className="text-xs mr-4">
-            <ClockCircleOutlined /> In
-          </span>
-          <span>{formatTime(start)}</span>
+      <div className="flex">
+        <div className="mr-4">
+          <div className="flex justify-between items-center">
+            <span className="text-xs mr-4">
+              <ClockCircleOutlined /> In
+            </span>
+            <span>{formatTime(start)}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-xs mr-4">
+              <ClockCircleOutlined /> Out
+            </span>
+            <span>{formatTime(end)}</span>
+          </div>
         </div>
-        <div className="flex justify-between items-center">
-          <span className="text-xs mr-4">
-            <ClockCircleOutlined /> Out
-          </span>
-          <span>{formatTime(end)}</span>
-        </div>
+        <DeleteFilled
+          onClick={handleDeleteSubtitle}
+          className="text-black cursor-pointer hover:text-red-500"
+        />
       </div>
-      <DeleteFilled className="text-red-500 cursor-pointer" />
     </div>
   )
 })

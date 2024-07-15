@@ -81,6 +81,8 @@ type State = {
   setTotalProjects: (totalProjects: number) => void
   setProjectsSearchFilter: (filter: string) => void
   insertSubtitleLine: (index: number) => void
+  deleteSubtitleLine: (index: number) => void
+  mergeSubtitleLines: (index1: number, index2: number) => void
 }
 
 const useAppStore = create<State>()((set, get) => ({
@@ -310,7 +312,32 @@ const useAppStore = create<State>()((set, get) => ({
       project.subtitles = project.subtitles.slice()
       project.subtitles.splice(index, 0, { start: 0, end: 0, text: '' })
       project.subtitles[index].start = project.subtitles[index - 1].end
-      project.subtitles[index].end = project.subtitles[index + 1].start
+      project.subtitles[index].end = project.subtitles[index + 1]?.start || project.mediaDuration
+      indexedDBService.updateProject(project)
+      return { projects }
+    })
+  },
+  deleteSubtitleLine: (index): void => {
+    set((state) => {
+      if (state.currentProjectIndex === null) return state
+      const projects = [...state.projects]
+      const project = projects[state.currentProjectIndex]
+      project.subtitles = project.subtitles.slice()
+      project.subtitles.splice(index, 1)
+      indexedDBService.updateProject(project)
+      return { projects }
+    })
+  },
+  mergeSubtitleLines: (index1, index2): void => {
+    set((state) => {
+      if (state.currentProjectIndex === null) return state
+      const projects = [...state.projects]
+      const project = projects[state.currentProjectIndex]
+      project.subtitles = project.subtitles.slice()
+      project.subtitles[index1].end = project.subtitles[index2].end
+      project.subtitles[index1].text =
+        project.subtitles[index1].text + ' ' + project.subtitles[index2].text
+      project.subtitles.splice(index2, 1)
       indexedDBService.updateProject(project)
       return { projects }
     })

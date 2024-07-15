@@ -30,6 +30,7 @@
     "posthog-js": "^1.143.0",
     "react-konva": "^18.2.10",
     "srt-parser-2": "^1.2.3",
+    "use-debounce": "^10.0.1",
     "zustand": "^4.5.2"
   },
   "devDependencies": {

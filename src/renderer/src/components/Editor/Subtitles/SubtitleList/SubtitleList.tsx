@@ -20,10 +20,9 @@ export default function SubtitleList(): JSX.Element {
   const mediaType = useProjectStore((state) => state.mediaType)
   const currentTime = useProjectStore((state) => state.mediaCurrentTime)
   const canvasWidth = useProjectStore((state) => state.canvasWidth)
+  const mediaDuration = useProjectStore((state) => state.mediaDuration)
   const canvasHeight = useProjectStore((state) => state.canvasHeight)
   const subtitleStyleProps = useProjectStore((state) => state.subtitleStyleProps)
-
-  console.log('SubtitleList', subtitles)
 
   const items: MenuProps['items'] = [
     {
@@ -84,15 +83,19 @@ export default function SubtitleList(): JSX.Element {
         </Dropdown>
       </div>
       {subtitles.map((s, i) => (
-        <>
+        <div key={s.start}>
           <SubtitleListItem
             currentlyPlaying={isSubtitlePlaying(currentTime, s.start, s.end)}
-            key={s.start}
             {...s}
             index={i}
           />
-          <SubtitlesMedian key={s.start} index={i} />
-        </>
+          <SubtitlesMedian
+            currentEnd={subtitles[i].end}
+            nextStart={subtitles[i + 1]?.start || mediaDuration}
+            currentIndex={i}
+            lastIndex={subtitles.length - 1}
+          />
+        </div>
       ))}
     </div>
   )
