@@ -16,6 +16,10 @@ enum AppUpdatesLifecycle {
   DOWNLOADED = 'downloaded'
 }
 
+function generateUniqueId(): string {
+  return Math.random().toString(16).slice(2)
+}
+
 function sendUpdatesStatusToWindow(status: AppUpdatesLifecycle): void {
   win?.webContents.send('update-status', status)
 }
@@ -224,7 +228,12 @@ app.whenReady().then(() => {
             const parser = new srtParser2()
             const srt_array = parser.fromSrt(data)
             resolve(
-              srt_array.map((s) => ({ start: s.startSeconds, end: s.endSeconds, text: s.text }))
+              srt_array.map((s) => ({
+                start: s.startSeconds,
+                end: s.endSeconds,
+                text: s.text,
+                id: generateUniqueId()
+              }))
             )
             fs.rm(outputDir, { recursive: true, force: true }, () => {})
           } else {

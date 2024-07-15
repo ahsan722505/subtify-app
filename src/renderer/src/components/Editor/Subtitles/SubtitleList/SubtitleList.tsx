@@ -13,6 +13,7 @@ import { SubtitleFormat } from './SubtitleList.types'
 import { useProjectStore } from '@renderer/hooks/useProjectStore'
 import ExportVideo from './ExportVideo'
 import { isVideo } from '../../Media/Media.utils'
+import SubtitlesMedian from './SubtitlesMedian'
 
 export default function SubtitleList(): JSX.Element {
   const subtitles = useProjectStore((state) => state.subtitles)
@@ -81,12 +82,17 @@ export default function SubtitleList(): JSX.Element {
         </Dropdown>
       </div>
       {subtitles.map((s, i) => (
-        <SubtitleListItem
-          currentlyPlaying={isSubtitlePlaying(currentTime, s.start, s.end)}
-          key={s.start}
-          {...s}
-          index={i}
-        />
+        <div key={s.id}>
+          <SubtitleListItem
+            currentlyPlaying={isSubtitlePlaying(currentTime, s.start, s.end)}
+            {...s}
+          />
+          <SubtitlesMedian
+            id={subtitles[i].id}
+            disableInsert={subtitles[i].end === subtitles[i + 1]?.start}
+            disableMerge={i === subtitles.length - 1}
+          />
+        </div>
       ))}
     </div>
   )
