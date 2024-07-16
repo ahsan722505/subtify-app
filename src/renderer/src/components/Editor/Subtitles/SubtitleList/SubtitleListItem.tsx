@@ -1,11 +1,12 @@
 import { ClockCircleOutlined } from '@ant-design/icons'
-import { formatTime } from './SubtitleList.utils'
 import React from 'react'
 import clsx from 'clsx'
 import { Input } from 'antd'
 import useAppStore, { Subtitle } from '@renderer/store/store'
 import { DeleteFilled } from '@ant-design/icons'
 import { useDebouncedCallback } from 'use-debounce'
+import SubtitleTime from './SubtitleTime'
+import { formatTime } from './SubtitleList.utils'
 const { TextArea } = Input
 
 export default React.memo(function SubtitleListItem({
@@ -46,7 +47,6 @@ export default React.memo(function SubtitleListItem({
     deleteSubtitleLine(id)
   }
 
-  console.log('re-rendering', id)
   return (
     <div
       onClick={handleSeek}
@@ -69,13 +69,13 @@ export default React.memo(function SubtitleListItem({
             <span className="text-xs mr-4">
               <ClockCircleOutlined /> In
             </span>
-            <span>{formatTime(start)}</span>
+            <SubtitleTime id={id} time={formatTime(start)} type="start" />
           </div>
           <div className="flex justify-between items-center">
             <span className="text-xs mr-4">
               <ClockCircleOutlined /> Out
             </span>
-            <span>{formatTime(end)}</span>
+            <SubtitleTime id={id} time={formatTime(end)} type="end" />
           </div>
         </div>
         <DeleteFilled

@@ -37,7 +37,6 @@ function App(): JSX.Element {
     window.electron.ipcRenderer.on(
       'subtitle-generation-progress',
       (_, payload: SubtitleGenerationProgressPayload) => {
-        console.log('progress', payload)
         if (payload.type === 'progress')
           setGeneratedSubtitlesPercentage(payload.duration!, payload.projectId)
         if (payload.type === 'completed') setSubtitles(payload.subtitles!, payload.projectId)

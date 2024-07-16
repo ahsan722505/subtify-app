@@ -2,7 +2,10 @@ import { create } from 'zustand'
 import Konva from 'konva'
 import indexedDBService from '@renderer/database/IndexedDBService'
 import { PROJECTS_LIMIT } from '@renderer/constants'
-import { generateUniqueId } from '@renderer/components/Editor/Subtitles/SubtitleList/SubtitleList.utils'
+import {
+  generateUniqueId,
+  hmsToSecondsOnly
+} from '@renderer/components/Editor/Subtitles/SubtitleList/SubtitleList.utils'
 
 export enum navItems {
   myProjects = 'My Projects',
@@ -17,7 +20,9 @@ export enum AppUpdatesLifecycle {
 }
 
 export enum TranscriptionStatus {
-  IDLE = 'idle',
+  MediaInput = 'mediaInput',
+  SubtitleTypeInput = 'subtitleTypeInput',
+  AutoSubtitleInput = 'autoSubtitleInput',
   LOADING = 'loading',
   SUCCESS = 'success',
   ERROR = 'error'
@@ -87,6 +92,7 @@ type State = {
   deleteSubtitleLine: (id: string) => void
   mergeSubtitleLines: (id: string) => void
   setGeneratedSubtitlesPercentage: (duration: number, projectId: IDBValidKey) => void
+  setTime: (updatedTime: string, subtitleId: string, subtitleType: 'start' | 'end') => void
 }
 
 const useAppStore = create<State>()((set, get) => ({
@@ -327,6 +333,7 @@ const useAppStore = create<State>()((set, get) => ({
       if (state.currentProjectIndex === null) return state
       const projects = [...state.projects]
       const project = projects[state.currentProjectIndex]
+      if (project.subtitles.length === 1) return state
       project.subtitles = project.subtitles.slice()
       const index = project.subtitles.findIndex((subtitle) => subtitle.id === id)
       project.subtitles.splice(index, 1)
@@ -358,6 +365,38 @@ const useAppStore = create<State>()((set, get) => ({
       if (project.id === projectId) return { ...project, generatedSubtitlesPercentage: percentage }
       return project
     })
+    set({ projects })
+  },
+  setTime: (updatedTime, subtitleId, subtitleType): void => {
+    const state = get()
+    if (state.currentProjectIndex === null) return
+    const projects = [...state.projects]
+    const project = projects[state.currentProjectIndex]
+    project.subtitles = project.subtitles.slice()
+    const index = project.subtitles.findIndex((subtitle) => subtitle.id === subtitleId)
+    const subtitle = project.subtitles[index]
+    const timeInSeconds = hmsToSecondsOnly(updatedTime)
+    if (isNaN(timeInSeconds) || timeInSeconds < 0) throw new Error('Invalid time format')
+    const previousSubtitle = project.subtitles[index - 1]
+    const nextSubtitle = project.subtitles[index + 1]
+    if (subtitleType === 'start') {
+      if (previousSubtitle && timeInSeconds < previousSubtitle.end) {
+        throw new Error('Start time should be greater than or equal to previous subtitle end time')
+      }
+      if (timeInSeconds >= subtitle.end) {
+        throw new Error('Start time should be less than end time')
+      }
+      subtitle.start = timeInSeconds
+    } else {
+      if (timeInSeconds <= subtitle.start) {
+        throw new Error('Start time should be less than end time')
+      }
+      if (timeInSeconds > (nextSubtitle?.start || project.mediaDuration)) {
+        throw new Error('End time should be less than or equal to next subtitle start time')
+      }
+      subtitle.end = timeInSeconds
+    }
+    indexedDBService.updateProject(project)
     set({ projects })
   }
 }))

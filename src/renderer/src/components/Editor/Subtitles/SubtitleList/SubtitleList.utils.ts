@@ -49,24 +49,20 @@ export function formatTime(seconds: number, format?: SubtitleFormat): string {
   if (format === SubtitleFormat.SRT) return formattedTime.slice(11, -1).replace('.', ',')
   if (format === SubtitleFormat.VTT) return formattedTime.slice(11, -1)
   if (format === SubtitleFormat.ASS) {
-    // Calculate hours, minutes, seconds, and centiseconds for ASS format
-    let totalSeconds = seconds
+    const totalSeconds = Math.floor(seconds)
+    const deciseconds = Math.floor((seconds - totalSeconds) * 100)
     const hours = Math.floor(totalSeconds / 3600)
-    totalSeconds %= 3600
-    const minutes = Math.floor(totalSeconds / 60)
-    const secs = Math.floor(totalSeconds % 60)
-    const centiseconds = Math.floor((totalSeconds - secs) * 100)
-
-    // Pad hours, minutes, seconds, and centiseconds with leading zeros if necessary
-    const hoursPadded = String(hours).padStart(1, '0')
-    const minutesPadded = String(minutes).padStart(2, '0')
-    const secondsPadded = String(secs).padStart(2, '0')
-    const centisecondsPadded = String(centiseconds).padStart(2, '0')
-
-    return `${hoursPadded}:${minutesPadded}:${secondsPadded}.${centisecondsPadded}`
+    const remainingSeconds = totalSeconds % 3600
+    const minutes = Math.floor(remainingSeconds / 60)
+    const secs = remainingSeconds % 60
+    const pad = (num: number, size: number): string => {
+      const s = '0' + num
+      return s.slice(s.length - size)
+    }
+    return `${hours}:${pad(minutes, 2)}:${pad(secs, 2)}.${pad(deciseconds, 2)}`
   }
   // UI display format e.g. 01:12.5
-  const uiDisplayFormat = formattedTime.slice(11, -3)
+  const uiDisplayFormat = formattedTime.slice(11, -2)
   const hoursEndIndex = uiDisplayFormat.indexOf(':')
   const hours = parseInt(uiDisplayFormat.slice(0, hoursEndIndex))
   return hours > 0 ? uiDisplayFormat : uiDisplayFormat.slice(hoursEndIndex + 1)
@@ -166,4 +162,17 @@ export async function findSubtitleIndexByIdInWorker(
     }
     worker.postMessage({ subtitles, id })
   })
+}
+
+export function hmsToSecondsOnly(str: string): number {
+  const p = str.split(':')
+  let s = 0
+  let m = 1
+  while (p.length > 0) {
+    const part = p.pop()
+    if (part === undefined) break
+    s += parseFloat(part) * m
+    m *= 60
+  }
+  return s
 }
