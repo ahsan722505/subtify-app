@@ -23,8 +23,6 @@ export default React.memo(function SubtitlesMedian({
     mergeSubtitleLines(id)
   }
 
-  console.log('ree-rendering', id)
-
   return (
     <div className="py-[10px] opacity-0 hover:opacity-100 cursor-pointer relative">
       <hr className="bg-black h-1" />

@@ -22,7 +22,7 @@ export default function Projects(): JSX.Element {
       subtitles: [],
       id: new Date().getTime(),
       mediaThumbnail: null,
-      transcriptionStatus: TranscriptionStatus.IDLE,
+      transcriptionStatus: TranscriptionStatus.MediaInput,
       mediaName: null,
       mediaPath: null,
       mediaType: null,

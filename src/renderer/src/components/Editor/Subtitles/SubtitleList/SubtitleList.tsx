@@ -22,6 +22,7 @@ export default function SubtitleList(): JSX.Element {
   const canvasWidth = useProjectStore((state) => state.canvasWidth)
   const canvasHeight = useProjectStore((state) => state.canvasHeight)
   const subtitleStyleProps = useProjectStore((state) => state.subtitleStyleProps)
+  const mediaDuration = useProjectStore((state) => state.mediaDuration)
 
   const items: MenuProps['items'] = [
     {
@@ -89,7 +90,10 @@ export default function SubtitleList(): JSX.Element {
           />
           <SubtitlesMedian
             id={subtitles[i].id}
-            disableInsert={subtitles[i].end === subtitles[i + 1]?.start}
+            disableInsert={
+              +subtitles[i].end.toFixed(2) ===
+              +(subtitles[i + 1]?.start.toFixed(2) || mediaDuration.toFixed(2))
+            }
             disableMerge={i === subtitles.length - 1}
           />
         </div>
