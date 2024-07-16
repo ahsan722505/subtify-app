@@ -52,8 +52,8 @@ function Media(): JSX.Element {
     typeof currentSubtitleIndex === 'number' &&
     isSubtitlePlaying(
       currentTime,
-      subtitles[currentSubtitleIndex].start,
-      subtitles[currentSubtitleIndex].end
+      subtitles[currentSubtitleIndex]?.start,
+      subtitles[currentSubtitleIndex]?.end
     )
       ? subtitles[currentSubtitleIndex].text
       : null

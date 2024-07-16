@@ -69,7 +69,9 @@ export function formatTime(seconds: number, format?: SubtitleFormat): string {
 }
 
 export function isSubtitlePlaying(currentTime: number, start: number, end: number): boolean {
-  return +currentTime.toFixed(2) >= +start.toFixed(2) && +currentTime.toFixed(2) < +end.toFixed(2)
+  return (
+    +currentTime?.toFixed(2) >= +start?.toFixed(2) && +currentTime?.toFixed(2) < +end?.toFixed(2)
+  )
 }
 
 export function generateASS(
