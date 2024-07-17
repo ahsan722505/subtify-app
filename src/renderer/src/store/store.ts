@@ -6,6 +6,7 @@ import {
   generateUniqueId,
   hmsToSecondsOnly
 } from '@renderer/components/Editor/Subtitles/SubtitleList/SubtitleList.utils'
+import { message } from 'antd'
 
 export enum navItems {
   myProjects = 'My Projects',
@@ -93,6 +94,7 @@ type State = {
   mergeSubtitleLines: (id: string) => void
   setGeneratedSubtitlesPercentage: (duration: number, projectId: IDBValidKey) => void
   setTime: (updatedTime: string, subtitleId: string, subtitleType: 'start' | 'end') => void
+  shiftSubtitles: (time: number) => void
 }
 
 const useAppStore = create<State>()((set, get) => ({
@@ -396,6 +398,35 @@ const useAppStore = create<State>()((set, get) => ({
       }
       subtitle.end = timeInSeconds
     }
+    indexedDBService.updateProject(project)
+    set({ projects })
+  },
+  shiftSubtitles: (time): void => {
+    const state = get()
+    if (state.currentProjectIndex === null) return
+    const projects = [...state.projects]
+    const project = projects[state.currentProjectIndex]
+    const firstSubtitle = project.subtitles[0]
+    if (firstSubtitle.start + time < 0) {
+      message.error(
+        'Subtitle start time cannot be negative. Either remove first subtitle or update its start time'
+      )
+      return
+    }
+    const lastSubtitle = project.subtitles[project.subtitles.length - 1]
+    if (lastSubtitle.end + time > project.mediaDuration) {
+      message.error(
+        'Subtitle end time cannot be greater than media duration. Either remove last subtitle or update its end time.'
+      )
+      return
+    }
+    project.subtitles = project.subtitles.map((subtitle) => {
+      return {
+        ...subtitle,
+        start: Math.max(0, subtitle.start + time),
+        end: Math.max(0, subtitle.end + time)
+      }
+    })
     indexedDBService.updateProject(project)
     set({ projects })
   }

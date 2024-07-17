@@ -1,6 +1,6 @@
 {
   "name": "subtify",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "An Electron application with React and TypeScript",
   "main": "./out/main/index.js",
   "author": "example.com",
@@ -28,6 +28,7 @@
     "electron-updater": "^6.2.1",
     "konva": "^9.3.13",
     "posthog-js": "^1.143.0",
+    "react-infinite-scroll-component": "^6.1.0",
     "react-konva": "^18.2.10",
     "srt-parser-2": "^1.2.3",
     "use-debounce": "^10.0.1",
