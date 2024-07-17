@@ -21,12 +21,6 @@ function Media(): JSX.Element {
   const mediaRef = React.useRef<HTMLVideoElement | null>(null)
 
   React.useEffect(() => {
-    if (mediaRef.current) {
-      mediaRef.current.currentTime = currentTime
-    }
-  }, [mediaPath])
-
-  React.useEffect(() => {
     const handleSetParameters = (): void => {
       const width = mediaRef.current?.clientWidth || 0
       const height = mediaRef.current?.clientHeight || 0

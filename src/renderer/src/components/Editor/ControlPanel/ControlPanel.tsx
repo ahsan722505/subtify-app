@@ -18,22 +18,21 @@ export default function ControlPanel(): JSX.Element {
   const setDuration = useAppStore((state) => state.setMediaDuration)
 
   React.useEffect(() => {
-    const handleUpdateCurrentTime = (): void => {
+    const handleUpdateTime = (): void => {
       setCurrentTime(mediaRef.current?.currentTime || 0)
-      handleUpdateDuration()
+      setDuration(mediaRef.current?.duration || 0)
     }
-    const handleUpdateDuration = (): void => setDuration(mediaRef.current?.duration || 0)
     const handleMediaEnded = (): void => setMediaPlaying(false)
     if (mediaPath) {
       mediaRef.current = document.getElementById('media') as HTMLVideoElement
       mediaRef.current.addEventListener('ended', handleMediaEnded)
-      mediaRef.current.addEventListener('timeupdate', handleUpdateCurrentTime)
-      mediaRef.current.addEventListener('loadedmetadata', handleUpdateDuration)
+      mediaRef.current.addEventListener('timeupdate', handleUpdateTime)
+      mediaRef.current.addEventListener('loadedmetadata', handleUpdateTime)
     }
     return () => {
       if (mediaRef.current) {
-        mediaRef.current.removeEventListener('timeupdate', handleUpdateCurrentTime)
-        mediaRef.current.removeEventListener('loadedmetadata', handleUpdateDuration)
+        mediaRef.current.removeEventListener('timeupdate', handleUpdateTime)
+        mediaRef.current.removeEventListener('loadedmetadata', handleUpdateTime)
         mediaRef.current.removeEventListener('ended', handleMediaEnded)
       }
     }

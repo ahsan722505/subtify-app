@@ -1,6 +1,6 @@
 import SubtitleListItem from './SubtitleListItem'
 import { Button, Dropdown, MenuProps } from 'antd'
-import { SettingOutlined, DownloadOutlined } from '@ant-design/icons'
+import { EnterOutlined, SettingOutlined, DownloadOutlined } from '@ant-design/icons'
 import {
   downloadSubtitles,
   generateASS,
@@ -14,6 +14,11 @@ import { useProjectStore } from '@renderer/hooks/useProjectStore'
 import ExportVideo from './ExportVideo'
 import { isVideo } from '../../Media/Media.utils'
 import SubtitlesMedian from './SubtitlesMedian'
+import ShiftTimings from './ShiftTimings'
+import React from 'react'
+import InfiniteScroll from 'react-infinite-scroll-component'
+
+const INITIAL_RENDERED_SUBTITLES_LENGTH = 30
 
 export default function SubtitleList(): JSX.Element {
   const subtitles = useProjectStore((state) => state.subtitles)
@@ -23,6 +28,10 @@ export default function SubtitleList(): JSX.Element {
   const canvasHeight = useProjectStore((state) => state.canvasHeight)
   const subtitleStyleProps = useProjectStore((state) => state.subtitleStyleProps)
   const mediaDuration = useProjectStore((state) => state.mediaDuration)
+  const [renderedSubtitlesLength, setRenderedSubtitlesLength] = React.useState(
+    INITIAL_RENDERED_SUBTITLES_LENGTH
+  )
+  const renderedSubtitles = subtitles.slice(0, renderedSubtitlesLength)
 
   const items: MenuProps['items'] = [
     {
@@ -64,14 +73,21 @@ export default function SubtitleList(): JSX.Element {
             }
           : null
       ]
-    }
+    },
+    isVideo(mediaType || '')
+      ? {
+          key: '2',
+          label: <ExportVideo />,
+          icon: <DownloadOutlined className="!text-base" />
+        }
+      : null,
+    { key: '3', label: <ShiftTimings />, icon: <EnterOutlined className="!text-base" /> }
   ]
-  if (isVideo(mediaType || ''))
-    items.push({
-      key: '2',
-      label: <ExportVideo />,
-      icon: <DownloadOutlined className="!text-base" />
-    })
+
+  const loadFunc = (): void => {
+    setRenderedSubtitlesLength((length) => length + INITIAL_RENDERED_SUBTITLES_LENGTH)
+  }
+
   return (
     <div>
       <div className="sticky top-0 mb-4 bg-white flex justify-between items-center py-6 z-50">
@@ -82,22 +98,30 @@ export default function SubtitleList(): JSX.Element {
           </Button>
         </Dropdown>
       </div>
-      {subtitles.map((s, i) => (
-        <div key={s.id}>
-          <SubtitleListItem
-            currentlyPlaying={isSubtitlePlaying(currentTime, s.start, s.end)}
-            {...s}
-          />
-          <SubtitlesMedian
-            id={subtitles[i].id}
-            disableInsert={
-              +subtitles[i].end.toFixed(2) ===
-              +(subtitles[i + 1]?.start.toFixed(2) || mediaDuration.toFixed(2))
-            }
-            disableMerge={i === subtitles.length - 1}
-          />
-        </div>
-      ))}
+      <InfiniteScroll
+        dataLength={renderedSubtitles.length}
+        next={loadFunc}
+        hasMore={subtitles.length > renderedSubtitlesLength}
+        loader={<h4>Loading...</h4>}
+        scrollableTarget="scrollableDiv"
+      >
+        {renderedSubtitles.map((s, i) => (
+          <div key={s.id}>
+            <SubtitleListItem
+              currentlyPlaying={isSubtitlePlaying(currentTime, s.start, s.end)}
+              {...s}
+            />
+            <SubtitlesMedian
+              id={subtitles[i].id}
+              disableInsert={
+                +subtitles[i].end.toFixed(2) ===
+                +(subtitles[i + 1]?.start.toFixed(2) || mediaDuration.toFixed(2))
+              }
+              disableMerge={i === subtitles.length - 1}
+            />
+          </div>
+        ))}
+      </InfiniteScroll>
     </div>
   )
 }
