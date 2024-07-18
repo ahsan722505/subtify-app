@@ -5,6 +5,7 @@ import { InfoCircleFilled } from '@ant-design/icons'
 import { useProjectStore } from '@renderer/hooks/useProjectStore'
 import { generateASS, generateSRT, generateVTT } from './SubtitleList.utils'
 import { SubtitleFormat } from './SubtitleList.types'
+import { DownloadOutlined } from '@ant-design/icons'
 
 export default function ExportVideo(): JSX.Element {
   const subtitles = useProjectStore((state) => state.subtitles)
@@ -55,7 +56,10 @@ export default function ExportVideo(): JSX.Element {
   }
   return (
     <>
-      <span onClick={() => setIsModalOpen(true)}>Export Video</span>
+      <span className="flex w-full px-3 py-1" onClick={() => setIsModalOpen(true)}>
+        <DownloadOutlined className="!text-base mr-2" />
+        Export Video
+      </span>
       <Modal
         title="Export Video"
         open={isModalOpen}

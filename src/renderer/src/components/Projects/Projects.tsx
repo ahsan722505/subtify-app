@@ -39,16 +39,9 @@ export default function Projects(): JSX.Element {
   })
 
   return (
-    <div className="p-6">
+    <div className="px-6 pt-6">
       <div className="mb-6 flex justify-between items-center">
         <h1 className="text-2xl font-bold">My Projects</h1>
-        <Pagination
-          onChange={(page) => setPageNumber(page)}
-          pageSize={PROJECTS_LIMIT}
-          current={pageNumber}
-          total={totalProjects}
-          showSizeChanger={false}
-        />
         <Button
           onClick={handleCreateNewProject}
           icon={<PlusOutlined />}
@@ -58,31 +51,43 @@ export default function Projects(): JSX.Element {
         </Button>
       </div>
       <Input.Search
+        defaultValue={projectsSearchFilter}
         onChange={handleSearch}
         placeholder="Search projects by name"
         className="mb-6 w-1/2"
       />
-      {projects.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((project, i) => (
-            <ProjectListItem key={project.id as number} index={i} project={project} />
-          ))}
-        </div>
-      ) : loadingProjects ? (
-        <div className="h-[70vh] flex justify-center items-center">
-          <Spin size="large" />
-        </div>
-      ) : (
-        <div className="flex justify-center items-center h-[70vh]">
-          <Empty
-            description={
-              projectsSearchFilter
-                ? 'No projects found please update the search filter.'
-                : "You don't have any projects. Please create a new project."
-            }
-          />
-        </div>
-      )}
+      <div className="min-h-screen">
+        {projects.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-3">
+            {projects.map((project, i) => (
+              <ProjectListItem key={project.id as number} index={i} project={project} />
+            ))}
+          </div>
+        ) : loadingProjects ? (
+          <div className="h-[70vh] flex justify-center items-center">
+            <Spin size="large" />
+          </div>
+        ) : (
+          <div className="flex justify-center items-center h-[55vh]">
+            <Empty
+              description={
+                projectsSearchFilter
+                  ? 'No projects found please update the search filter.'
+                  : "You don't have any projects. Please create a new project."
+              }
+            />
+          </div>
+        )}
+      </div>
+      <div className="sticky bottom-0 w-full p-3 bg-white flex justify-center">
+        <Pagination
+          onChange={(page) => setPageNumber(page)}
+          pageSize={PROJECTS_LIMIT}
+          current={pageNumber}
+          total={totalProjects}
+          showSizeChanger={false}
+        />
+      </div>
     </div>
   )
 }
