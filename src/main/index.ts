@@ -318,6 +318,10 @@ app.whenReady().then(() => {
     }
   })
 
+  ipcMain.handle('open-link', (_, link: string) => {
+    shell.openExternal(link)
+  })
+
   createWindow()
 
   app.on('activate', function () {

@@ -1,7 +1,8 @@
 import appIcon from '@renderer/assets/icon.ico'
 import useAppStore, { navItems } from '@renderer/store/store'
+import { FileDoneOutlined } from '@ant-design/icons'
 import clsx from 'clsx'
-import Feedback from './Feedback'
+import { Button, message } from 'antd'
 
 export default function Sider(): JSX.Element {
   const setCurrentNavItem = useAppStore((state) => state.setCurrentNavItem)
@@ -27,7 +28,16 @@ export default function Sider(): JSX.Element {
         ))}
       </ul>
       <h1 className="fixed bottom-5 left-5">
-        <Feedback />
+        <Button
+          icon={<FileDoneOutlined />}
+          type="primary"
+          onClick={() => {
+            message.info('Opening feedback page in your browser')
+            window.electron.ipcRenderer.invoke('open-link', 'https://subtify.canny.io/feedback')
+          }}
+        >
+          Feedback
+        </Button>
       </h1>
     </div>
   )
