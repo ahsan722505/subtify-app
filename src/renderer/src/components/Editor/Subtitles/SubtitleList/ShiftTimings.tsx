@@ -1,6 +1,7 @@
 import useAppStore from '@renderer/store/store'
 import { Input, Modal } from 'antd'
 import React from 'react'
+import { EnterOutlined } from '@ant-design/icons'
 
 export default function ShiftTimings(): JSX.Element {
   const [isModalOpen, setIsModalOpen] = React.useState(false)
@@ -14,7 +15,10 @@ export default function ShiftTimings(): JSX.Element {
 
   return (
     <>
-      <span onClick={() => setIsModalOpen(true)}>Shift all timings</span>
+      <span className="flex w-full px-3 py-1" onClick={() => setIsModalOpen(true)}>
+        <EnterOutlined className="!text-base mr-2" />
+        Shift all timings
+      </span>
       <Modal
         title="Shift Timings"
         open={isModalOpen}

@@ -15,6 +15,7 @@ export default function ProjectListItem({
   const items: MenuProps['items'] = [
     {
       key: '1',
+      className: '!p-0',
       label: (
         <Popconfirm
           title="Delete the project"
@@ -23,11 +24,12 @@ export default function ProjectListItem({
           okText="Yes"
           cancelText="No"
           okButtonProps={{ danger: true }}
+          className="p-2"
         >
+          <DeleteOutlined className="mr-2" />
           Delete
         </Popconfirm>
       ),
-      icon: <DeleteOutlined />,
       danger: true
     }
   ]
