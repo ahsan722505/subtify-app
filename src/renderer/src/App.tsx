@@ -24,6 +24,7 @@ function App(): JSX.Element {
   const currentProjectIndex = useAppStore((state) => state.currentProjectIndex)
   const projectsSearchFilter = useAppStore((state) => state.projectsSearchFilter)
   const setSubtitles = useAppStore((state) => state.setSubtitles)
+  const handleSubtitleGenerationError = useAppStore((state) => state.handleSubtitleGenerationError)
   const setGeneratedSubtitlesPercentage = useAppStore(
     (state) => state.setGeneratedSubtitlesPercentage
   )
@@ -42,6 +43,7 @@ function App(): JSX.Element {
         if (payload.type === 'progress')
           setGeneratedSubtitlesPercentage(payload.duration!, payload.projectId)
         if (payload.type === 'completed') setSubtitles(payload.subtitles!, payload.projectId)
+        if (payload.type === 'error') handleSubtitleGenerationError(payload.projectId)
       }
     )
     window.electron.ipcRenderer.invoke('get-system-info').then((systemInfo) => {

@@ -95,6 +95,7 @@ type State = {
   setGeneratedSubtitlesPercentage: (duration: number, projectId: IDBValidKey) => void
   setTime: (updatedTime: string, subtitleId: string, subtitleType: 'start' | 'end') => void
   shiftSubtitles: (time: number) => void
+  handleSubtitleGenerationError: (projectId: IDBValidKey) => void
 }
 
 const useAppStore = create<State>()((set, get) => ({
@@ -428,6 +429,25 @@ const useAppStore = create<State>()((set, get) => ({
       }
     })
     indexedDBService.updateProject(project)
+    set({ projects })
+  },
+  handleSubtitleGenerationError: async (projectId): Promise<void> => {
+    const project = await indexedDBService.getProject(projectId)
+    message.error('Subtitle generation failed. Please report the issue on the feedback page.')
+    await indexedDBService.updateProject({
+      ...project,
+      transcriptionStatus: TranscriptionStatus.SubtitleTypeInput,
+      generatedSubtitlesPercentage: 0
+    })
+    const projects = get().projects.map((project) => {
+      if (project.id === projectId)
+        return {
+          ...project,
+          transcriptionStatus: TranscriptionStatus.SubtitleTypeInput,
+          generatedSubtitlesPercentage: 0
+        }
+      return project
+    })
     set({ projects })
   }
 }))
