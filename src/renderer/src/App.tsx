@@ -4,6 +4,7 @@ import Editor from './components/Editor/Editor'
 import useAppStore, { AppUpdatesLifecycle, Subtitle } from './store/store'
 import indexedDBService from './database/IndexedDBService'
 import { PROJECTS_LIMIT } from './constants'
+import { usePostHog } from 'posthog-js/react'
 
 type SubtitleGenerationProgressPayload = {
   type: 'progress' | 'completed' | 'error'
@@ -26,6 +27,7 @@ function App(): JSX.Element {
   const setGeneratedSubtitlesPercentage = useAppStore(
     (state) => state.setGeneratedSubtitlesPercentage
   )
+  const posthog = usePostHog()
 
   React.useEffect(() => {
     window.electron.ipcRenderer.on('update-status', (_, status: AppUpdatesLifecycle) => {
@@ -42,6 +44,11 @@ function App(): JSX.Element {
         if (payload.type === 'completed') setSubtitles(payload.subtitles!, payload.projectId)
       }
     )
+    window.electron.ipcRenderer.invoke('get-system-info').then((systemInfo) => {
+      posthog.capture('$set', {
+        $set: { ...systemInfo }
+      })
+    })
     return () => {
       window.electron.ipcRenderer.removeAllListeners('update-status')
       window.electron.ipcRenderer.removeAllListeners('downloaded-updates-percentage')

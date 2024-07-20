@@ -6,6 +6,7 @@ import { spawn } from 'child_process'
 import fs from 'fs'
 import { autoUpdater } from 'electron-updater'
 import srtParser2 from 'srt-parser-2'
+import os from 'os'
 
 let win: BrowserWindow | null = null
 
@@ -315,6 +316,21 @@ app.whenReady().then(() => {
       throw new Error('File does not exist')
     } catch (error) {
       throw new Error('Failed to delete thumbnail')
+    }
+  })
+
+  ipcMain.handle('get-system-info', async () => {
+    const { totalmem, freemem } = os
+    const totalMemoryGb = (totalmem() / 1024 / 1024 / 1024).toFixed(1) + ' GB'
+    const freeMemoryGb = (freemem() / 1024 / 1024 / 1024).toFixed(1) + ' GB'
+    return {
+      totalMemory: totalMemoryGb,
+      freeMemory: freeMemoryGb,
+      platform: os.platform(),
+      kernalVersion: os.version(),
+      cpuModel: os.cpus()[0]?.model,
+      architecture: os.arch(),
+      logicalCores: os.cpus().length
     }
   })
 
