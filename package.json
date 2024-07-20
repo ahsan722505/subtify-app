@@ -1,6 +1,6 @@
 {
   "name": "subtify",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "An Electron application with React and TypeScript",
   "main": "./out/main/index.js",
   "author": "example.com",
@@ -23,6 +23,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.0",
     "@electron-toolkit/utils": "^3.0.0",
+    "@sentry/electron": "^5.2.0",
     "antd": "^5.17.2",
     "clsx": "^2.1.1",
     "electron-updater": "^6.2.1",

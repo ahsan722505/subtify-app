@@ -6,7 +6,10 @@ export default function GenerationProgress(): JSX.Element {
   return (
     <div className="w-full h-full flex justify-center items-center flex-col">
       <Progress type="circle" percent={Math.floor(percent)} />
-      <h1 className="mt-2 text-xl">Generating Subtitles...</h1>
+      <h1 className="mt-2 text-xl text-center">
+        Generating Subtitles...
+        <br /> Feel free to work on another project.
+      </h1>
     </div>
   )
 }

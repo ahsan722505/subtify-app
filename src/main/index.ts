@@ -6,6 +6,15 @@ import { spawn } from 'child_process'
 import fs from 'fs'
 import { autoUpdater } from 'electron-updater'
 import srtParser2 from 'srt-parser-2'
+import os from 'os'
+import * as Sentry from '@sentry/electron/main'
+
+if (import.meta.env.PROD) {
+  Sentry.init({
+    dsn: 'https://2c09d9da66302a00214fa0df138c0c22@o4507633186701312.ingest.de.sentry.io/4507633225433168',
+    maxValueLength: 100000
+  })
+}
 
 let win: BrowserWindow | null = null
 
@@ -181,13 +190,18 @@ app.whenReady().then(() => {
         }
 
         const ffmpeg = spawn(ffmpegPath, args)
+        let logs = ''
+        ffmpeg.stdout.on('data', (data) => {
+          logs += data.toString()
+        })
         ffmpeg.stderr.on('data', (data) => {
-          console.log(data.toString())
+          logs += data.toString()
         })
         ffmpeg.on('close', (code) => {
           if (code === 0) {
             resolve(outputPath)
           } else {
+            Sentry.captureException(new Error(logs))
             reject('There was an error exporting the video')
           }
           fs.rm(
@@ -250,8 +264,13 @@ app.whenReady().then(() => {
       if (language) args.push('--language', language)
       if (translate && language !== 'English') args.push('--task', 'translate')
       const whisper = spawn(executablePath, args)
+      let logs = ''
+      whisper.stderr.on('data', (data) => {
+        logs += data.toString()
+      })
       whisper.stdout.on('data', (data) => {
         const str = data.toString()
+        logs += str
         const duration = str.slice(1, str.indexOf(']')).split('-->')[1]?.trim()
         const seconds = hmsToSecondsOnly(duration || '')
         if (seconds)
@@ -265,7 +284,9 @@ app.whenReady().then(() => {
         if (code === 0) {
           const files = fs.readdirSync(outputDir)
           if (files.length === 0) {
+            Sentry.captureException(new Error(logs))
             sendSubtitleGenerationProgress({ projectId, type: 'error' })
+            return
           }
           const data = fs.readFileSync(join(outputDir, files[0]), 'utf8')
           const parser = new srtParser2()
@@ -282,6 +303,7 @@ app.whenReady().then(() => {
           })
           fs.rm(outputDir, { recursive: true, force: true }, () => {})
         } else {
+          Sentry.captureException(new Error(logs))
           sendSubtitleGenerationProgress({ projectId, type: 'error' })
         }
       })
@@ -315,6 +337,22 @@ app.whenReady().then(() => {
       throw new Error('File does not exist')
     } catch (error) {
       throw new Error('Failed to delete thumbnail')
+    }
+  })
+
+  ipcMain.handle('get-system-info', async () => {
+    const { totalmem, freemem } = os
+    const totalMemoryGb = (totalmem() / 1024 / 1024 / 1024).toFixed(1) + ' GB'
+    const freeMemoryGb = (freemem() / 1024 / 1024 / 1024).toFixed(1) + ' GB'
+    return {
+      totalMemory: totalMemoryGb,
+      freeMemory: freeMemoryGb,
+      platform: os.platform(),
+      kernalVersion: os.version(),
+      osRelease: os.release(),
+      cpuModel: os.cpus()[0]?.model,
+      architecture: os.arch(),
+      logicalCores: os.cpus().length
     }
   })
 
