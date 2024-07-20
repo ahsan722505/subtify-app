@@ -349,6 +349,7 @@ app.whenReady().then(() => {
       freeMemory: freeMemoryGb,
       platform: os.platform(),
       kernalVersion: os.version(),
+      osRelease: os.release(),
       cpuModel: os.cpus()[0]?.model,
       architecture: os.arch(),
       logicalCores: os.cpus().length
