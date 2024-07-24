@@ -17,7 +17,6 @@ export default React.memo(function SubtitleListItem({
   id
 }: Subtitle & { currentlyPlaying: boolean }): JSX.Element {
   const editSubtitle = useAppStore((state) => state.editSubtitle)
-  const setCurrentSubtitleIndex = useAppStore((state) => state.setCurrentSubtitleIndex)
   const deleteSubtitleLine = useAppStore((state) => state.deleteSubtitleLine)
   const subtitleRef = React.useRef<HTMLDivElement>(null)
   const [localText, setLocalText] = React.useState(globalText)
@@ -32,7 +31,6 @@ export default React.memo(function SubtitleListItem({
 
   React.useEffect(() => {
     if (currentlyPlaying) {
-      setCurrentSubtitleIndex(id)
       subtitleRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
   }, [currentlyPlaying])

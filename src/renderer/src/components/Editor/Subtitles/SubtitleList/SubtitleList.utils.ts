@@ -153,19 +153,6 @@ export function generateUniqueId(): string {
   return Math.random().toString(16).slice(2)
 }
 
-export async function findSubtitleIndexByIdInWorker(
-  subtitles: Subtitle[],
-  id: string
-): Promise<number> {
-  return new Promise((resolve) => {
-    const worker = new Worker(new URL('./SubtitleList.worker.ts', import.meta.url))
-    worker.onmessage = (event): void => {
-      resolve(event.data)
-    }
-    worker.postMessage({ subtitles, id })
-  })
-}
-
 export function hmsToSecondsOnly(str: string): number {
   const p = str.split(':')
   let s = 0

@@ -26,7 +26,14 @@ export enum TranscriptionStatus {
   AutoSubtitleInput = 'autoSubtitleInput',
   LOADING = 'loading',
   SUCCESS = 'success',
-  ERROR = 'error'
+  ERROR = 'error',
+  STYLES = 'styles'
+}
+
+export enum AlphabetCase {
+  UPPERCASE = 'uppercase',
+  LOWERCASE = 'lowercase',
+  CAPITALIZE = 'capitalize'
 }
 
 export type Subtitle = {
@@ -47,11 +54,13 @@ export type Project = {
   mediaDuration: number
   transcriptionStatus: TranscriptionStatus
   mediaType: string | null
-  currentSubtitleIndex: number | null
   subtitleStyleProps: Konva.TextConfig | null
   canvasWidth: number
   canvasHeight: number
   generatedSubtitlesPercentage: number
+  showSubtitleBackground: boolean
+  subtitleBackgroundColor: string
+  alphabetCase: AlphabetCase | null
 }
 
 type State = {
@@ -81,7 +90,6 @@ type State = {
   setCurrentNavItem: (navItem: navItems) => void
   setAppUpdateStatus: (status: AppUpdatesLifecycle) => void
   setDownloadedUpdatesPercentage: (percentage: number) => void
-  setCurrentSubtitleIndex: (id: string) => void
   initializeSubtitleStyleProps: (props: Konva.TextConfig) => void
   setSubtitleStyleProps: (props: Konva.TextConfig) => void
   setCanvasWidth: (width: number) => void
@@ -96,6 +104,9 @@ type State = {
   setTime: (updatedTime: string, subtitleId: string, subtitleType: 'start' | 'end') => void
   shiftSubtitles: (time: number) => void
   handleSubtitleGenerationError: (projectId: IDBValidKey) => void
+  setShowSubtitleBackground: (showSubtitleBackground: boolean) => void
+  setSubtitleBackgroundColor: (subtitleBackgroundColor: string) => void
+  setAlphabetCase: (alphabetCase: AlphabetCase | null) => void
 }
 
 const useAppStore = create<State>()((set, get) => ({
@@ -266,16 +277,6 @@ const useAppStore = create<State>()((set, get) => ({
   },
   setDownloadedUpdatesPercentage: (percentage): void => {
     set({ downloadedUpdatesPercentage: percentage })
-  },
-  setCurrentSubtitleIndex: async (id): Promise<void> => {
-    const state = get()
-    if (state.currentProjectIndex === null) return
-    const projects = [...state.projects]
-    const project = projects[state.currentProjectIndex]
-    const index = project.subtitles.findIndex((subtitle) => subtitle.id === id)
-    project.currentSubtitleIndex = index
-    indexedDBService.updateProject(project)
-    set({ projects })
   },
   initializeSubtitleStyleProps: (props): void => {
     set((state) => {
@@ -449,6 +450,36 @@ const useAppStore = create<State>()((set, get) => ({
       return project
     })
     set({ projects })
+  },
+  setShowSubtitleBackground: (showSubtitleBackground): void => {
+    set((state) => {
+      if (state.currentProjectIndex === null) return state
+      const projects = [...state.projects]
+      const project = projects[state.currentProjectIndex]
+      project.showSubtitleBackground = showSubtitleBackground
+      indexedDBService.updateProject(project)
+      return { projects }
+    })
+  },
+  setSubtitleBackgroundColor: (subtitleBackgroundColor): void => {
+    set((state) => {
+      if (state.currentProjectIndex === null) return state
+      const projects = [...state.projects]
+      const project = projects[state.currentProjectIndex]
+      project.subtitleBackgroundColor = subtitleBackgroundColor
+      indexedDBService.updateProject(project)
+      return { projects }
+    })
+  },
+  setAlphabetCase: (alphabetCase): void => {
+    set((state) => {
+      if (state.currentProjectIndex === null) return state
+      const projects = [...state.projects]
+      const project = projects[state.currentProjectIndex]
+      project.alphabetCase = alphabetCase
+      indexedDBService.updateProject(project)
+      return { projects }
+    })
   }
 }))
 
