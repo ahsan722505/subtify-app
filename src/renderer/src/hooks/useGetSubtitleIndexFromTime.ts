@@ -2,22 +2,37 @@ import React from 'react'
 import { useProjectStore } from './useProjectStore'
 import { Subtitle } from '@renderer/store/store'
 
-const precision = 0.01
 export default function useGetSubtitleFromTime(): Subtitle | null {
   const subtitles = useProjectStore((state) => state.subtitles)
   const currentTime = useProjectStore((state) => state.mediaCurrentTime)
-  const lookupTable = React.useMemo(() => {
-    const lookupTable = new Map<number, number>()
-    subtitles.forEach((sub, index) => {
-      for (let time = sub.start; time <= sub.end; time += precision) {
-        const roundedTime = Math.floor(time / precision) * precision
-        lookupTable.set(roundedTime, index)
+  const getSubtitleFromTime = React.useCallback(
+    (time: number) => {
+      let low = 0
+      let high = subtitles.length - 1
+
+      while (low <= high) {
+        const mid = Math.floor((low + high) / 2)
+        const subtitle = subtitles[mid]
+
+        if (
+          +time.toFixed(2) >= +subtitle.start.toFixed(2) &&
+          +time.toFixed(2) <= +subtitle.end.toFixed(2)
+        ) {
+          return subtitle
+        } else if (time < subtitle.start) {
+          high = mid - 1
+        } else {
+          low = mid + 1
+        }
       }
-    })
-    return lookupTable
-  }, [subtitles])
-  const time = currentTime
-  const key = Math.floor(time / precision) * precision
-  const index = lookupTable.get(key)
-  return index !== undefined ? subtitles[index] : null
+
+      return null
+    },
+    [subtitles]
+  )
+  const subtitle = React.useMemo(
+    () => getSubtitleFromTime(currentTime),
+    [currentTime, getSubtitleFromTime]
+  )
+  return subtitle
 }
