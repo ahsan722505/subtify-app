@@ -1,6 +1,7 @@
 import React from 'react'
 import { useProjectStore } from './useProjectStore'
 import { Subtitle } from '@renderer/store/store'
+import { isSubtitlePlaying } from '@renderer/components/Editor/Subtitles/SubtitleList/SubtitleList.utils'
 
 export default function useGetSubtitleFromTime(): Subtitle | null {
   const subtitles = useProjectStore((state) => state.subtitles)
@@ -14,10 +15,7 @@ export default function useGetSubtitleFromTime(): Subtitle | null {
         const mid = Math.floor((low + high) / 2)
         const subtitle = subtitles[mid]
 
-        if (
-          +time.toFixed(2) >= +subtitle.start.toFixed(2) &&
-          +time.toFixed(2) <= +subtitle.end.toFixed(2)
-        ) {
+        if (isSubtitlePlaying(time, subtitle.start, subtitle.end)) {
           return subtitle
         } else if (time < subtitle.start) {
           high = mid - 1

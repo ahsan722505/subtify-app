@@ -4,6 +4,8 @@ import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 import React from 'react'
 import { Layer, Stage, StageProps, Text, Transformer } from 'react-konva'
+import { loadFontFamily } from '../Subtitles/SubtitleStyles/SubtitleStyles.utils'
+import FontFaceObserver from 'fontfaceobserver'
 
 const GUIDELINE_OFFSET = 5
 
@@ -27,6 +29,7 @@ export default React.memo(function CanvasEditor(
   const setSubtitleStyleProps = useAppStore((state) => state.setSubtitleStyleProps)
   const subtitleStyleProps = useProjectStore((state) => state.subtitleStyleProps)
   const [isSelected, setIsSelected] = React.useState(false)
+  const [fontAvailable, setFontAvailable] = React.useState(false)
   const subtitleNodeRef = React.useRef<Konva.Text>(null)
   const trRef = React.useRef<Konva.Transformer>(null)
   const showSubtitleBackground = useProjectStore((state) => state.showSubtitleBackground)
@@ -337,10 +340,25 @@ export default React.memo(function CanvasEditor(
       break
   }
 
+  React.useEffect(() => {
+    if (subtitleStyleProps?.fontFamily) {
+      loadFontFamily(subtitleStyleProps.fontFamily)
+      const font = new FontFaceObserver(subtitleStyleProps?.fontFamily)
+      font.load().then(
+        function () {
+          setFontAvailable(true)
+        },
+        function () {
+          setFontAvailable(true)
+        }
+      )
+    }
+  }, [subtitleStyleProps?.fontFamily])
+
   return (
     <Stage {...props} onMouseDown={checkDeselect} onTouchStart={checkDeselect}>
       <Layer id="canvas-editor">
-        {casedSubtitle && (
+        {casedSubtitle && fontAvailable && (
           <Text
             onClick={handleNodeClick}
             onTap={handleNodeClick}

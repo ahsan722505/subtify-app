@@ -9,25 +9,7 @@ import FontStyles from './FontStyles'
 import AlphabetCasing from './AlphabetCasing'
 import Spacing from './Spacing'
 import Alignment from './Alignment'
-const fonts = [
-  'Arial',
-  'Helvetica',
-  'Roboto',
-  'Open Sans',
-  'Lato',
-  'Verdana',
-  'Times',
-  'Poppins',
-  'Rubik',
-  'Georgia',
-  'Arvo',
-  'Quicksand',
-  'Montserrat',
-  'Lora',
-  'Cabin',
-  'Josefin Sans',
-  'Tahoma'
-]
+import FontFamily from './FontFamily/FontFamily'
 
 const availablefontSizes = [
   18, 24, 30, 36, 42, 48, 54, 60, 66, 72, 78, 84, 90, 96, 102, 108, 114, 120, 136, 148, 160
@@ -55,19 +37,7 @@ export default function SubtitleStyles(): JSX.Element {
         </p>
       </div>
       <div className="flex gap-2 mb-4">
-        <Select
-          className="w-4/6 h-10"
-          showSearch
-          placeholder="Select a font"
-          options={fonts.map((font) => ({
-            value: font,
-            label: font,
-            style: { fontFamily: font }
-          }))}
-          value={subtitleStyleProps?.fontFamily}
-          style={{ fontFamily: subtitleStyleProps?.fontFamily }}
-          onChange={(value) => setSubtitleStyleProps({ ...subtitleStyleProps, fontFamily: value })}
-        />
+        <FontFamily />
         <Select
           className="w-1/4 h-10"
           showSearch

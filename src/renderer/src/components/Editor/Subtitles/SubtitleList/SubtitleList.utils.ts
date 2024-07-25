@@ -80,7 +80,7 @@ export function generateASS(
   styleProps: Konva.TextConfig,
   subtitles: Subtitle[]
 ): string {
-  const { fontSize, rotation, x, y } = styleProps
+  const { fontSize, rotation, x, y, fontFamily } = styleProps
   const konvaTextNode = getHeadlessKonvaTextNode(styleProps, canvasWidth, canvasHeight)
 
   return `[Script Info]
@@ -97,7 +97,7 @@ PlayResY: ${canvasHeight}
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default, Arial, ${fontSize}, &H00FFFFFF, &H000000FF, &H00000000, &HFF000000, 0, 0, 0, 0, 100, 100, 0, ${-rotation!}, 3, 1, 0, 2, 0, 0, 0, 1
+Style: Default, ${fontFamily || 'Arial'}, ${fontSize}, &H00FFFFFF, &H000000FF, &H00000000, &HFF000000, 0, 0, 0, 0, 100, 100, 0, ${-rotation!}, 3, 1, 0, 2, 0, 0, 0, 1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
