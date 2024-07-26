@@ -19,6 +19,8 @@ export default function SubtitleOptions(): JSX.Element {
   const subtitleStyleProps = useProjectStore((state) => state.subtitleStyleProps)
   const mediaType = useProjectStore((state) => state.mediaType)
   const subtitles = useProjectStore((state) => state.subtitles)
+  const showSubtitleBackground = useProjectStore((state) => state.showSubtitleBackground)
+  const subtitleBackgroundColor = useProjectStore((state) => state.subtitleBackgroundColor)
 
   const items: MenuProps['items'] = [
     {
@@ -53,7 +55,13 @@ export default function SubtitleOptions(): JSX.Element {
               label: '.ASS format (Styled)',
               onClick: (): void => {
                 downloadSubtitles(
-                  generateASS(canvasWidth, canvasHeight, subtitleStyleProps!, subtitles),
+                  generateASS(
+                    canvasWidth,
+                    canvasHeight,
+                    subtitleStyleProps!,
+                    showSubtitleBackground ? subtitleBackgroundColor : '#00FFFFFF',
+                    subtitles
+                  ),
                   SubtitleFormat.ASS
                 )
               }

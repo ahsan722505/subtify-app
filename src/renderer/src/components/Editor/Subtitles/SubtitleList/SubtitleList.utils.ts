@@ -74,13 +74,32 @@ export function isSubtitlePlaying(currentTime: number, start: number, end: numbe
   )
 }
 
+function hexWithAlphaToAssColor(hex: string): string {
+  console.log('-------------------hex', hex, '--------------------')
+  if (!hex) return ''
+  hex = hex.replace(/^#/, '')
+
+  // Extract RGBA components
+  const r = hex.slice(0, 2)
+  const g = hex.slice(2, 4)
+  const b = hex.slice(4, 6)
+  const a = hex.slice(6, 8) || 'FF'
+  const reversedAlpha = (parseInt(a, 16) ^ 0xff).toString(16).padStart(2, '0').toUpperCase()
+
+  console.log('-------------------reversealpha', reversedAlpha, '--------------------')
+
+  // Combine into ABGR format
+  return `&H${reversedAlpha}${b.toUpperCase()}${g.toUpperCase()}${r.toUpperCase()}`
+}
+
 export function generateASS(
   canvasWidth: number,
   canvasHeight: number,
   styleProps: Konva.TextConfig,
+  backgroundColor: string,
   subtitles: Subtitle[]
 ): string {
-  const { fontSize, rotation, x, y, fontFamily } = styleProps
+  const { fontSize, rotation, x, y, fontStyle, fontFamily, fill } = styleProps
   const konvaTextNode = getHeadlessKonvaTextNode(styleProps, canvasWidth, canvasHeight)
 
   return `[Script Info]
@@ -97,7 +116,7 @@ PlayResY: ${canvasHeight}
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default, ${fontFamily || 'Arial'}, ${fontSize}, &H00FFFFFF, &H000000FF, &H00000000, &HFF000000, 0, 0, 0, 0, 100, 100, 0, ${-rotation!}, 3, 1, 0, 2, 0, 0, 0, 1
+Style: Default, ${fontFamily || 'Arial'}, ${fontSize}, ${hexWithAlphaToAssColor(fill as string) || '&H00FFFFFF'}, &H000000FF, '&HFF000000', ${hexWithAlphaToAssColor(backgroundColor) || '&H00000000'}, ${fontStyle?.includes('bold') ? '-1' : '0'}, ${fontStyle?.includes('italic') ? '-1' : '0'}, 0, 0, 100, 100, 0, ${-rotation!}, 4, 0, 0, 2, 0, 0, 0, 1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -164,4 +183,24 @@ export function hmsToSecondsOnly(str: string): number {
     m *= 60
   }
   return s
+}
+
+export function getFontVariant(fontStyle: string, availableVariants: string[]): string {
+  // possible fontStyle values: 'normal' 'bold', 'italic', 'italic bold'
+  // possible availableVariants values: 'regular', 'italic', '700', '700italic' (all of these variants may not be present)
+  if (fontStyle.includes('bold') && fontStyle.includes('italic')) {
+    if (availableVariants.includes('700italic')) return '700italic'
+    if (availableVariants.includes('italic')) return 'italic'
+    if (availableVariants.includes('700')) return '700'
+    return 'regular'
+  }
+  if (fontStyle.includes('bold')) {
+    if (availableVariants.includes('700')) return '700'
+    return 'regular'
+  }
+  if (fontStyle.includes('italic')) {
+    if (availableVariants.includes('italic')) return 'italic'
+    return 'regular'
+  }
+  return 'regular'
 }

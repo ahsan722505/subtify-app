@@ -355,6 +355,8 @@ export default React.memo(function CanvasEditor(
     }
   }, [subtitleStyleProps?.fontFamily])
 
+  console.log(subtitleStyleProps)
+
   return (
     <Stage {...props} onMouseDown={checkDeselect} onTouchStart={checkDeselect}>
       <Layer id="canvas-editor">
