@@ -14,8 +14,8 @@ export default function FontFamily(): JSX.Element {
       showSearch
       placeholder="Select a font"
       options={FONTS_FAMILIES.map((font) => ({
-        value: font.family,
-        label: font.family
+        value: font,
+        label: font
       }))}
       value={subtitleStyleProps?.fontFamily}
       style={{ fontFamily: subtitleStyleProps?.fontFamily }}

@@ -74,25 +74,6 @@ export function isSubtitlePlaying(currentTime: number, start: number, end: numbe
   )
 }
 
-export function getHeadlessKonvaTextNode(
-  textProps: Konva.TextConfig,
-  canvasWidth: number,
-  canvasHeight: number
-): Konva.Text {
-  const container = document.createElement('div')
-  container.id = 'headless-konva'
-  const stage = new Konva.Stage({
-    container,
-    width: canvasWidth,
-    height: canvasHeight
-  })
-  const layer = new Konva.Layer()
-  const text = new Konva.Text(textProps)
-  layer.add(text)
-  stage.add(layer)
-  return text
-}
-
 export function matchStrings(s1: string, s2: string): boolean {
   return (
     s1.trim().toLowerCase().includes(s2.trim().toLowerCase()) ||
