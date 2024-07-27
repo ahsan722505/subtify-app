@@ -117,26 +117,6 @@ export function hmsToSecondsOnly(str: string): number {
   return s
 }
 
-export function getFontVariant(fontStyle: string, availableVariants: string[]): string {
-  // possible fontStyle values: 'normal' 'bold', 'italic', 'italic bold'
-  // possible availableVariants values: 'regular', 'italic', '700', '700italic' (all of these variants may not be present)
-  if (fontStyle.includes('bold') && fontStyle.includes('italic')) {
-    if (availableVariants.includes('700italic')) return '700italic'
-    if (availableVariants.includes('italic')) return 'italic'
-    if (availableVariants.includes('700')) return '700'
-    return 'regular'
-  }
-  if (fontStyle.includes('bold')) {
-    if (availableVariants.includes('700')) return '700'
-    return 'regular'
-  }
-  if (fontStyle.includes('italic')) {
-    if (availableVariants.includes('italic')) return 'italic'
-    return 'regular'
-  }
-  return 'regular'
-}
-
 export function getBackgroundDrawFunc(
   subtitleTextProps: Konva.TextConfig,
   backgroundColor: string
