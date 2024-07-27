@@ -20,6 +20,12 @@ function Media(): JSX.Element {
 
   React.useEffect(() => {
     const handleSetParameters = (): void => {
+      console.log(
+        'mediaRef.current?.clientWidth',
+        mediaRef.current?.clientWidth,
+        'mediaRef.current?.clientHeight',
+        mediaRef.current?.clientHeight
+      )
       const width = mediaRef.current?.clientWidth || 0
       const height = mediaRef.current?.clientHeight || 0
       setCanvasWidth(width)

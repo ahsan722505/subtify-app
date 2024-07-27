@@ -3,7 +3,7 @@ import React from 'react'
 import { Switch } from 'antd'
 import { InfoCircleFilled } from '@ant-design/icons'
 import { useProjectStore } from '@renderer/hooks/useProjectStore'
-import { generateASS, generateSRT, generateVTT, getFontVariant } from './SubtitleList.utils'
+import { generateSRT, generateVTT, getFontVariant, handleBurnSubtitles } from './SubtitleList.utils'
 import { SubtitleFormat } from './SubtitleList.types'
 import { DownloadOutlined } from '@ant-design/icons'
 import { FONTS_FAMILIES } from '@renderer/constants'
@@ -20,23 +20,13 @@ export default function ExportVideo(): JSX.Element {
   const subtitleStyleProps = useProjectStore((state) => state.subtitleStyleProps)
   const subtitleBackgroundColor = useProjectStore((state) => state.subtitleBackgroundColor)
   const showSubtitleBackground = useProjectStore((state) => state.showSubtitleBackground)
+  const mediaPath = useProjectStore((state) => state.mediaPath)
 
   const handleExportVideo = async (): Promise<void> => {
     setLoading(true)
     let subtitleMetadata: { text: string; type: SubtitleFormat } | null = null
     const isWebm = mediaType === 'video/webm'
-    if (burnSubtitles) {
-      subtitleMetadata = {
-        text: generateASS(
-          canvasWidth,
-          canvasHeight,
-          subtitleStyleProps!,
-          showSubtitleBackground ? subtitleBackgroundColor : '#00000000',
-          subtitles
-        ),
-        type: SubtitleFormat.ASS
-      }
-    } else if (isWebm) {
+    if (isWebm) {
       subtitleMetadata = {
         text: generateVTT(subtitles),
         type: SubtitleFormat.VTT
@@ -49,20 +39,37 @@ export default function ExportVideo(): JSX.Element {
     }
 
     try {
-      const family = FONTS_FAMILIES.find((f) => f.family === subtitleStyleProps?.fontFamily)
-      const fontVariant = getFontVariant(
-        subtitleStyleProps?.fontStyle || 'normal',
-        Object.keys(family?.files || {})
-      )
-      await window.electron.ipcRenderer.invoke('export-video', {
-        filePath,
-        burnSubtitles,
-        subtitleMetadata,
-        mediaType,
-        fontFamily: subtitleStyleProps?.fontFamily,
-        fontVariant: fontVariant,
-        fontUrl: family && family.files[fontVariant]
-      })
+      if (burnSubtitles) {
+        const video = document.getElementById('media') as HTMLVideoElement
+        await handleBurnSubtitles(
+          subtitleStyleProps!,
+          showSubtitleBackground,
+          subtitleBackgroundColor,
+          subtitles,
+          mediaPath!,
+          canvasWidth,
+          canvasHeight,
+          video.videoWidth,
+          video.videoHeight
+        )
+        return
+      } else {
+        const family = FONTS_FAMILIES.find((f) => f.family === subtitleStyleProps?.fontFamily)
+        const fontVariant = getFontVariant(
+          subtitleStyleProps?.fontStyle || 'normal',
+          Object.keys(family?.files || {})
+        )
+        await window.electron.ipcRenderer.invoke('export-video', {
+          filePath,
+          burnSubtitles,
+          subtitleMetadata,
+          mediaType,
+          fontFamily: subtitleStyleProps?.fontFamily,
+          fontVariant: fontVariant,
+          fontUrl: family && family.files[fontVariant]
+        })
+      }
+
       message.success('Video exported successfully. Please Check your downloads folder.')
     } catch (error) {
       message.error('Failed to export video.')

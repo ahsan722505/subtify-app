@@ -6,6 +6,7 @@ import React from 'react'
 import { Layer, Stage, StageProps, Text, Transformer } from 'react-konva'
 import { loadFontFamily } from '../Subtitles/SubtitleStyles/SubtitleStyles.utils'
 import FontFaceObserver from 'fontfaceobserver'
+import { getBackgroundDrawFunc } from '../Subtitles/SubtitleList/SubtitleList.utils'
 
 const GUIDELINE_OFFSET = 5
 
@@ -31,6 +32,7 @@ export default React.memo(function CanvasEditor(
   const [isSelected, setIsSelected] = React.useState(false)
   const [fontAvailable, setFontAvailable] = React.useState(false)
   const subtitleNodeRef = React.useRef<Konva.Text>(null)
+  const stageRef = React.useRef<Konva.Stage>(null)
   const trRef = React.useRef<Konva.Transformer>(null)
   const showSubtitleBackground = useProjectStore((state) => state.showSubtitleBackground)
   const subtitleBackgroundColor = useProjectStore((state) => state.subtitleBackgroundColor)
@@ -355,10 +357,8 @@ export default React.memo(function CanvasEditor(
     }
   }, [subtitleStyleProps?.fontFamily])
 
-  console.log(subtitleStyleProps)
-
   return (
-    <Stage {...props} onMouseDown={checkDeselect} onTouchStart={checkDeselect}>
+    <Stage ref={stageRef} {...props} onMouseDown={checkDeselect} onTouchStart={checkDeselect}>
       <Layer id="canvas-editor">
         {casedSubtitle && fontAvailable && (
           <Text
@@ -368,28 +368,11 @@ export default React.memo(function CanvasEditor(
             text={casedSubtitle}
             name="object"
             {...(subtitleStyleProps || {})}
-            sceneFunc={function (context, shape) {
-              const typecastedShape = shape as Konva.Text
-              if (showSubtitleBackground) {
-                const diff = typecastedShape.width() - typecastedShape.getTextWidth()
-                const align = subtitleStyleProps?.align || 'center'
-                context.fillStyle = subtitleBackgroundColor || '#000000FF'
-                let x = 0 // left
-                if (align === 'center') {
-                  x = diff / 2
-                }
-                if (align === 'right') {
-                  x = diff
-                }
-                context.fillRect(
-                  x - 4,
-                  -7,
-                  typecastedShape.getTextWidth() + 8,
-                  typecastedShape.height() + 12
-                )
-              }
-              typecastedShape._sceneFunc(context)
-            }}
+            sceneFunc={
+              showSubtitleBackground
+                ? getBackgroundDrawFunc(subtitleStyleProps!, subtitleBackgroundColor)
+                : undefined
+            }
             draggable
             onDragEnd={(e) => {
               setSubtitleStyleProps({

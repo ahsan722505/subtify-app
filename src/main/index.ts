@@ -391,6 +391,99 @@ app.whenReady().then(() => {
     }
   })
 
+  ipcMain.handle(
+    'save-subtitle-image',
+    async (_, dataURL: string, exportId: string, imageNumber: number) => {
+      return new Promise((res, rej) => {
+        const base64Data = dataURL.replace(/^data:image\/png;base64,/, '')
+        const exportDir = join(app.getPath('userData'), `export-${exportId}`)
+        if (!fs.existsSync(exportDir)) {
+          fs.mkdirSync(exportDir)
+        }
+        const filePath = join(exportDir, `${imageNumber}.png`)
+        fs.writeFile(filePath, base64Data, 'base64', (err) => {
+          if (err) {
+            rej()
+          } else {
+            res(`image ${imageNumber} saved successfully`)
+          }
+        })
+      })
+    }
+  )
+
+  ipcMain.handle(
+    'burn-subtitles',
+    async (_, subtitles: Subtitle[], exportId: string, videoPath: string) => {
+      return new Promise((resolve, reject) => {
+        let filterComplex = ''
+        const inputs: string[] = []
+
+        // Prepare FFmpeg input files and filter complex string
+        for (let index = 0; index < subtitles.length; index++) {
+          const imageFile = join(app.getPath('userData'), `export-${exportId}`, `${index + 1}.png`)
+          inputs.push(`-i ${imageFile}`)
+          const subtitle = subtitles[index]
+
+          // Define the overlay filter for each subtitle
+          if (index === 0) {
+            filterComplex += `[0][1]overlay=enable='between(t,${subtitle.start},${subtitle.end})':x=0:y=0[out];`
+            continue
+          }
+          if (index === subtitles.length - 1) {
+            filterComplex += `[out][${index + 1}]overlay=enable='between(t,${subtitle.start},${subtitle.end})':x=0:y=0`
+            continue
+          }
+
+          filterComplex += `[out][${index + 1}]overlay=enable='between(t,${subtitle.start},${subtitle.end})':x=0:y=0[out];`
+        }
+
+        const outputPath = join(app.getPath('downloads'), `subtify-${exportId}.mp4`)
+
+        const args = [
+          '-i',
+          videoPath,
+          ...inputs.join(' ').split(' '),
+          '-filter_complex',
+          filterComplex,
+          outputPath
+        ]
+
+        console.log(args)
+
+        const ffmpegPath = join(
+          is.dev ? '' : process.resourcesPath,
+          'ffmpeg',
+          process.platform,
+          'ffmpeg'
+        )
+        const ffmpeg = spawn(ffmpegPath, args)
+        let logs = ''
+        ffmpeg.stdout.on('data', (data) => {
+          console.log(data.toString())
+          logs += data.toString()
+        })
+        ffmpeg.stderr.on('data', (data) => {
+          console.log(data.toString())
+          logs += data.toString()
+        })
+        ffmpeg.on('close', (code) => {
+          if (code === 0) {
+            resolve(outputPath)
+          } else {
+            Sentry.captureException(new Error(logs))
+            reject('There was an error exporting the video')
+          }
+          fs.rm(
+            join(app.getPath('userData'), `export-${exportId}`),
+            { recursive: true, force: true },
+            () => {}
+          )
+        })
+      })
+    }
+  )
+
   ipcMain.handle('delete-thumbnail', async (_, thumbnailPath) => {
     try {
       if (fs.existsSync(thumbnailPath)) {
