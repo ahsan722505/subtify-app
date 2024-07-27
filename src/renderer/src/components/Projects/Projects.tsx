@@ -30,7 +30,7 @@ export default function Projects(): JSX.Element {
       canvasWidth: 0,
       canvasHeight: 0,
       generatedSubtitlesPercentage: 0,
-      showSubtitleBackground: false,
+      showSubtitleBackground: true,
       subtitleBackgroundColor: '',
       alphabetCase: null
     })

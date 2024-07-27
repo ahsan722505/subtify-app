@@ -8,7 +8,6 @@ import { autoUpdater } from 'electron-updater'
 import srtParser2 from 'srt-parser-2'
 import os from 'os'
 import * as Sentry from '@sentry/electron/main'
-import fetch from 'node-fetch'
 
 if (import.meta.env.PROD) {
   Sentry.init({
@@ -49,50 +48,6 @@ function hmsToSecondsOnly(str: string): number {
   }
 
   return s
-}
-
-async function downloadFontInUserData(
-  fontFamily: string,
-  fontVariant: string,
-  fontUrl: string
-): Promise<string> {
-  // Define the user data path
-  const userDataPath = app.getPath('userData')
-  const fontsDir = join(userDataPath, 'fonts', fontFamily, fontVariant)
-
-  // Ensure the font variant directory exists
-  if (!fs.existsSync(fontsDir)) {
-    fs.mkdirSync(fontsDir, { recursive: true })
-  }
-
-  // Define the file path for the font
-  const fontFileName = `${fontFamily}.ttf`
-  const fontFilePath = join(fontsDir, fontFileName)
-
-  // Check if the font file already exists
-  if (fs.existsSync(fontFilePath)) {
-    console.log(`Font ${fontFamily} (${fontVariant}) already exists.`)
-    return fontsDir
-  }
-
-  // Download the font file
-  try {
-    const response = await fetch(fontUrl)
-    if (!response.ok) {
-      throw new Error(`Failed to download font: ${response.statusText}`)
-    }
-
-    const arrayBuffer = await response.arrayBuffer()
-    const buffer = Buffer.from(arrayBuffer)
-
-    // Save the font file to the user data directory
-    fs.writeFileSync(fontFilePath, buffer)
-    console.log(`Font ${fontFamily} (${fontVariant}) downloaded and saved to ${fontFilePath}`)
-    return fontsDir
-  } catch (error) {
-    console.error('Error downloading font')
-    throw error
-  }
 }
 
 function sendSubtitleGenerationProgress(payload: SubtitleGenerationProgressPayload): void {
@@ -177,26 +132,17 @@ app.whenReady().then(() => {
   ipcMain.on('ping', () => console.log('pong'))
 
   ipcMain.handle(
-    'export-video',
+    'add-subtitle-stream',
     async (
       _,
       data: {
         filePath: string
-        burnSubtitles: boolean
         subtitleMetadata: { text: string; type: string }
         mediaType: string
-        fontFamily: string
-        fontVariant: string
-        fontUrl: string
       }
     ) => {
-      console.log(data)
-      let fontsDir = ''
-      if (data.burnSubtitles && data.fontUrl) {
-        fontsDir = await downloadFontInUserData(data.fontFamily, data.fontVariant, data.fontUrl)
-      }
       return new Promise((resolve, reject) => {
-        const { burnSubtitles, filePath, subtitleMetadata, mediaType } = data
+        const { filePath, subtitleMetadata, mediaType } = data
         const isWebm = mediaType === 'video/webm'
 
         const ffmpegPath = join(
@@ -218,37 +164,20 @@ app.whenReady().then(() => {
 
         const outputPath = join(
           app.getPath('downloads'),
-          `subtify-${processId}.${isWebm && !burnSubtitles ? 'webm' : 'mp4'}`
+          `subtify-${processId}.${isWebm ? 'webm' : 'mp4'}`
         )
 
-        let args: string[] = []
-        if (burnSubtitles) {
-          const subtitlesPath =
-            process.platform === 'win32'
-              ? inputPath.replaceAll('\\', '\\\\\\\\').replace(':', '\\\\:')
-              : inputPath
-          args = [
-            '-i',
-            filePath,
-            '-vf',
-            `subtitles=${subtitlesPath}:fontsdir=${fontsDir}:force_style='Fontname=${data.fontFamily}'`,
-            '-c:a',
-            'copy',
-            outputPath
-          ]
-        } else {
-          args = [
-            '-i',
-            filePath,
-            '-i',
-            inputPath,
-            '-c',
-            'copy',
-            '-c:s',
-            isWebm ? 'webvtt' : 'mov_text',
-            outputPath
-          ]
-        }
+        const args = [
+          '-i',
+          filePath,
+          '-i',
+          inputPath,
+          '-c',
+          'copy',
+          '-c:s',
+          isWebm ? 'webvtt' : 'mov_text',
+          outputPath
+        ]
 
         const ffmpeg = spawn(ffmpegPath, args)
         let logs = ''
@@ -265,7 +194,7 @@ app.whenReady().then(() => {
             resolve(outputPath)
           } else {
             Sentry.captureException(new Error(logs))
-            reject('There was an error exporting the video')
+            reject('There was an error adding the subtitle stream')
           }
           fs.rm(
             join(app.getPath('userData'), processId.toString()),
@@ -448,8 +377,6 @@ app.whenReady().then(() => {
           filterComplex,
           outputPath
         ]
-
-        console.log(args)
 
         const ffmpegPath = join(
           is.dev ? '' : process.resourcesPath,

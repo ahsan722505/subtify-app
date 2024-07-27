@@ -3,10 +3,9 @@ import React from 'react'
 import { Switch } from 'antd'
 import { InfoCircleFilled } from '@ant-design/icons'
 import { useProjectStore } from '@renderer/hooks/useProjectStore'
-import { generateSRT, generateVTT, getFontVariant, handleBurnSubtitles } from './SubtitleList.utils'
+import { generateSRT, generateVTT, handleBurnSubtitles } from './SubtitleList.utils'
 import { SubtitleFormat } from './SubtitleList.types'
 import { DownloadOutlined } from '@ant-design/icons'
-import { FONTS_FAMILIES } from '@renderer/constants'
 
 export default function ExportVideo(): JSX.Element {
   const subtitles = useProjectStore((state) => state.subtitles)
@@ -23,22 +22,8 @@ export default function ExportVideo(): JSX.Element {
   const mediaPath = useProjectStore((state) => state.mediaPath)
 
   const handleExportVideo = async (): Promise<void> => {
-    setLoading(true)
-    let subtitleMetadata: { text: string; type: SubtitleFormat } | null = null
-    const isWebm = mediaType === 'video/webm'
-    if (isWebm) {
-      subtitleMetadata = {
-        text: generateVTT(subtitles),
-        type: SubtitleFormat.VTT
-      }
-    } else {
-      subtitleMetadata = {
-        text: generateSRT(subtitles),
-        type: SubtitleFormat.SRT
-      }
-    }
-
     try {
+      setLoading(true)
       if (burnSubtitles) {
         const video = document.getElementById('media') as HTMLVideoElement
         await handleBurnSubtitles(
@@ -52,21 +37,24 @@ export default function ExportVideo(): JSX.Element {
           video.videoWidth,
           video.videoHeight
         )
-        return
       } else {
-        const family = FONTS_FAMILIES.find((f) => f.family === subtitleStyleProps?.fontFamily)
-        const fontVariant = getFontVariant(
-          subtitleStyleProps?.fontStyle || 'normal',
-          Object.keys(family?.files || {})
-        )
-        await window.electron.ipcRenderer.invoke('export-video', {
+        let subtitleMetadata: { text: string; type: SubtitleFormat } | null = null
+        const isWebm = mediaType === 'video/webm'
+        if (isWebm) {
+          subtitleMetadata = {
+            text: generateVTT(subtitles),
+            type: SubtitleFormat.VTT
+          }
+        } else {
+          subtitleMetadata = {
+            text: generateSRT(subtitles),
+            type: SubtitleFormat.SRT
+          }
+        }
+        await window.electron.ipcRenderer.invoke('add-subtitle-stream', {
           filePath,
-          burnSubtitles,
           subtitleMetadata,
-          mediaType,
-          fontFamily: subtitleStyleProps?.fontFamily,
-          fontVariant: fontVariant,
-          fontUrl: family && family.files[fontVariant]
+          mediaType
         })
       }
 

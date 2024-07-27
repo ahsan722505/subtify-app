@@ -32,7 +32,6 @@ export default React.memo(function CanvasEditor(
   const [isSelected, setIsSelected] = React.useState(false)
   const [fontAvailable, setFontAvailable] = React.useState(false)
   const subtitleNodeRef = React.useRef<Konva.Text>(null)
-  const stageRef = React.useRef<Konva.Stage>(null)
   const trRef = React.useRef<Konva.Transformer>(null)
   const showSubtitleBackground = useProjectStore((state) => state.showSubtitleBackground)
   const subtitleBackgroundColor = useProjectStore((state) => state.subtitleBackgroundColor)
@@ -354,11 +353,11 @@ export default React.memo(function CanvasEditor(
           setFontAvailable(true)
         }
       )
-    }
+    } else setFontAvailable(true)
   }, [subtitleStyleProps?.fontFamily])
 
   return (
-    <Stage ref={stageRef} {...props} onMouseDown={checkDeselect} onTouchStart={checkDeselect}>
+    <Stage {...props} onMouseDown={checkDeselect} onTouchStart={checkDeselect}>
       <Layer id="canvas-editor">
         {casedSubtitle && fontAvailable && (
           <Text
