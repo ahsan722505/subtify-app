@@ -4,21 +4,19 @@ import { PlaySquareFilled } from '@ant-design/icons'
 import { isVideo } from './Media.utils'
 import CanvasEditor from './CanvasEditor'
 import useAppStore from '@renderer/store/store'
-import { isSubtitlePlaying } from '../Subtitles/SubtitleList/SubtitleList.utils'
 import { Spin } from 'antd'
+import useGetSubtitleFromTime from '@renderer/hooks/useGetSubtitleIndexFromTime'
 
 function Media(): JSX.Element {
   const mediaPath = useProjectStore((state) => state.mediaPath)
-  const currentTime = useProjectStore((state) => state.mediaCurrentTime)
   const mediaType = useProjectStore((state) => state.mediaType)
-  const currentSubtitleIndex = useProjectStore((state) => state.currentSubtitleIndex)
-  const subtitles = useProjectStore((state) => state.subtitles)
   const initializeSubtitleStyleProps = useAppStore((state) => state.initializeSubtitleStyleProps)
   const setCanvasWidth = useAppStore((state) => state.setCanvasWidth)
   const setCanvasHeight = useAppStore((state) => state.setCanvasHeight)
   const canvasWidth = useProjectStore((state) => state.canvasWidth)
   const canvasHeight = useProjectStore((state) => state.canvasHeight)
   const mediaRef = React.useRef<HTMLVideoElement | null>(null)
+  const currentSubtitle = useGetSubtitleFromTime()
 
   React.useEffect(() => {
     const handleSetParameters = (): void => {
@@ -42,16 +40,6 @@ function Media(): JSX.Element {
     }
   }, [mediaPath])
 
-  const currentSubtitle =
-    typeof currentSubtitleIndex === 'number' &&
-    isSubtitlePlaying(
-      currentTime,
-      subtitles[currentSubtitleIndex]?.start,
-      subtitles[currentSubtitleIndex]?.end
-    )
-      ? subtitles[currentSubtitleIndex].text
-      : null
-
   return (
     <div className="w-full h-full flex flex-col items-center justify-start relative">
       {mediaPath && mediaType ? (
@@ -64,7 +52,7 @@ function Media(): JSX.Element {
                 id="media"
                 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-h-full"
               >
-                <source src={`file://${mediaPath}`} type={mediaType} />
+                <source src={`file://${mediaPath}`} />
                 Your browser does not support the video tag.
               </video>
               {Boolean(canvasWidth) && Boolean(canvasHeight) ? (
@@ -72,7 +60,7 @@ function Media(): JSX.Element {
                   className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
                   width={canvasWidth}
                   height={canvasHeight}
-                  subtitle={currentSubtitle}
+                  subtitle={currentSubtitle && currentSubtitle.text}
                 />
               ) : (
                 <Spin

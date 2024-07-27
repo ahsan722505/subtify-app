@@ -20,7 +20,9 @@ export default function MediaInput(): JSX.Element {
     'audio/aac',
     'audio/webm',
     'video/mp4',
-    'video/webm'
+    'video/webm',
+    'vidoe/mkv',
+    'video/quicktime'
   ]
 
   const props: UploadProps = {

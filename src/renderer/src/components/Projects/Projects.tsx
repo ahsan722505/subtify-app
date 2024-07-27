@@ -26,11 +26,13 @@ export default function Projects(): JSX.Element {
       mediaName: null,
       mediaPath: null,
       mediaType: null,
-      currentSubtitleIndex: null,
       subtitleStyleProps: null,
       canvasWidth: 0,
       canvasHeight: 0,
-      generatedSubtitlesPercentage: 0
+      generatedSubtitlesPercentage: 0,
+      showSubtitleBackground: true,
+      subtitleBackgroundColor: '',
+      alphabetCase: null
     })
   }
 

@@ -1,12 +1,6 @@
 import { Button, Dropdown, MenuProps } from 'antd'
 import { SettingOutlined, DownloadOutlined } from '@ant-design/icons'
-import {
-  downloadSubtitles,
-  generateASS,
-  generateSRT,
-  generateTXT,
-  generateVTT
-} from './SubtitleList.utils'
+import { downloadSubtitles, generateSRT, generateTXT, generateVTT } from './SubtitleList.utils'
 import { SubtitleFormat } from './SubtitleList.types'
 import { useProjectStore } from '@renderer/hooks/useProjectStore'
 import ExportVideo from './ExportVideo'
@@ -14,9 +8,6 @@ import { isVideo } from '../../Media/Media.utils'
 import ShiftTimings from './ShiftTimings'
 
 export default function SubtitleOptions(): JSX.Element {
-  const canvasWidth = useProjectStore((state) => state.canvasWidth)
-  const canvasHeight = useProjectStore((state) => state.canvasHeight)
-  const subtitleStyleProps = useProjectStore((state) => state.subtitleStyleProps)
   const mediaType = useProjectStore((state) => state.mediaType)
   const subtitles = useProjectStore((state) => state.subtitles)
 
@@ -46,19 +37,7 @@ export default function SubtitleOptions(): JSX.Element {
           onClick: (): void => {
             downloadSubtitles(generateTXT(subtitles), SubtitleFormat.TXT)
           }
-        },
-        isVideo(mediaType || '')
-          ? {
-              key: '1-4',
-              label: '.ASS format (Styled)',
-              onClick: (): void => {
-                downloadSubtitles(
-                  generateASS(canvasWidth, canvasHeight, subtitleStyleProps!, subtitles),
-                  SubtitleFormat.ASS
-                )
-              }
-            }
-          : null
+        }
       ]
     },
     isVideo(mediaType || '')
