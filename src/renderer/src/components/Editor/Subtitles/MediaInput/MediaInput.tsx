@@ -21,7 +21,8 @@ export default function MediaInput(): JSX.Element {
     'audio/webm',
     'video/mp4',
     'video/webm',
-    'vidoe/mkv',
+    'video/mkv',
+    'video/x-matroska',
     'video/quicktime'
   ]
 
