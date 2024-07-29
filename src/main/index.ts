@@ -432,6 +432,10 @@ app.whenReady().then(() => {
     }
   })
 
+  ipcMain.handle('check-file-existence', (_, filePath: string) => {
+    return fs.existsSync(filePath)
+  })
+
   ipcMain.handle('open-link', (_, link: string) => {
     shell.openExternal(link)
   })

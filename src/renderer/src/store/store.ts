@@ -61,6 +61,7 @@ export type Project = {
   showSubtitleBackground: boolean
   subtitleBackgroundColor: string
   alphabetCase: AlphabetCase | null
+  fileNotFound: boolean
 }
 
 type State = {
@@ -107,6 +108,7 @@ type State = {
   setShowSubtitleBackground: (showSubtitleBackground: boolean) => void
   setSubtitleBackgroundColor: (subtitleBackgroundColor: string) => void
   setAlphabetCase: (alphabetCase: AlphabetCase | null) => void
+  setFileNotFound: (fileNotFound: boolean) => void
 }
 
 const useAppStore = create<State>()((set, get) => ({
@@ -477,6 +479,16 @@ const useAppStore = create<State>()((set, get) => ({
       const projects = [...state.projects]
       const project = projects[state.currentProjectIndex]
       project.alphabetCase = alphabetCase
+      indexedDBService.updateProject(project)
+      return { projects }
+    })
+  },
+  setFileNotFound: (fileNotFound): void => {
+    set((state) => {
+      if (state.currentProjectIndex === null) return state
+      const projects = [...state.projects]
+      const project = projects[state.currentProjectIndex]
+      project.fileNotFound = fileNotFound
       indexedDBService.updateProject(project)
       return { projects }
     })

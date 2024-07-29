@@ -32,7 +32,8 @@ export default function Projects(): JSX.Element {
       generatedSubtitlesPercentage: 0,
       showSubtitleBackground: true,
       subtitleBackgroundColor: '',
-      alphabetCase: null
+      alphabetCase: null,
+      fileNotFound: false
     })
   }
 

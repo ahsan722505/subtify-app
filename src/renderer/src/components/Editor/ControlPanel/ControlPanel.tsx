@@ -16,6 +16,7 @@ export default function ControlPanel(): JSX.Element {
   const duration = useProjectStore((state) => state.mediaDuration)
   const setCurrentTime = useAppStore((state) => state.setMediaCurrentTime)
   const setDuration = useAppStore((state) => state.setMediaDuration)
+  const fileNotFound = useProjectStore((state) => state.fileNotFound)
 
   React.useEffect(() => {
     const handleUpdateTime = (): void => {
@@ -23,8 +24,8 @@ export default function ControlPanel(): JSX.Element {
       setDuration(mediaRef.current?.duration || 0)
     }
     const handleMediaEnded = (): void => setMediaPlaying(false)
-    if (mediaPath) {
-      mediaRef.current = document.getElementById('media') as HTMLVideoElement
+    mediaRef.current = document.getElementById('media') as HTMLVideoElement
+    if (mediaPath && mediaRef.current) {
       mediaRef.current.addEventListener('ended', handleMediaEnded)
       mediaRef.current.addEventListener('timeupdate', handleUpdateTime)
       mediaRef.current.addEventListener('loadedmetadata', handleUpdateTime)
@@ -36,22 +37,22 @@ export default function ControlPanel(): JSX.Element {
         mediaRef.current.removeEventListener('ended', handleMediaEnded)
       }
     }
-  }, [mediaPath])
+  }, [mediaPath, fileNotFound])
 
   const handelPlayMedia = (): void => {
-    if (!mediaRef.current) return
+    if (!mediaRef.current || fileNotFound) return
     mediaRef.current.play()
     setMediaPlaying(true)
   }
 
   const handelPauseMedia = (): void => {
-    if (!mediaRef.current) return
+    if (!mediaRef.current || fileNotFound) return
     mediaRef.current.pause()
     setMediaPlaying(false)
   }
 
   const handelForwardMedia = (): void => {
-    if (!mediaRef.current) return
+    if (!mediaRef.current || fileNotFound) return
     mediaRef.current.currentTime = Math.min(
       mediaRef.current.duration,
       mediaRef.current.currentTime + 10
@@ -59,7 +60,7 @@ export default function ControlPanel(): JSX.Element {
   }
 
   const handelRewindMedia = (): void => {
-    if (!mediaRef.current) return
+    if (!mediaRef.current || fileNotFound) return
     mediaRef.current.currentTime = Math.max(0, mediaRef.current.currentTime - 10)
   }
 
