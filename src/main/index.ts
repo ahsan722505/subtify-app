@@ -428,12 +428,17 @@ app.whenReady().then(() => {
       osRelease: os.release(),
       cpuModel: os.cpus()[0]?.model,
       architecture: os.arch(),
-      logicalCores: os.cpus().length
+      logicalCores: os.cpus().length,
+      appVersion: app.getVersion()
     }
   })
 
   ipcMain.handle('check-file-existence', (_, filePath: string) => {
     return fs.existsSync(filePath)
+  })
+
+  ipcMain.handle('get-app-version', () => {
+    return app.getVersion()
   })
 
   ipcMain.handle('open-link', (_, link: string) => {
