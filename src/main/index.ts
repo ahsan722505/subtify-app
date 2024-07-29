@@ -351,7 +351,7 @@ app.whenReady().then(() => {
         // Prepare FFmpeg input files and filter complex string
         for (let index = 0; index < subtitles.length; index++) {
           const imageFile = join(app.getPath('userData'), `export-${exportId}`, `${index + 1}.png`)
-          inputs.push(`-i ${imageFile}`)
+          inputs.push('-i', imageFile)
           const subtitle = subtitles[index]
 
           // Define the overlay filter for each subtitle
@@ -369,14 +369,7 @@ app.whenReady().then(() => {
 
         const outputPath = join(app.getPath('downloads'), `subtify-${exportId}.mp4`)
 
-        const args = [
-          '-i',
-          videoPath,
-          ...inputs.join(' ').split(' '),
-          '-filter_complex',
-          filterComplex,
-          outputPath
-        ]
+        const args = ['-i', videoPath, ...inputs, '-filter_complex', filterComplex, outputPath]
 
         const ffmpegPath = join(
           is.dev ? '' : process.resourcesPath,
