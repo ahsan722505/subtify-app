@@ -36,6 +36,7 @@ export default React.memo(function CanvasEditor(
   const showSubtitleBackground = useProjectStore((state) => state.showSubtitleBackground)
   const subtitleBackgroundColor = useProjectStore((state) => state.subtitleBackgroundColor)
   const alphabetCase = useProjectStore((state) => state.alphabetCase)
+  const userFonts = useAppStore((state) => state.userFonts)
 
   React.useEffect(() => {
     if (isSelected) {
@@ -343,7 +344,10 @@ export default React.memo(function CanvasEditor(
 
   React.useEffect(() => {
     if (subtitleStyleProps?.fontFamily) {
-      loadFontFamily(subtitleStyleProps.fontFamily)
+      loadFontFamily(
+        subtitleStyleProps.fontFamily,
+        userFonts.find((font) => font.name === subtitleStyleProps.fontFamily)?.path
+      )
       const font = new FontFaceObserver(subtitleStyleProps?.fontFamily)
       font.load().then(
         function () {

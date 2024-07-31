@@ -433,6 +433,26 @@ app.whenReady().then(() => {
     }
   })
 
+  ipcMain.handle('save-font-file', async (_, dataURL: string, fontFileName: string) => {
+    try {
+      const base64Data = dataURL.replace(/^data:font\/\w+;base64,/, '')
+      const fontsDir = join(app.getPath('userData'), 'user-fonts')
+
+      if (!fs.existsSync(fontsDir)) {
+        fs.mkdirSync(fontsDir)
+      }
+
+      const filePath = join(fontsDir, fontFileName)
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath)
+      }
+      fs.writeFileSync(filePath, base64Data, 'base64')
+      return filePath
+    } catch (error) {
+      throw new Error('Failed to save font file')
+    }
+  })
+
   ipcMain.handle('check-file-existence', (_, filePath: string) => {
     return fs.existsSync(filePath)
   })
