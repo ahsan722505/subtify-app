@@ -1,6 +1,8 @@
-import { Subtitle } from '@renderer/store/store'
+import { BackgroundType, Subtitle } from '@renderer/store/store'
 import { SubtitleFormat } from './SubtitleList.types'
 import Konva from 'konva'
+import { Context } from 'konva/lib/Context'
+import { Shape, ShapeConfig } from 'konva/lib/Shape'
 
 export function generateSRT(subtitles: Subtitle[]): string {
   return subtitles
@@ -100,21 +102,84 @@ export function hmsToSecondsOnly(str: string): number {
 
 export function getBackgroundDrawFunc(
   subtitleTextProps: Konva.TextConfig,
-  backgroundColor: string
-) {
-  return function (context, shape): void {
+  backgroundColor: string,
+  backgroundType: BackgroundType,
+  borderRadius: boolean
+): (context: Context, shape: Shape<ShapeConfig>) => void {
+  function drawRoundedBackground(
+    context: Context,
+    xPos: number,
+    yPos: number,
+    width: number,
+    height: number
+  ): void {
+    const cornerRadius = 6
+    context.beginPath()
+    context.moveTo(xPos + cornerRadius, yPos)
+    context.lineTo(xPos + width - cornerRadius, yPos)
+    context.quadraticCurveTo(xPos + width, yPos, xPos + width, yPos + cornerRadius)
+    context.lineTo(xPos + width, yPos + height - cornerRadius)
+    context.quadraticCurveTo(
+      xPos + width,
+      yPos + height,
+      xPos + width - cornerRadius,
+      yPos + height
+    )
+    context.lineTo(xPos + cornerRadius, yPos + height)
+    context.quadraticCurveTo(xPos, yPos + height, xPos, yPos + height - cornerRadius)
+    context.lineTo(xPos, yPos + cornerRadius)
+    context.quadraticCurveTo(xPos, yPos, xPos + cornerRadius, yPos)
+    context.closePath()
+    context.fill()
+  }
+  return function (context: Context, shape: Shape<ShapeConfig>): void {
     const typecastedShape = shape as Konva.Text
-    const diff = typecastedShape.width() - typecastedShape.getTextWidth()
     const align = subtitleTextProps?.align || 'center'
     context.fillStyle = backgroundColor || '#000000FF'
-    let x = 0 // left
-    if (align === 'center') {
-      x = diff / 2
+    const xAdjustment = -8
+    const widthAdjustment = 12
+    const heightAdjustment = 8
+    const yAdjustment = -6
+    if (backgroundType === BackgroundType.SINGLE) {
+      const textWidth = typecastedShape.getTextWidth()
+      const diff = typecastedShape.width() - textWidth
+      let x = 0
+      if (align === 'center') {
+        x = diff / 2
+      }
+      if (align === 'right') {
+        x = diff
+      }
+      x += xAdjustment
+      const width = textWidth + widthAdjustment
+      const height = typecastedShape.height() + heightAdjustment
+      if (borderRadius) drawRoundedBackground(context, x, yAdjustment, width, height)
+      else context.fillRect(x, yAdjustment, width, height)
+    } else {
+      const textNode = getKonvaTextNode(
+        subtitleTextProps,
+        context.canvas.width,
+        context.canvas.height
+      )
+      let y = yAdjustment
+      typecastedShape.textArr.forEach((t) => {
+        textNode.setText(t.text)
+        const width = t.width
+        const height = textNode.height() + heightAdjustment
+        const diff = typecastedShape.width() - width
+        let x = 0
+        if (align === 'center') {
+          x = diff / 2
+        }
+        if (align === 'right') {
+          x = diff
+        }
+        x += xAdjustment
+        if (borderRadius) drawRoundedBackground(context, x, y, width + widthAdjustment, height)
+        else context.fillRect(x, y, width + widthAdjustment, height)
+        y += height + yAdjustment
+      })
     }
-    if (align === 'right') {
-      x = diff
-    }
-    context.fillRect(x - 4, -7, typecastedShape.getTextWidth() + 8, typecastedShape.height() + 12)
     typecastedShape._sceneFunc(context)
   }
 }
@@ -145,7 +210,9 @@ export async function handleBurnSubtitles(
   canvasWidth: number,
   canvasHeight: number,
   originalVideoWidth: number,
-  originalVideoHeight: number
+  originalVideoHeight: number,
+  backgroundType: BackgroundType,
+  borderRadius: boolean
 ): Promise<void> {
   const exportId = generateUniqueId()
   const container = document.createElement('div')
@@ -158,7 +225,9 @@ export async function handleBurnSubtitles(
   const layer = new Konva.Layer()
   const text = new Konva.Text({
     ...textProps,
-    sceneFunc: showBackground ? getBackgroundDrawFunc(textProps, backgroundColor) : undefined
+    sceneFunc: showBackground
+      ? getBackgroundDrawFunc(textProps, backgroundColor, backgroundType, borderRadius)
+      : undefined
   })
   layer.add(text)
   stage.add(layer)
@@ -170,4 +239,25 @@ export async function handleBurnSubtitles(
     await saveStageAsImage(stage, Math.max(pixelRatioX, pixelRatioY), exportId, i + 1)
   }
   await window.electron.ipcRenderer.invoke('burn-subtitles', subtitles, exportId, videoPath)
+}
+
+export function getKonvaTextNode(
+  textProps: Konva.TextConfig,
+  canvasWidth: number,
+  canvasHeight: number
+): Konva.Text {
+  const container = document.createElement('div')
+  container.id = 'headless-konva'
+  const stage = new Konva.Stage({
+    container,
+    width: canvasWidth,
+    height: canvasHeight
+  })
+  const layer = new Konva.Layer()
+  const text = new Konva.Text({
+    ...textProps
+  })
+  layer.add(text)
+  stage.add(layer)
+  return text
 }

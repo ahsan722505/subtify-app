@@ -37,6 +37,11 @@ export enum AlphabetCase {
   CAPITALIZE = 'capitalize'
 }
 
+export enum BackgroundType {
+  SINGLE = 'single',
+  SPLITTED = 'splitted'
+}
+
 export type Subtitle = {
   start: number
   end: number
@@ -68,6 +73,8 @@ export type Project = {
   subtitleBackgroundColor: string
   alphabetCase: AlphabetCase | null
   fileNotFound: boolean
+  backgroundType: BackgroundType | null
+  borderRadius: boolean
 }
 
 type State = {
@@ -119,6 +126,8 @@ type State = {
   setFileNotFound: (fileNotFound: boolean) => void
   addUserFont: (font: UserFont) => void
   addPresetColor: (color: string) => void
+  setBackgroundType: (backgroundType: BackgroundType) => void
+  setBorderRadius: (borderRadius: boolean) => void
 }
 
 const useAppStore = create<State>()(
@@ -526,6 +535,26 @@ const useAppStore = create<State>()(
           if (state.presetColors.includes(color)) return state
           const presetColors = [...state.presetColors, color]
           return { presetColors }
+        })
+      },
+      setBackgroundType: (backgroundType): void => {
+        set((state) => {
+          if (state.currentProjectIndex === null) return state
+          const projects = [...state.projects]
+          const project = projects[state.currentProjectIndex]
+          project.backgroundType = backgroundType
+          indexedDBService.updateProject(project)
+          return { projects }
+        })
+      },
+      setBorderRadius: (borderRadius): void => {
+        set((state) => {
+          if (state.currentProjectIndex === null) return state
+          const projects = [...state.projects]
+          const project = projects[state.currentProjectIndex]
+          project.borderRadius = borderRadius
+          indexedDBService.updateProject(project)
+          return { projects }
         })
       }
     }),
