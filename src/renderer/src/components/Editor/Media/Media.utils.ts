@@ -20,3 +20,7 @@ export async function generateVideoThumbnail(videoPath: string): Promise<string>
 export const isVideo = (mimeType: string): boolean => mimeType.startsWith('video')
 
 export const isAudio = (mimeType: string): boolean => mimeType.startsWith('audio')
+
+export const checkFileExistence = async (filePath: string): Promise<boolean> => {
+  return window.electron.ipcRenderer.invoke('check-file-existence', filePath)
+}

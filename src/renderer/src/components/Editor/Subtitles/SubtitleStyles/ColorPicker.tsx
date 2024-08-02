@@ -1,7 +1,9 @@
-import { HexAlphaColorPicker } from 'react-colorful'
 import { BgColorsOutlined } from '@ant-design/icons'
 import React from 'react'
 import useOutsideClick from '@renderer/hooks/useOutsideClick'
+import Sketch from '@uiw/react-color-sketch'
+import { Button } from 'antd'
+import useAppStore from '@renderer/store/store'
 
 export default function ColorPicker({
   color,
@@ -12,6 +14,8 @@ export default function ColorPicker({
 }): JSX.Element {
   const [showPicker, setShowPicker] = React.useState(false)
   const pickerRef = React.useRef<HTMLDivElement>(null)
+  const presetColors = useAppStore((state) => state.presetColors)
+  const addPresetColor = useAppStore((state) => state.addPresetColor)
   useOutsideClick(pickerRef, () => setShowPicker(false), ['toggle-color-picker'])
 
   return (
@@ -21,7 +25,19 @@ export default function ColorPicker({
           ref={pickerRef}
           className="!absolute z-[200] transform -translate-y-1/3 -translate-x-[102%]"
         >
-          <HexAlphaColorPicker color={color} onChange={setColor} />
+          <Sketch
+            color={color}
+            onChange={(color) => {
+              setColor(color.hexa)
+            }}
+            presetColors={presetColors}
+          />
+
+          {color && (
+            <Button onClick={() => addPresetColor(color)} className="mt-2 w-full">
+              Save Color
+            </Button>
+          )}
         </div>
       )}
       <span

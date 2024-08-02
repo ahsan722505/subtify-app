@@ -1,6 +1,8 @@
-import { Subtitle } from '@renderer/store/store'
+import { BackgroundType, Subtitle } from '@renderer/store/store'
 import { SubtitleFormat } from './SubtitleList.types'
 import Konva from 'konva'
+import { Context } from 'konva/lib/Context'
+import { Shape, ShapeConfig } from 'konva/lib/Shape'
 
 export function generateSRT(subtitles: Subtitle[]): string {
   return subtitles
@@ -100,21 +102,60 @@ export function hmsToSecondsOnly(str: string): number {
 
 export function getBackgroundDrawFunc(
   subtitleTextProps: Konva.TextConfig,
-  backgroundColor: string
-) {
-  return function (context, shape): void {
+  backgroundColor: string,
+  backgroundType: BackgroundType,
+  borderRadius: boolean
+): (context: Context, shape: Shape<ShapeConfig>) => void {
+  return function (context: Context, shape: Shape<ShapeConfig>): void {
     const typecastedShape = shape as Konva.Text
-    const diff = typecastedShape.width() - typecastedShape.getTextWidth()
     const align = subtitleTextProps?.align || 'center'
     context.fillStyle = backgroundColor || '#000000FF'
-    let x = 0 // left
-    if (align === 'center') {
-      x = diff / 2
+    const xAdjustment = -8
+    const widthAdjustment = 12
+    const heightAdjustment = 8
+    const yAdjustment = -6
+    if (backgroundType === BackgroundType.SINGLE) {
+      const textWidth = typecastedShape.getTextWidth()
+      const diff = typecastedShape.width() - textWidth
+      let x = 0
+      if (align === 'center') {
+        x = diff / 2
+      }
+      if (align === 'right') {
+        x = diff
+      }
+      x += xAdjustment
+      const width = textWidth + widthAdjustment
+      const height = typecastedShape.height() + heightAdjustment
+      if (borderRadius) {
+        context.beginPath()
+        context.roundRect(x, yAdjustment, width, height, 6)
+        context.fill()
+      } else context.fillRect(x, yAdjustment, width, height)
+    } else {
+      let y = yAdjustment
+      typecastedShape.textArr.forEach((t) => {
+        const width = t.width
+        const textHeight =
+          (subtitleTextProps?.fontSize || 12) * (subtitleTextProps?.lineHeight || 1)
+        const height = textHeight + heightAdjustment
+        const diff = typecastedShape.width() - width
+        let x = 0
+        if (align === 'center') {
+          x = diff / 2
+        }
+        if (align === 'right') {
+          x = diff
+        }
+        x += xAdjustment
+        if (borderRadius) {
+          context.beginPath()
+          context.roundRect(x, y, width + widthAdjustment, height, 6)
+          context.fill()
+        } else context.fillRect(x, y, width + widthAdjustment, height)
+        y += height + yAdjustment
+      })
     }
-    if (align === 'right') {
-      x = diff
-    }
-    context.fillRect(x - 4, -7, typecastedShape.getTextWidth() + 8, typecastedShape.height() + 12)
     typecastedShape._sceneFunc(context)
   }
 }
@@ -145,7 +186,9 @@ export async function handleBurnSubtitles(
   canvasWidth: number,
   canvasHeight: number,
   originalVideoWidth: number,
-  originalVideoHeight: number
+  originalVideoHeight: number,
+  backgroundType: BackgroundType,
+  borderRadius: boolean
 ): Promise<void> {
   const exportId = generateUniqueId()
   const container = document.createElement('div')
@@ -158,7 +201,9 @@ export async function handleBurnSubtitles(
   const layer = new Konva.Layer()
   const text = new Konva.Text({
     ...textProps,
-    sceneFunc: showBackground ? getBackgroundDrawFunc(textProps, backgroundColor) : undefined
+    sceneFunc: showBackground
+      ? getBackgroundDrawFunc(textProps, backgroundColor, backgroundType, borderRadius)
+      : undefined
   })
   layer.add(text)
   stage.add(layer)

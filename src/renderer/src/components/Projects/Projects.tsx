@@ -1,6 +1,6 @@
 import { Button, Empty, Input, Pagination, Spin } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
-import useAppStore, { TranscriptionStatus } from '@renderer/store/store'
+import useAppStore, { BackgroundType, TranscriptionStatus } from '@renderer/store/store'
 import ProjectListItem from './ProjectListItem'
 import { PROJECTS_LIMIT } from '@renderer/constants'
 import { useDebouncedCallback } from '@renderer/hooks/useDebouncedCallback'
@@ -32,7 +32,10 @@ export default function Projects(): JSX.Element {
       generatedSubtitlesPercentage: 0,
       showSubtitleBackground: true,
       subtitleBackgroundColor: '',
-      alphabetCase: null
+      alphabetCase: null,
+      fileNotFound: false,
+      backgroundType: BackgroundType.SINGLE,
+      borderRadius: false
     })
   }
 

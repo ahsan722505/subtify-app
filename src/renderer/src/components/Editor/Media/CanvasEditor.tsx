@@ -1,5 +1,5 @@
 import { useProjectStore } from '@renderer/hooks/useProjectStore'
-import useAppStore, { AlphabetCase } from '@renderer/store/store'
+import useAppStore, { AlphabetCase, BackgroundType } from '@renderer/store/store'
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 import React from 'react'
@@ -36,6 +36,9 @@ export default React.memo(function CanvasEditor(
   const showSubtitleBackground = useProjectStore((state) => state.showSubtitleBackground)
   const subtitleBackgroundColor = useProjectStore((state) => state.subtitleBackgroundColor)
   const alphabetCase = useProjectStore((state) => state.alphabetCase)
+  const userFonts = useAppStore((state) => state.userFonts)
+  const backgroundType = useProjectStore((state) => state.backgroundType)
+  const borderRadius = useProjectStore((state) => state.borderRadius)
 
   React.useEffect(() => {
     if (isSelected) {
@@ -343,7 +346,10 @@ export default React.memo(function CanvasEditor(
 
   React.useEffect(() => {
     if (subtitleStyleProps?.fontFamily) {
-      loadFontFamily(subtitleStyleProps.fontFamily)
+      loadFontFamily(
+        subtitleStyleProps.fontFamily,
+        userFonts.find((font) => font.name === subtitleStyleProps.fontFamily)?.path
+      )
       const font = new FontFaceObserver(subtitleStyleProps?.fontFamily)
       font.load().then(
         function () {
@@ -369,7 +375,12 @@ export default React.memo(function CanvasEditor(
             {...(subtitleStyleProps || {})}
             sceneFunc={
               showSubtitleBackground
-                ? getBackgroundDrawFunc(subtitleStyleProps!, subtitleBackgroundColor)
+                ? getBackgroundDrawFunc(
+                    subtitleStyleProps!,
+                    subtitleBackgroundColor,
+                    backgroundType || BackgroundType.SINGLE,
+                    borderRadius
+                  )
                 : undefined
             }
             draggable

@@ -6,6 +6,7 @@ import { useProjectStore } from '@renderer/hooks/useProjectStore'
 import { generateSRT, generateVTT, handleBurnSubtitles } from './SubtitleList.utils'
 import { SubtitleFormat } from './SubtitleList.types'
 import { DownloadOutlined } from '@ant-design/icons'
+import { BackgroundType } from '@renderer/store/store'
 
 export default function ExportVideo(): JSX.Element {
   const subtitles = useProjectStore((state) => state.subtitles)
@@ -20,6 +21,8 @@ export default function ExportVideo(): JSX.Element {
   const subtitleBackgroundColor = useProjectStore((state) => state.subtitleBackgroundColor)
   const showSubtitleBackground = useProjectStore((state) => state.showSubtitleBackground)
   const mediaPath = useProjectStore((state) => state.mediaPath)
+  const backgroundType = useProjectStore((state) => state.backgroundType)
+  const borderRadius = useProjectStore((state) => state.borderRadius)
 
   const handleExportVideo = async (): Promise<void> => {
     try {
@@ -35,7 +38,9 @@ export default function ExportVideo(): JSX.Element {
           canvasWidth,
           canvasHeight,
           video.videoWidth,
-          video.videoHeight
+          video.videoHeight,
+          backgroundType || BackgroundType.SINGLE,
+          borderRadius
         )
       } else {
         let subtitleMetadata: { text: string; type: SubtitleFormat } | null = null

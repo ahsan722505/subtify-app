@@ -51,6 +51,9 @@ function App(): JSX.Element {
         $set: { ...systemInfo }
       })
     })
+    window.electron.ipcRenderer.invoke('get-app-version').then((version) => {
+      document.title = `subtify v${version}`
+    })
     return () => {
       window.electron.ipcRenderer.removeAllListeners('update-status')
       window.electron.ipcRenderer.removeAllListeners('downloaded-updates-percentage')
