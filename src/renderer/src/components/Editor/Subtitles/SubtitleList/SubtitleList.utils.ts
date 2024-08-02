@@ -133,16 +133,12 @@ export function getBackgroundDrawFunc(
         context.fill()
       } else context.fillRect(x, yAdjustment, width, height)
     } else {
-      const textNode = getKonvaTextNode(
-        subtitleTextProps,
-        context.canvas.width,
-        context.canvas.height
-      )
       let y = yAdjustment
       typecastedShape.textArr.forEach((t) => {
-        textNode.setText(t.text)
         const width = t.width
-        const height = textNode.height() + heightAdjustment
+        const textHeight =
+          (subtitleTextProps?.fontSize || 12) * (subtitleTextProps?.lineHeight || 1)
+        const height = textHeight + heightAdjustment
         const diff = typecastedShape.width() - width
         let x = 0
         if (align === 'center') {
