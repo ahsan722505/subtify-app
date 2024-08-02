@@ -106,32 +106,6 @@ export function getBackgroundDrawFunc(
   backgroundType: BackgroundType,
   borderRadius: boolean
 ): (context: Context, shape: Shape<ShapeConfig>) => void {
-  function drawRoundedBackground(
-    context: Context,
-    xPos: number,
-    yPos: number,
-    width: number,
-    height: number
-  ): void {
-    const cornerRadius = 6
-    context.beginPath()
-    context.moveTo(xPos + cornerRadius, yPos)
-    context.lineTo(xPos + width - cornerRadius, yPos)
-    context.quadraticCurveTo(xPos + width, yPos, xPos + width, yPos + cornerRadius)
-    context.lineTo(xPos + width, yPos + height - cornerRadius)
-    context.quadraticCurveTo(
-      xPos + width,
-      yPos + height,
-      xPos + width - cornerRadius,
-      yPos + height
-    )
-    context.lineTo(xPos + cornerRadius, yPos + height)
-    context.quadraticCurveTo(xPos, yPos + height, xPos, yPos + height - cornerRadius)
-    context.lineTo(xPos, yPos + cornerRadius)
-    context.quadraticCurveTo(xPos, yPos, xPos + cornerRadius, yPos)
-    context.closePath()
-    context.fill()
-  }
   return function (context: Context, shape: Shape<ShapeConfig>): void {
     const typecastedShape = shape as Konva.Text
     const align = subtitleTextProps?.align || 'center'
@@ -153,8 +127,11 @@ export function getBackgroundDrawFunc(
       x += xAdjustment
       const width = textWidth + widthAdjustment
       const height = typecastedShape.height() + heightAdjustment
-      if (borderRadius) drawRoundedBackground(context, x, yAdjustment, width, height)
-      else context.fillRect(x, yAdjustment, width, height)
+      if (borderRadius) {
+        context.beginPath()
+        context.roundRect(x, yAdjustment, width, height, 6)
+        context.fill()
+      } else context.fillRect(x, yAdjustment, width, height)
     } else {
       const textNode = getKonvaTextNode(
         subtitleTextProps,
@@ -175,8 +152,11 @@ export function getBackgroundDrawFunc(
           x = diff
         }
         x += xAdjustment
-        if (borderRadius) drawRoundedBackground(context, x, y, width + widthAdjustment, height)
-        else context.fillRect(x, y, width + widthAdjustment, height)
+        if (borderRadius) {
+          context.beginPath()
+          context.roundRect(x, y, width + widthAdjustment, height, 6)
+          context.fill()
+        } else context.fillRect(x, y, width + widthAdjustment, height)
         y += height + yAdjustment
       })
     }
