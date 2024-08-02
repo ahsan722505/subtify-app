@@ -216,24 +216,3 @@ export async function handleBurnSubtitles(
   }
   await window.electron.ipcRenderer.invoke('burn-subtitles', subtitles, exportId, videoPath)
 }
-
-export function getKonvaTextNode(
-  textProps: Konva.TextConfig,
-  canvasWidth: number,
-  canvasHeight: number
-): Konva.Text {
-  const container = document.createElement('div')
-  container.id = 'headless-konva'
-  const stage = new Konva.Stage({
-    container,
-    width: canvasWidth,
-    height: canvasHeight
-  })
-  const layer = new Konva.Layer()
-  const text = new Konva.Text({
-    ...textProps
-  })
-  layer.add(text)
-  stage.add(layer)
-  return text
-}
