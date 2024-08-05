@@ -3,7 +3,11 @@ import { useProjectStore } from './useProjectStore'
 import { Subtitle } from '@renderer/store/store'
 import { isSubtitlePlaying } from '@renderer/components/Editor/Subtitles/SubtitleList/SubtitleList.utils'
 
-export default function useGetSubtitleFromTime(): Subtitle | null {
+interface SubtitleWithWordIndex extends Subtitle {
+  currentWordIndex: number
+}
+
+export default function useGetSubtitleFromTime(): SubtitleWithWordIndex | null {
   const subtitles = useProjectStore((state) => state.subtitles)
   const currentTime = useProjectStore((state) => state.mediaCurrentTime)
   const getSubtitleFromTime = React.useCallback(
@@ -16,7 +20,16 @@ export default function useGetSubtitleFromTime(): Subtitle | null {
         const subtitle = subtitles[mid]
 
         if (isSubtitlePlaying(time, subtitle.start, subtitle.end)) {
-          return subtitle
+          const words = subtitle.text.split(' ')
+          const subtitleDuration = subtitle.end - subtitle.start
+          const timeIntoSubtitle = time - subtitle.start
+          const wordDuration = subtitleDuration / words.length
+          const currentWordIndex = Math.floor(timeIntoSubtitle / wordDuration)
+
+          return {
+            ...subtitle,
+            currentWordIndex: Math.min(currentWordIndex, words.length - 1)
+          }
         } else if (time < subtitle.start) {
           high = mid - 1
         } else {

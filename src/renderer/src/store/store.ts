@@ -28,7 +28,8 @@ export enum TranscriptionStatus {
   LOADING = 'loading',
   SUCCESS = 'success',
   ERROR = 'error',
-  STYLES = 'styles'
+  STYLES = 'styles',
+  ANIMATIONS = 'animations'
 }
 
 export enum AlphabetCase {

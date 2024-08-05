@@ -43,6 +43,8 @@ function Media(): JSX.Element {
     }
   }, [mediaPath])
 
+  console.log('cuurent word', currentSubtitle?.currentWordIndex)
+
   return (
     <div className="w-full h-full flex flex-col items-center justify-start relative">
       {mediaPath && mediaType ? (

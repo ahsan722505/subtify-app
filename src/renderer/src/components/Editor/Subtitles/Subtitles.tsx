@@ -6,6 +6,7 @@ import { TranscriptionStatus } from '@renderer/store/store'
 import SubtitleTypeInput from './SubtitleTypeInput/SubtitleTypeInput'
 import AutoSubtitleInput from './AutoSubtitleInput/AutoSubtitleInput'
 import SubtitleStyles from './SubtitleStyles/SubtitleStyles'
+import SubtitleAnimations from './SubtitleAnimations/SubtitleAnimations'
 
 function Subtitles(): JSX.Element {
   const status = useProjectStore((state) => state.transcriptionStatus)
@@ -17,6 +18,7 @@ function Subtitles(): JSX.Element {
       {status === TranscriptionStatus.LOADING && <GenerationProgress />}
       {status === TranscriptionStatus.SUCCESS && <SubtitleList />}
       {status === TranscriptionStatus.STYLES && <SubtitleStyles />}
+      {status === TranscriptionStatus.ANIMATIONS && <SubtitleAnimations />}
     </div>
   )
 }
