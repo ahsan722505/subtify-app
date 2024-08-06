@@ -3,10 +3,12 @@ import useAppStore, { AlphabetCase, BackgroundType } from '@renderer/store/store
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 import React from 'react'
-import { Layer, Stage, StageProps, Text, Transformer } from 'react-konva'
+import { Group, Layer, Stage, StageProps, Text, Transformer } from 'react-konva'
 import { loadFontFamily } from '../Subtitles/SubtitleStyles/SubtitleStyles.utils'
 import FontFaceObserver from 'fontfaceobserver'
 import { getBackgroundDrawFunc } from '../Subtitles/SubtitleList/SubtitleList.utils'
+const canvas = document.createElement('canvas')
+const context = canvas.getContext('2d')
 
 const GUIDELINE_OFFSET = 5
 
@@ -31,7 +33,8 @@ export default React.memo(function CanvasEditor(
   const subtitleStyleProps = useProjectStore((state) => state.subtitleStyleProps)
   const [isSelected, setIsSelected] = React.useState(false)
   const [fontAvailable, setFontAvailable] = React.useState(false)
-  const subtitleNodeRef = React.useRef<Konva.Text>(null)
+  const subtitleNodeRef = React.useRef<Konva.Group>(null)
+  const charRef = React.useRef<Konva.Text>(null)
   const trRef = React.useRef<Konva.Transformer>(null)
   const showSubtitleBackground = useProjectStore((state) => state.showSubtitleBackground)
   const subtitleBackgroundColor = useProjectStore((state) => state.subtitleBackgroundColor)
@@ -362,27 +365,20 @@ export default React.memo(function CanvasEditor(
     } else setFontAvailable(true)
   }, [subtitleStyleProps?.fontFamily])
 
+  context!.font = `${subtitleStyleProps?.fontStyle || 'normal'} ${subtitleStyleProps?.fontSize || 12}px ${subtitleStyleProps?.fontFamily || 'Arial'}`
+  console.log(subtitleStyleProps?.x, subtitleStyleProps?.y, 'naruto')
   return (
     <Stage {...props} onMouseDown={checkDeselect} onTouchStart={checkDeselect}>
       <Layer id="canvas-editor">
         {casedSubtitle && fontAvailable && (
-          <Text
+          <Group
+            name="object"
+            ref={subtitleNodeRef}
             onClick={handleNodeClick}
             onTap={handleNodeClick}
-            ref={subtitleNodeRef}
-            text={casedSubtitle}
-            name="object"
-            {...(subtitleStyleProps || {})}
-            sceneFunc={
-              showSubtitleBackground
-                ? getBackgroundDrawFunc(
-                    subtitleStyleProps!,
-                    subtitleBackgroundColor,
-                    backgroundType || BackgroundType.SINGLE,
-                    borderRadius
-                  )
-                : undefined
-            }
+            x={subtitleStyleProps?.x}
+            y={subtitleStyleProps?.y}
+            width={subtitleStyleProps?.width}
             draggable
             onDragEnd={(e) => {
               setSubtitleStyleProps({
@@ -411,11 +407,41 @@ export default React.memo(function CanvasEditor(
                 x: node.x(),
                 y: node.y(),
                 width: Math.max(10, node.width() * scaleX),
-                fontSize: Math.max(5, node.fontSize() * scaleY),
+                fontSize: Math.max(5, (node.children[0] as Konva.Text).fontSize() * scaleY),
                 rotation: node.rotation()
               })
             }}
-          />
+            // sceneFunc={
+            //   showSubtitleBackground
+            //     ? getBackgroundDrawFunc(
+            //         subtitleStyleProps!,
+            //         subtitleBackgroundColor,
+            //         backgroundType || BackgroundType.SINGLE,
+            //         borderRadius
+            //       )
+            //     : undefined
+            // }
+          >
+            {casedSubtitle.split('').map((w, i) => {
+              const accumulatedWidth = context?.measureText(casedSubtitle.slice(0, i)).width || 0
+              console.log('accumulatedWidth', accumulatedWidth, i)
+              return (
+                <Text
+                  ref={i === 0 ? charRef : null}
+                  key={i}
+                  text={w}
+                  // x={(subtitleStyleProps?.x || 0) + accumulatedWidth}
+                  x={accumulatedWidth}
+                  // y={subtitleStyleProps?.y}
+                  y={0}
+                  fontSize={subtitleStyleProps?.fontSize}
+                  fontFamily={subtitleStyleProps?.fontFamily}
+                  fill={subtitleStyleProps?.fill}
+                  letterSpacing={subtitleStyleProps?.letterSpacing}
+                />
+              )
+            })}
+          </Group>
         )}
         {isSelected && (
           <Transformer
