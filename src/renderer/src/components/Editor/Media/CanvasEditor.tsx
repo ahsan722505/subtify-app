@@ -362,6 +362,8 @@ export default React.memo(function CanvasEditor(
   context!.font = `${subtitleStyleProps?.fontStyle || 'normal'} ${subtitleStyleProps?.fontSize || 12}px ${subtitleStyleProps?.fontFamily || 'Arial'}`
   const subtitleWidth = subtitleStyleProps?.width || props.width!
   const subtitleAlignment = subtitleStyleProps?.align || 'center'
+  const letterSpacing = subtitleStyleProps?.letterSpacing || 0
+  const fontStyle = subtitleStyleProps?.fontStyle || 'normal'
   return (
     <Stage {...props} onMouseDown={checkDeselect} onTouchStart={checkDeselect}>
       <Layer id="canvas-editor">
@@ -438,7 +440,7 @@ export default React.memo(function CanvasEditor(
                   return lineNodes
                 }
 
-                const characterWidth = context?.measureText(w).width || 0
+                const characterWidth = (context?.measureText(w).width || 0) + letterSpacing
                 const firstCharacterOfWord = i === 0 || casedSubtitle[i - 1] === ' '
                 let currentWidth = characterWidth
 
@@ -450,7 +452,8 @@ export default React.memo(function CanvasEditor(
                     return casedSubtitle.slice(i, endIndex)
                   })()
 
-                  const wordWidth = context?.measureText(word).width || 0
+                  const wordWidth =
+                    (context?.measureText(word).width || 0) + letterSpacing * word.length
                   if (wordWidth <= subtitleWidth) currentWidth = wordWidth
                 }
 
@@ -466,6 +469,7 @@ export default React.memo(function CanvasEditor(
                       fontSize={subtitleStyleProps?.fontSize}
                       fontFamily={subtitleStyleProps?.fontFamily}
                       fill={subtitleStyleProps?.fill}
+                      fontStyle={fontStyle}
                     />
                   ]
                   accumulatedWidth = characterWidth
@@ -481,6 +485,7 @@ export default React.memo(function CanvasEditor(
                     fontSize={subtitleStyleProps?.fontSize}
                     fontFamily={subtitleStyleProps?.fontFamily}
                     fill={subtitleStyleProps?.fill}
+                    fontStyle={fontStyle}
                   />
                 )
 
