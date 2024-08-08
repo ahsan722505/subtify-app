@@ -360,7 +360,7 @@ export default React.memo(function CanvasEditor(
   }, [subtitleStyleProps?.fontFamily])
 
   context!.font = `${subtitleStyleProps?.fontStyle || 'normal'} ${subtitleStyleProps?.fontSize || 12}px ${subtitleStyleProps?.fontFamily || 'Arial'}`
-  console.log(subtitleStyleProps?.width, 'naruto')
+  const subtitleWidth = subtitleStyleProps?.width || props.width!
   return (
     <Stage {...props} onMouseDown={checkDeselect} onTouchStart={checkDeselect}>
       <Layer id="canvas-editor">
@@ -383,7 +383,7 @@ export default React.memo(function CanvasEditor(
               handleSnapOnDragEnd(e)
             }}
             onDragMove={handleSnapOnDragMove}
-            onTransform={() => {
+            onTransformEnd={() => {
               const node = subtitleNodeRef.current!
               setSubtitleStyleProps({
                 ...subtitleStyleProps,
@@ -398,20 +398,58 @@ export default React.memo(function CanvasEditor(
             }}
           >
             <Rect width={subtitleStyleProps?.width} />
-            {casedSubtitle.split('').map((w, i) => {
-              const accumulatedWidth = context?.measureText(casedSubtitle.slice(0, i)).width || 0
-              return (
-                <Text
-                  key={i}
-                  text={w}
-                  x={accumulatedWidth}
-                  y={0}
-                  fontSize={subtitleStyleProps?.fontSize}
-                  fontFamily={subtitleStyleProps?.fontFamily}
-                  fill={subtitleStyleProps?.fill}
-                />
-              )
-            })}
+            {((): Array<JSX.Element | null> => {
+              let accumulatedWidth = 0
+              let accumulatedHeight = 0
+              const lineHeight =
+                (subtitleStyleProps?.fontSize || 12) * (subtitleStyleProps?.lineHeight || 1)
+
+              return casedSubtitle.split('').map((w, i) => {
+                if (w === '\n') {
+                  //next line
+                  accumulatedWidth = 0
+                  accumulatedHeight += lineHeight
+                  return null
+                }
+
+                const characterWidth = context?.measureText(w).width || 0
+                const firstCharacterOfWord = i === 0 || casedSubtitle[i - 1] === ' '
+                let currentWidth = characterWidth
+
+                if (firstCharacterOfWord) {
+                  const word = ((): string => {
+                    let endIndex = i
+                    while (endIndex < casedSubtitle.length && casedSubtitle[endIndex] !== ' ')
+                      endIndex++
+                    return casedSubtitle.slice(i, endIndex)
+                  })()
+
+                  const wordWidth = context?.measureText(word).width || 0
+                  if (wordWidth <= subtitleWidth) currentWidth = wordWidth
+                }
+
+                if (accumulatedWidth + currentWidth > subtitleWidth) {
+                  //next line
+                  accumulatedWidth = 0
+                  accumulatedHeight += lineHeight
+                }
+
+                const textNode = (
+                  <Text
+                    key={i}
+                    text={w}
+                    x={accumulatedWidth}
+                    y={accumulatedHeight}
+                    fontSize={subtitleStyleProps?.fontSize}
+                    fontFamily={subtitleStyleProps?.fontFamily}
+                    fill={subtitleStyleProps?.fill}
+                  />
+                )
+
+                accumulatedWidth += characterWidth
+                return textNode
+              })
+            })()}
           </Group>
         )}
         {isSelected && (
