@@ -361,6 +361,7 @@ export default React.memo(function CanvasEditor(
 
   context!.font = `${subtitleStyleProps?.fontStyle || 'normal'} ${subtitleStyleProps?.fontSize || 12}px ${subtitleStyleProps?.fontFamily || 'Arial'}`
   const subtitleWidth = subtitleStyleProps?.width || props.width!
+  const subtitleAlignment = subtitleStyleProps?.align || 'center'
   return (
     <Stage {...props} onMouseDown={checkDeselect} onTouchStart={checkDeselect}>
       <Layer id="canvas-editor">
@@ -403,13 +404,38 @@ export default React.memo(function CanvasEditor(
               let accumulatedHeight = 0
               const lineHeight =
                 (subtitleStyleProps?.fontSize || 12) * (subtitleStyleProps?.lineHeight || 1)
+              let currentLine: JSX.Element[] = []
 
-              return casedSubtitle.split('').map((w, i) => {
+              const renderLine = (
+                lineNodes: Array<JSX.Element | null>,
+                align: string
+              ): Array<JSX.Element | null> => {
+                const totalLineWidth = accumulatedWidth
+                let xOffset = 0
+
+                if (align === 'center') {
+                  xOffset = (subtitleWidth - totalLineWidth) / 2
+                } else if (align === 'right') {
+                  xOffset = subtitleWidth - totalLineWidth
+                }
+
+                return lineNodes.map((node) => {
+                  if (node) {
+                    return React.cloneElement(node, {
+                      x: (node.props.x || 0) + xOffset
+                    })
+                  }
+                  return null
+                })
+              }
+
+              const allTextNodes = casedSubtitle.split('').flatMap((w, i) => {
                 if (w === '\n') {
-                  //next line
+                  const lineNodes = renderLine(currentLine, subtitleAlignment)
                   accumulatedWidth = 0
                   accumulatedHeight += lineHeight
-                  return null
+                  currentLine = []
+                  return lineNodes
                 }
 
                 const characterWidth = context?.measureText(w).width || 0
@@ -429,9 +455,21 @@ export default React.memo(function CanvasEditor(
                 }
 
                 if (accumulatedWidth + currentWidth > subtitleWidth) {
-                  //next line
-                  accumulatedWidth = 0
+                  const lineNodes = renderLine(currentLine, subtitleAlignment)
                   accumulatedHeight += lineHeight
+                  currentLine = [
+                    <Text
+                      key={i}
+                      text={w}
+                      x={0}
+                      y={accumulatedHeight}
+                      fontSize={subtitleStyleProps?.fontSize}
+                      fontFamily={subtitleStyleProps?.fontFamily}
+                      fill={subtitleStyleProps?.fill}
+                    />
+                  ]
+                  accumulatedWidth = characterWidth
+                  return lineNodes
                 }
 
                 const textNode = (
@@ -447,8 +485,11 @@ export default React.memo(function CanvasEditor(
                 )
 
                 accumulatedWidth += characterWidth
-                return textNode
+                currentLine.push(textNode)
+                return []
               })
+
+              return [...renderLine(currentLine, subtitleAlignment), ...allTextNodes]
             })()}
           </Group>
         )}
