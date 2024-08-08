@@ -1,12 +1,11 @@
 import { useProjectStore } from '@renderer/hooks/useProjectStore'
-import useAppStore, { AlphabetCase, BackgroundType } from '@renderer/store/store'
+import useAppStore, { AlphabetCase } from '@renderer/store/store'
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 import React from 'react'
-import { Group, Layer, Stage, StageProps, Text, Transformer } from 'react-konva'
+import { Group, Layer, Rect, Stage, StageProps, Text, Transformer } from 'react-konva'
 import { loadFontFamily } from '../Subtitles/SubtitleStyles/SubtitleStyles.utils'
 import FontFaceObserver from 'fontfaceobserver'
-import { getBackgroundDrawFunc } from '../Subtitles/SubtitleList/SubtitleList.utils'
 const canvas = document.createElement('canvas')
 const context = canvas.getContext('2d')
 
@@ -34,14 +33,9 @@ export default React.memo(function CanvasEditor(
   const [isSelected, setIsSelected] = React.useState(false)
   const [fontAvailable, setFontAvailable] = React.useState(false)
   const subtitleNodeRef = React.useRef<Konva.Group>(null)
-  const charRef = React.useRef<Konva.Text>(null)
   const trRef = React.useRef<Konva.Transformer>(null)
-  const showSubtitleBackground = useProjectStore((state) => state.showSubtitleBackground)
-  const subtitleBackgroundColor = useProjectStore((state) => state.subtitleBackgroundColor)
   const alphabetCase = useProjectStore((state) => state.alphabetCase)
   const userFonts = useAppStore((state) => state.userFonts)
-  const backgroundType = useProjectStore((state) => state.backgroundType)
-  const borderRadius = useProjectStore((state) => state.borderRadius)
 
   React.useEffect(() => {
     if (isSelected) {
@@ -366,7 +360,7 @@ export default React.memo(function CanvasEditor(
   }, [subtitleStyleProps?.fontFamily])
 
   context!.font = `${subtitleStyleProps?.fontStyle || 'normal'} ${subtitleStyleProps?.fontSize || 12}px ${subtitleStyleProps?.fontFamily || 'Arial'}`
-  console.log(subtitleStyleProps?.x, subtitleStyleProps?.y, 'naruto')
+  console.log(subtitleStyleProps?.width, 'naruto')
   return (
     <Stage {...props} onMouseDown={checkDeselect} onTouchStart={checkDeselect}>
       <Layer id="canvas-editor">
@@ -389,55 +383,32 @@ export default React.memo(function CanvasEditor(
               handleSnapOnDragEnd(e)
             }}
             onDragMove={handleSnapOnDragMove}
-            onTransformEnd={() => {
-              // transformer is changing scale of the node
-              // and NOT its width or height
-              // but in the store we have only width and height
-              // to match the data better we will reset scale on transform end
+            onTransform={() => {
               const node = subtitleNodeRef.current!
-
-              const scaleX = node.scaleX()
-              const scaleY = node.scaleY()
-
-              // we will reset it back
-              node.scaleX(1)
-              node.scaleY(1)
               setSubtitleStyleProps({
                 ...subtitleStyleProps,
                 x: node.x(),
                 y: node.y(),
-                width: Math.max(10, node.width() * scaleX),
-                fontSize: Math.max(5, (node.children[0] as Konva.Text).fontSize() * scaleY),
+                width: Math.max(10, (node.children[0] as Konva.Rect).width() * node.scaleX()),
+                fontSize: Math.max(5, (node.children[1] as Konva.Text).fontSize() * node.scaleY()),
                 rotation: node.rotation()
               })
+              node.scaleX(1)
+              node.scaleY(1)
             }}
-            // sceneFunc={
-            //   showSubtitleBackground
-            //     ? getBackgroundDrawFunc(
-            //         subtitleStyleProps!,
-            //         subtitleBackgroundColor,
-            //         backgroundType || BackgroundType.SINGLE,
-            //         borderRadius
-            //       )
-            //     : undefined
-            // }
           >
+            <Rect width={subtitleStyleProps?.width} />
             {casedSubtitle.split('').map((w, i) => {
               const accumulatedWidth = context?.measureText(casedSubtitle.slice(0, i)).width || 0
-              console.log('accumulatedWidth', accumulatedWidth, i)
               return (
                 <Text
-                  ref={i === 0 ? charRef : null}
                   key={i}
                   text={w}
-                  // x={(subtitleStyleProps?.x || 0) + accumulatedWidth}
                   x={accumulatedWidth}
-                  // y={subtitleStyleProps?.y}
                   y={0}
                   fontSize={subtitleStyleProps?.fontSize}
                   fontFamily={subtitleStyleProps?.fontFamily}
                   fill={subtitleStyleProps?.fill}
-                  letterSpacing={subtitleStyleProps?.letterSpacing}
                 />
               )
             })}
