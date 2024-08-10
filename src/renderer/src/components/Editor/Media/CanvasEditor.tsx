@@ -1,5 +1,5 @@
 import { useProjectStore } from '@renderer/hooks/useProjectStore'
-import useAppStore, { AlphabetCase } from '@renderer/store/store'
+import useAppStore, { AlphabetCase, BackgroundType } from '@renderer/store/store'
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 import React from 'react'
@@ -36,6 +36,12 @@ export default React.memo(function CanvasEditor(
   const trRef = React.useRef<Konva.Transformer>(null)
   const alphabetCase = useProjectStore((state) => state.alphabetCase)
   const userFonts = useAppStore((state) => state.userFonts)
+  const rectRef = React.useRef<Konva.Rect>(null)
+  const showBackground = useProjectStore((state) => state.showSubtitleBackground)
+  const backgroundColor = useProjectStore((state) => state.subtitleBackgroundColor) || '#000000FF'
+  const backgroundRadius = useProjectStore((state) => state.borderRadius)
+  const backgroundType = useProjectStore((state) => state.backgroundType)
+  const [rectHeight, setRectHeight] = React.useState(0)
 
   React.useEffect(() => {
     if (isSelected) {
@@ -393,20 +399,23 @@ export default React.memo(function CanvasEditor(
                 x: node.x(),
                 y: node.y(),
                 width: Math.max(10, (node.children[0] as Konva.Rect).width() * node.scaleX()),
-                fontSize: Math.max(5, (node.children[1] as Konva.Text).fontSize() * node.scaleY()),
+                fontSize: Math.max(
+                  5,
+                  (node.children[node.children.length - 1] as Konva.Text).fontSize() * node.scaleY()
+                ),
                 rotation: node.rotation()
               })
               node.scaleX(1)
               node.scaleY(1)
             }}
           >
-            <Rect width={subtitleStyleProps?.width} />
             {((): Array<JSX.Element | null> => {
               let accumulatedWidth = 0
-              let accumulatedHeight = 0
+              let accumulatedHeight = 8
               const lineHeight =
                 (subtitleStyleProps?.fontSize || 12) * (subtitleStyleProps?.lineHeight || 1)
               let currentLine: JSX.Element[] = []
+              const splittedBackgrounds: Array<JSX.Element> = []
 
               const renderLine = (
                 lineNodes: Array<JSX.Element | null>,
@@ -419,6 +428,19 @@ export default React.memo(function CanvasEditor(
                   xOffset = (subtitleWidth - totalLineWidth) / 2
                 } else if (align === 'right') {
                   xOffset = subtitleWidth - totalLineWidth
+                }
+
+                if (showBackground && backgroundType === BackgroundType.SPLITTED) {
+                  splittedBackgrounds.push(
+                    <Rect
+                      width={totalLineWidth + 12}
+                      height={lineHeight + 16}
+                      y={accumulatedHeight - 8}
+                      x={lineNodes[0] ? lineNodes[0].props.x + xOffset - 8 : 0}
+                      fill={backgroundColor}
+                      cornerRadius={backgroundRadius ? 6 : 0}
+                    />
+                  )
                 }
 
                 return lineNodes.map((node) => {
@@ -494,7 +516,22 @@ export default React.memo(function CanvasEditor(
                 return []
               })
 
-              return [...renderLine(currentLine, subtitleAlignment), ...allTextNodes]
+              allTextNodes.push(...renderLine(currentLine, subtitleAlignment))
+
+              const singleBackground = (
+                <Rect
+                  width={subtitleStyleProps?.width}
+                  height={accumulatedHeight + lineHeight + 8}
+                  fill={
+                    showBackground && backgroundType === BackgroundType.SINGLE
+                      ? backgroundColor
+                      : ''
+                  }
+                  cornerRadius={backgroundRadius ? 6 : 0}
+                />
+              )
+
+              return [singleBackground, ...splittedBackgrounds, ...allTextNodes] //order of nodes in array is important. Group.onTransformEnd() depends on this order
             })()}
           </Group>
         )}
