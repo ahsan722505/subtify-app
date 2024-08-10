@@ -36,12 +36,11 @@ export default React.memo(function CanvasEditor(
   const trRef = React.useRef<Konva.Transformer>(null)
   const alphabetCase = useProjectStore((state) => state.alphabetCase)
   const userFonts = useAppStore((state) => state.userFonts)
-  const rectRef = React.useRef<Konva.Rect>(null)
+
   const showBackground = useProjectStore((state) => state.showSubtitleBackground)
   const backgroundColor = useProjectStore((state) => state.subtitleBackgroundColor) || '#000000FF'
   const backgroundRadius = useProjectStore((state) => state.borderRadius)
-  const backgroundType = useProjectStore((state) => state.backgroundType)
-  const [rectHeight, setRectHeight] = React.useState(0)
+  const backgroundType = useProjectStore((state) => state.backgroundType) || BackgroundType.SINGLE
 
   React.useEffect(() => {
     if (isSelected) {
@@ -370,6 +369,7 @@ export default React.memo(function CanvasEditor(
   const subtitleAlignment = subtitleStyleProps?.align || 'center'
   const letterSpacing = subtitleStyleProps?.letterSpacing || 0
   const fontStyle = subtitleStyleProps?.fontStyle || 'normal'
+  const lineHeight = subtitleStyleProps?.lineHeight || 1
   return (
     <Stage {...props} onMouseDown={checkDeselect} onTouchStart={checkDeselect}>
       <Layer id="canvas-editor">
@@ -412,8 +412,7 @@ export default React.memo(function CanvasEditor(
             {((): Array<JSX.Element | null> => {
               let accumulatedWidth = 0
               let accumulatedHeight = 8
-              const lineHeight =
-                (subtitleStyleProps?.fontSize || 12) * (subtitleStyleProps?.lineHeight || 1)
+              const textHeight = subtitleStyleProps?.fontSize || 12
               let currentLine: JSX.Element[] = []
               const splittedBackgrounds: Array<JSX.Element> = []
 
@@ -434,7 +433,7 @@ export default React.memo(function CanvasEditor(
                   splittedBackgrounds.push(
                     <Rect
                       width={totalLineWidth + 12}
-                      height={lineHeight + 16}
+                      height={textHeight + 16}
                       y={accumulatedHeight - 8}
                       x={lineNodes[0] ? lineNodes[0].props.x + xOffset - 8 : 0}
                       fill={backgroundColor}
@@ -457,7 +456,7 @@ export default React.memo(function CanvasEditor(
                 if (w === '\n') {
                   const lineNodes = renderLine(currentLine, subtitleAlignment)
                   accumulatedWidth = 0
-                  accumulatedHeight += lineHeight
+                  accumulatedHeight += textHeight * lineHeight
                   currentLine = []
                   return lineNodes
                 }
@@ -481,7 +480,7 @@ export default React.memo(function CanvasEditor(
 
                 if (accumulatedWidth + currentWidth > subtitleWidth) {
                   const lineNodes = renderLine(currentLine, subtitleAlignment)
-                  accumulatedHeight += lineHeight
+                  accumulatedHeight += textHeight * lineHeight
                   currentLine = [
                     <Text
                       key={i}
@@ -521,7 +520,7 @@ export default React.memo(function CanvasEditor(
               const singleBackground = (
                 <Rect
                   width={subtitleStyleProps?.width}
-                  height={accumulatedHeight + lineHeight + 8}
+                  height={accumulatedHeight + textHeight + 8}
                   fill={
                     showBackground && backgroundType === BackgroundType.SINGLE
                       ? backgroundColor
