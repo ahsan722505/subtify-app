@@ -26,7 +26,7 @@ type SnappingEdges = {
 }
 
 export default React.memo(function CanvasEditor(
-  props: StageProps & { subtitle: string | null }
+  props: StageProps & { subtitle: string | null; currentWordIndex: number | null }
 ): JSX.Element {
   const setSubtitleStyleProps = useAppStore((state) => state.setSubtitleStyleProps)
   const subtitleStyleProps = useProjectStore((state) => state.subtitleStyleProps)
@@ -40,7 +40,7 @@ export default React.memo(function CanvasEditor(
   const showBackground = useProjectStore((state) => state.showSubtitleBackground)
   const backgroundColor = useProjectStore((state) => state.subtitleBackgroundColor) || '#000000FF'
   const backgroundRadius = useProjectStore((state) => state.borderRadius)
-  const backgroundType = useProjectStore((state) => state.backgroundType) || BackgroundType.SINGLE
+  const backgroundType = useProjectStore((state) => state.backgroundType) || BackgroundType.SPLITTED
 
   React.useEffect(() => {
     if (isSelected) {
@@ -415,6 +415,12 @@ export default React.memo(function CanvasEditor(
               const textHeight = subtitleStyleProps?.fontSize || 12
               let currentLine: JSX.Element[] = []
               const splittedBackgrounds: Array<JSX.Element> = []
+              let wordIndex = 0
+              let lineNumber = 0
+
+              // box highlight animation
+              let currentWordBackground: JSX.Element | null = null
+              let currentWordLineNumber: number | null = null
 
               const renderLine = (
                 lineNodes: Array<JSX.Element | null>,
@@ -441,6 +447,14 @@ export default React.memo(function CanvasEditor(
                     />
                   )
                 }
+
+                if (currentWordLineNumber === lineNumber && currentWordBackground) {
+                  currentWordBackground = React.cloneElement(currentWordBackground, {
+                    x: currentWordBackground.props.x + xOffset
+                  })
+                }
+
+                lineNumber++
 
                 return lineNodes.map((node) => {
                   if (node) {
@@ -476,6 +490,30 @@ export default React.memo(function CanvasEditor(
                   const wordWidth =
                     (context?.measureText(word).width || 0) + letterSpacing * word.length
                   if (wordWidth <= subtitleWidth) currentWidth = wordWidth
+
+                  // box highlight animation
+                  if (wordIndex === props.currentWordIndex) {
+                    currentWordLineNumber = lineNumber
+                    let x = accumulatedWidth
+                    let y = accumulatedHeight
+                    if (accumulatedWidth + currentWidth > subtitleWidth) {
+                      x = 0
+                      y += textHeight * lineHeight
+                      currentWordLineNumber++
+                    }
+                    currentWordBackground = (
+                      <Rect
+                        width={wordWidth}
+                        height={textHeight}
+                        x={x}
+                        y={y}
+                        fill="yellow"
+                        cornerRadius={6}
+                      />
+                    )
+                  }
+
+                  wordIndex++
                 }
 
                 if (accumulatedWidth + currentWidth > subtitleWidth) {
@@ -530,7 +568,12 @@ export default React.memo(function CanvasEditor(
                 />
               )
 
-              return [singleBackground, ...splittedBackgrounds, ...allTextNodes] //order of nodes in array is important. Group.onTransformEnd() depends on this order
+              return [
+                singleBackground,
+                ...splittedBackgrounds,
+                currentWordBackground,
+                ...allTextNodes
+              ] //order of nodes in array is important. Group.onTransformEnd() depends on this order
             })()}
           </Group>
         )}

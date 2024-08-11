@@ -81,6 +81,7 @@ function Media(): JSX.Element {
                     width={canvasWidth}
                     height={canvasHeight}
                     subtitle={currentSubtitle && currentSubtitle.text}
+                    currentWordIndex={currentSubtitle && currentSubtitle.currentWordIndex}
                   />
                 ) : (
                   <Spin

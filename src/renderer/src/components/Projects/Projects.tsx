@@ -34,7 +34,7 @@ export default function Projects(): JSX.Element {
       subtitleBackgroundColor: '',
       alphabetCase: null,
       fileNotFound: false,
-      backgroundType: BackgroundType.SINGLE,
+      backgroundType: BackgroundType.SPLITTED,
       borderRadius: false
     })
   }
