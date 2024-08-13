@@ -35,7 +35,10 @@ export default function Projects(): JSX.Element {
       alphabetCase: null,
       fileNotFound: false,
       backgroundType: BackgroundType.SPLITTED,
-      borderRadius: false
+      borderRadius: false,
+      animationColor: '',
+      showAnimation: false,
+      currentAnimation: null
     })
   }
 

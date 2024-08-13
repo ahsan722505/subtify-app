@@ -3,7 +3,7 @@ import ColorPicker from './ColorPicker'
 import { RightOutlined } from '@ant-design/icons'
 import useAppStore, { TranscriptionStatus } from '@renderer/store/store'
 import { useProjectStore } from '@renderer/hooks/useProjectStore'
-import { DEFAULT_ANIMATION, DEFAULT_ANIMATION_COLOR } from '@renderer/constants'
+import { ANIMATIONS, DEFAULT_ANIMATION, DEFAULT_ANIMATION_COLOR } from '@renderer/constants'
 
 export default function TextAnimation(): JSX.Element {
   const projects = useAppStore((state) => state.projects)
@@ -34,7 +34,9 @@ export default function TextAnimation(): JSX.Element {
             <h1>{currentAnimation}</h1>
             <RightOutlined />
           </div>
-          <ColorPicker color={animationColor} setColor={setAnimationColor} />
+          {ANIMATIONS[currentAnimation].colorRequired && (
+            <ColorPicker color={animationColor} setColor={setAnimationColor} />
+          )}
         </div>
       )}
     </div>

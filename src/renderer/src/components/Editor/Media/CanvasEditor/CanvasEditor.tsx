@@ -3,11 +3,12 @@ import useAppStore, { AlphabetCase, BackgroundType } from '@renderer/store/store
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 import React from 'react'
-import { Group, Layer, Rect, Stage, StageProps, Text, Transformer } from 'react-konva'
+import { Layer, Rect, Stage, StageProps, Text, Transformer } from 'react-konva'
 import { loadFontFamily } from '../../Subtitles/SubtitleStyles/SubtitleStyles.utils'
 import FontFaceObserver from 'fontfaceobserver'
 import BoxHighlightRect from './BoxHighlightRect'
 import { AnimationType, DEFAULT_ANIMATION } from '@renderer/constants'
+import AnimatedGroup from './AnimatedGroup'
 const canvas = document.createElement('canvas')
 const context = canvas.getContext('2d')
 
@@ -349,6 +350,12 @@ export default React.memo(function CanvasEditor(
         .join(' ')
       break
   }
+  context!.font = `${subtitleStyleProps?.fontStyle || 'normal'} ${subtitleStyleProps?.fontSize || 12}px ${subtitleStyleProps?.fontFamily || 'Arial'}`
+  const subtitleWidth = subtitleStyleProps?.width || props.width!
+  const subtitleAlignment = subtitleStyleProps?.align || 'center'
+  const letterSpacing = subtitleStyleProps?.letterSpacing || 0
+  const fontStyle = subtitleStyleProps?.fontStyle || 'normal'
+  const lineHeight = subtitleStyleProps?.lineHeight || 1
 
   React.useEffect(() => {
     if (subtitleStyleProps?.fontFamily) {
@@ -368,17 +375,12 @@ export default React.memo(function CanvasEditor(
     } else setFontAvailable(true)
   }, [subtitleStyleProps?.fontFamily])
 
-  context!.font = `${subtitleStyleProps?.fontStyle || 'normal'} ${subtitleStyleProps?.fontSize || 12}px ${subtitleStyleProps?.fontFamily || 'Arial'}`
-  const subtitleWidth = subtitleStyleProps?.width || props.width!
-  const subtitleAlignment = subtitleStyleProps?.align || 'center'
-  const letterSpacing = subtitleStyleProps?.letterSpacing || 0
-  const fontStyle = subtitleStyleProps?.fontStyle || 'normal'
-  const lineHeight = subtitleStyleProps?.lineHeight || 1
   return (
     <Stage {...props} onMouseDown={checkDeselect} onTouchStart={checkDeselect}>
       <Layer id="canvas-editor">
         {casedSubtitle && fontAvailable && (
-          <Group
+          <AnimatedGroup
+            key={casedSubtitle}
             name="object"
             ref={subtitleNodeRef}
             onClick={handleNodeClick}
@@ -576,7 +578,7 @@ export default React.memo(function CanvasEditor(
                 ...allTextNodes
               ] //order of nodes in array is important. Group.onTransformEnd() depends on this order
             })()}
-          </Group>
+          </AnimatedGroup>
         )}
         {isSelected && (
           <Transformer

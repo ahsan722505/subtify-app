@@ -1,4 +1,5 @@
-import BoxHighlight from '@renderer/assets/box-highlight.svg?react'
+import BoxHighlight from '@renderer/assets/animations/box-highlight.svg?react'
+import FlipClock from '@renderer/assets/animations/flip-clock.svg?react'
 
 export const PROJECTS_LIMIT = 10
 
@@ -352,7 +353,8 @@ export const FONTS_FAMILIES = [
 ]
 
 export enum AnimationType {
-  BoxHighlight = 'Box Highlight'
+  BoxHighlight = 'Box Highlight',
+  FlipClock = 'Flip Clock'
 }
 
 export type AnimationConfig = {
@@ -361,7 +363,8 @@ export type AnimationConfig = {
 }
 
 export const ANIMATIONS: Record<AnimationType, AnimationConfig> = {
-  [AnimationType.BoxHighlight]: { colorRequired: true, icon: BoxHighlight }
+  [AnimationType.BoxHighlight]: { colorRequired: true, icon: BoxHighlight },
+  [AnimationType.FlipClock]: { colorRequired: false, icon: FlipClock }
 }
 
 export const DEFAULT_ANIMATION_COLOR = '#000000FF'
