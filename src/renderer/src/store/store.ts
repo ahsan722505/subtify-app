@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import Konva from 'konva'
 import indexedDBService from '@renderer/database/IndexedDBService'
-import { PROJECTS_LIMIT } from '@renderer/constants'
+import { AnimationType, PROJECTS_LIMIT } from '@renderer/constants'
 import {
   generateUniqueId,
   hmsToSecondsOnly
@@ -76,6 +76,9 @@ export type Project = {
   fileNotFound: boolean
   backgroundType: BackgroundType | null
   borderRadius: boolean
+  animationColor: string | null
+  currentAnimation: AnimationType | null
+  showAnimation: boolean
 }
 
 type State = {
@@ -129,6 +132,9 @@ type State = {
   addPresetColor: (color: string) => void
   setBackgroundType: (backgroundType: BackgroundType) => void
   setBorderRadius: (borderRadius: boolean) => void
+  setAnimationColor: (color: string) => void
+  setCurrentAnimation: (animation: AnimationType) => void
+  setShowAnimation: (showAnimation: boolean) => void
 }
 
 const useAppStore = create<State>()(
@@ -554,6 +560,36 @@ const useAppStore = create<State>()(
           const projects = [...state.projects]
           const project = projects[state.currentProjectIndex]
           project.borderRadius = borderRadius
+          indexedDBService.updateProject(project)
+          return { projects }
+        })
+      },
+      setAnimationColor: (color): void => {
+        set((state) => {
+          if (state.currentProjectIndex === null) return state
+          const projects = [...state.projects]
+          const project = projects[state.currentProjectIndex]
+          project.animationColor = color
+          indexedDBService.updateProject(project)
+          return { projects }
+        })
+      },
+      setCurrentAnimation: (animation): void => {
+        set((state) => {
+          if (state.currentProjectIndex === null) return state
+          const projects = [...state.projects]
+          const project = projects[state.currentProjectIndex]
+          project.currentAnimation = animation
+          indexedDBService.updateProject(project)
+          return { projects }
+        })
+      },
+      setShowAnimation: (showAnimation): void => {
+        set((state) => {
+          if (state.currentProjectIndex === null) return state
+          const projects = [...state.projects]
+          const project = projects[state.currentProjectIndex]
+          project.showAnimation = showAnimation
           indexedDBService.updateProject(project)
           return { projects }
         })

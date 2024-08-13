@@ -9,3 +9,5 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
+
+type Icon = React.FunctionComponent<React.SVGProps<SVGSVGElement>>

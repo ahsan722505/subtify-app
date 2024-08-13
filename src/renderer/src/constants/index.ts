@@ -1,3 +1,5 @@
+import BoxHighlight from '@renderer/assets/box-highlight.svg?react'
+
 export const PROJECTS_LIMIT = 10
 
 export const FONTS_FAMILIES = [
@@ -348,3 +350,20 @@ export const FONTS_FAMILIES = [
   'Zilla Slab',
   'Zilla Slab Highlight'
 ]
+
+export enum AnimationType {
+  BoxHighlight = 'Box Highlight'
+}
+
+export type AnimationConfig = {
+  colorRequired: boolean
+  icon: Icon
+}
+
+export const ANIMATIONS: Record<AnimationType, AnimationConfig> = {
+  [AnimationType.BoxHighlight]: { colorRequired: true, icon: BoxHighlight }
+}
+
+export const DEFAULT_ANIMATION_COLOR = '#000000FF'
+
+export const DEFAULT_ANIMATION = AnimationType.BoxHighlight

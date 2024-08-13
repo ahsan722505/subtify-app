@@ -4,8 +4,10 @@ import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 import React from 'react'
 import { Group, Layer, Rect, Stage, StageProps, Text, Transformer } from 'react-konva'
-import { loadFontFamily } from '../Subtitles/SubtitleStyles/SubtitleStyles.utils'
+import { loadFontFamily } from '../../Subtitles/SubtitleStyles/SubtitleStyles.utils'
 import FontFaceObserver from 'fontfaceobserver'
+import BoxHighlightRect from './BoxHighlightRect'
+import { AnimationType, DEFAULT_ANIMATION } from '@renderer/constants'
 const canvas = document.createElement('canvas')
 const context = canvas.getContext('2d')
 
@@ -41,6 +43,8 @@ export default React.memo(function CanvasEditor(
   const backgroundColor = useProjectStore((state) => state.subtitleBackgroundColor) || '#000000FF'
   const backgroundRadius = useProjectStore((state) => state.borderRadius)
   const backgroundType = useProjectStore((state) => state.backgroundType) || BackgroundType.SPLITTED
+  const showAnimation = useProjectStore((state) => state.showAnimation)
+  const currentAnimation = useProjectStore((state) => state.currentAnimation) || DEFAULT_ANIMATION
 
   React.useEffect(() => {
     if (isSelected) {
@@ -492,7 +496,11 @@ export default React.memo(function CanvasEditor(
                   if (wordWidth <= subtitleWidth) currentWidth = wordWidth
 
                   // box highlight animation
-                  if (wordIndex === props.currentWordIndex) {
+                  if (
+                    wordIndex === props.currentWordIndex &&
+                    showAnimation &&
+                    currentAnimation === AnimationType.BoxHighlight
+                  ) {
                     currentWordLineNumber = lineNumber
                     let x = accumulatedWidth
                     let y = accumulatedHeight
@@ -502,14 +510,7 @@ export default React.memo(function CanvasEditor(
                       currentWordLineNumber++
                     }
                     currentWordBackground = (
-                      <Rect
-                        width={wordWidth}
-                        height={textHeight}
-                        x={x}
-                        y={y}
-                        fill="yellow"
-                        cornerRadius={6}
-                      />
+                      <BoxHighlightRect width={wordWidth} height={textHeight} x={x} y={y} />
                     )
                   }
 

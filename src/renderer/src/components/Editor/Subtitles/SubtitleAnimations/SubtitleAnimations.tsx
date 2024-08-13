@@ -1,14 +1,14 @@
 import { LeftOutlined } from '@ant-design/icons'
 import useAppStore, { TranscriptionStatus } from '@renderer/store/store'
-import BoxHighlight from '@renderer/assets/box-highlight.svg?react'
 import AnimationItem from './AnimationItem'
-
-const ANIMATIONS = [{ name: 'Box Highlight', icon: BoxHighlight }]
+import { ANIMATIONS, AnimationType, DEFAULT_ANIMATION } from '@renderer/constants'
+import { useProjectStore } from '@renderer/hooks/useProjectStore'
 
 export default function SubtitleAnimations(): JSX.Element {
   const projects = useAppStore((state) => state.projects)
   const currentProjectIndex = useAppStore((state) => state.currentProjectIndex)
   const setTranscriptionStatus = useAppStore((state) => state.setTranscriptionStatus)
+  const currentAnimation = useProjectStore((state) => state.currentAnimation) || DEFAULT_ANIMATION
 
   return (
     <>
@@ -24,12 +24,12 @@ export default function SubtitleAnimations(): JSX.Element {
         </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-3">
-        {ANIMATIONS.map((animation, i) => (
+        {Object.keys(ANIMATIONS).map((animation) => (
           <AnimationItem
-            key={animation.name}
-            Icon={animation.icon}
-            name={animation.name}
-            selected={i === 1}
+            key={animation}
+            Icon={ANIMATIONS[animation].icon}
+            name={animation as AnimationType}
+            selected={currentAnimation === animation}
           />
         ))}
       </div>
