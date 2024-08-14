@@ -358,7 +358,10 @@ export default React.memo(function CanvasEditor(
         .join(' ')
       break
   }
-  if (showAnimation && currentAnimation === AnimationType.Impact)
+  if (
+    showAnimation &&
+    (currentAnimation === AnimationType.Impact || currentAnimation === AnimationType.ImpactPop)
+  )
     casedSubtitle = casedSubtitle.split(' ')[props.currentWordIndex!]
 
   context!.font = `${subtitleStyleProps?.fontStyle || 'normal'} ${subtitleStyleProps?.fontSize || 12}px ${subtitleStyleProps?.fontFamily || 'Arial'}`

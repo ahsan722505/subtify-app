@@ -7,6 +7,7 @@ import Reveal from '@renderer/assets/animations/reveal.svg?react'
 import FloatDown from '@renderer/assets/animations/float-down.svg?react'
 import FloatUp from '@renderer/assets/animations/float-up.svg?react'
 import DropIn from '@renderer/assets/animations/drop-in.svg?react'
+import ImpactPop from '@renderer/assets/animations/impact-pop.svg?react'
 
 export const PROJECTS_LIMIT = 10
 
@@ -368,7 +369,8 @@ export enum AnimationType {
   Reveal = 'Reveal',
   FloatDown = 'Float Down',
   FloatUp = 'Float Up',
-  DropIn = 'Drop In'
+  DropIn = 'Drop In',
+  ImpactPop = 'Impact Pop'
 }
 
 export type AnimationConfig = {
@@ -385,7 +387,8 @@ export const ANIMATIONS: Record<AnimationType, AnimationConfig> = {
   [AnimationType.Reveal]: { colorRequired: false, icon: Reveal },
   [AnimationType.FloatDown]: { colorRequired: false, icon: FloatDown },
   [AnimationType.FloatUp]: { colorRequired: false, icon: FloatUp },
-  [AnimationType.DropIn]: { colorRequired: false, icon: DropIn }
+  [AnimationType.DropIn]: { colorRequired: false, icon: DropIn },
+  [AnimationType.ImpactPop]: { colorRequired: false, icon: ImpactPop }
 }
 
 export const DEFAULT_ANIMATION_COLOR = '#000000FF'

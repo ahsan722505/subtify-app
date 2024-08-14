@@ -56,6 +56,10 @@ export default function AnimatedText({
       />
     )
   }
+  if (currentAnimation === AnimationType.ImpactPop) {
+    return <ImpactPopAnimatedText {...props} />
+  }
+
   return <Text {...props} />
 }
 
@@ -158,6 +162,26 @@ function DropInAnimatedText({
       scaleY: 1
     },
     cancel: !animateDropIn,
+    config: {
+      duration: 150
+    }
+  })
+  //   @ts-ignore - unkown type error
+  return <animated.Text {...props} {...springs} />
+}
+
+function ImpactPopAnimatedText(props: Konva.TextConfig): JSX.Element {
+  const springs = useSpring({
+    from: {
+      opacity: 0,
+      scaleX: 0.5,
+      scaleY: 0.5
+    },
+    to: {
+      opacity: 1,
+      scaleX: 1,
+      scaleY: 1
+    },
     config: {
       duration: 150
     }
