@@ -2,6 +2,7 @@ import BoxHighlight from '@renderer/assets/animations/box-highlight.svg?react'
 import FlipClock from '@renderer/assets/animations/flip-clock.svg?react'
 import Highlight from '@renderer/assets/animations/highlight.svg?react'
 import Karaoke from '@renderer/assets/animations/karaoke.svg?react'
+import Impact from '@renderer/assets/animations/impact.svg?react'
 
 export const PROJECTS_LIMIT = 10
 
@@ -358,7 +359,8 @@ export enum AnimationType {
   BoxHighlight = 'Box Highlight',
   FlipClock = 'Flip Clock',
   Highlight = 'Highlight',
-  Karaoke = 'Karaoke'
+  Karaoke = 'Karaoke',
+  Impact = 'Impact'
 }
 
 export type AnimationConfig = {
@@ -370,7 +372,8 @@ export const ANIMATIONS: Record<AnimationType, AnimationConfig> = {
   [AnimationType.BoxHighlight]: { colorRequired: true, icon: BoxHighlight },
   [AnimationType.FlipClock]: { colorRequired: false, icon: FlipClock },
   [AnimationType.Highlight]: { colorRequired: false, icon: Highlight },
-  [AnimationType.Karaoke]: { colorRequired: false, icon: Karaoke }
+  [AnimationType.Karaoke]: { colorRequired: false, icon: Karaoke },
+  [AnimationType.Impact]: { colorRequired: false, icon: Impact }
 }
 
 export const DEFAULT_ANIMATION_COLOR = '#000000FF'

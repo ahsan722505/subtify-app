@@ -357,6 +357,9 @@ export default React.memo(function CanvasEditor(
         .join(' ')
       break
   }
+  if (showAnimation && currentAnimation === AnimationType.Impact)
+    casedSubtitle = casedSubtitle.split(' ')[props.currentWordIndex!]
+
   context!.font = `${subtitleStyleProps?.fontStyle || 'normal'} ${subtitleStyleProps?.fontSize || 12}px ${subtitleStyleProps?.fontFamily || 'Arial'}`
   const subtitleWidth = subtitleStyleProps?.width || props.width!
   const subtitleAlignment = subtitleStyleProps?.align || 'center'
