@@ -407,6 +407,7 @@ export default React.memo(function CanvasEditor(
             onTap={handleNodeClick}
             x={subtitleStyleProps?.x}
             y={subtitleStyleProps?.y}
+            rotation={subtitleStyleProps?.rotation}
             width={subtitleStyleProps?.width}
             draggable
             onDragEnd={(e) => {
