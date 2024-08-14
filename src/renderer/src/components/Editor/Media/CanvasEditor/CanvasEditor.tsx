@@ -7,8 +7,10 @@ import { Layer, Rect, Stage, StageProps, Text, Transformer } from 'react-konva'
 import { loadFontFamily } from '../../Subtitles/SubtitleStyles/SubtitleStyles.utils'
 import FontFaceObserver from 'fontfaceobserver'
 import BoxHighlightRect from './BoxHighlightRect'
-import { AnimationType, DEFAULT_ANIMATION } from '@renderer/constants'
+import { AnimationType, DEFAULT_ANIMATION, DEFAULT_TEXT_COLOR } from '@renderer/constants'
 import AnimatedGroup from './AnimatedGroup'
+import tinycolor from 'tinycolor2'
+
 const canvas = document.createElement('canvas')
 const context = canvas.getContext('2d')
 
@@ -29,7 +31,12 @@ type SnappingEdges = {
 }
 
 export default React.memo(function CanvasEditor(
-  props: StageProps & { subtitle: string | null; currentWordIndex: number | null }
+  props: StageProps & {
+    subtitle: string | null
+    currentWordIndex: number | null
+    currentStartCharacterIndex: number | null
+    currentEndCharacterIndex: number | null
+  }
 ): JSX.Element {
   const setSubtitleStyleProps = useAppStore((state) => state.setSubtitleStyleProps)
   const subtitleStyleProps = useProjectStore((state) => state.subtitleStyleProps)
@@ -473,6 +480,19 @@ export default React.memo(function CanvasEditor(
               }
 
               const allTextNodes = casedSubtitle.split('').flatMap((w, i) => {
+                let textColor = subtitleStyleProps?.fill || DEFAULT_TEXT_COLOR
+                const currentCharacter =
+                  i >= props.currentStartCharacterIndex! && i <= props.currentEndCharacterIndex!
+                if (
+                  showAnimation &&
+                  currentAnimation === AnimationType.Highlight &&
+                  !currentCharacter
+                ) {
+                  const color = tinycolor(textColor)
+                  if (color.getBrightness() === 255) textColor = color.darken(35).toString()
+                  else textColor = color.lighten(35).toString()
+                }
+
                 if (w === '\n') {
                   const lineNodes = renderLine(currentLine, subtitleAlignment)
                   accumulatedWidth = 0
@@ -530,7 +550,7 @@ export default React.memo(function CanvasEditor(
                       y={accumulatedHeight}
                       fontSize={subtitleStyleProps?.fontSize}
                       fontFamily={subtitleStyleProps?.fontFamily}
-                      fill={subtitleStyleProps?.fill}
+                      fill={textColor}
                       fontStyle={fontStyle}
                     />
                   ]
@@ -546,7 +566,7 @@ export default React.memo(function CanvasEditor(
                     y={accumulatedHeight}
                     fontSize={subtitleStyleProps?.fontSize}
                     fontFamily={subtitleStyleProps?.fontFamily}
-                    fill={subtitleStyleProps?.fill}
+                    fill={textColor}
                     fontStyle={fontStyle}
                   />
                 )

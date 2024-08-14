@@ -5,6 +5,8 @@ import { isSubtitlePlaying } from '@renderer/components/Editor/Subtitles/Subtitl
 
 interface SubtitleWithWordIndex extends Subtitle {
   currentWordIndex: number
+  currentStartCharacterIndex: number
+  currentEndCharacterIndex: number
 }
 
 export default function useGetSubtitleFromTime(): SubtitleWithWordIndex | null {
@@ -25,10 +27,27 @@ export default function useGetSubtitleFromTime(): SubtitleWithWordIndex | null {
           const timeIntoSubtitle = time - subtitle.start
           const wordDuration = subtitleDuration / words.length
           const currentWordIndex = Math.floor(timeIntoSubtitle / wordDuration)
+          let currentStartCharacterIndex = 0
+          let currentEndCharacterIndex = 0
+          let charIndex = 0
+          for (let i = 0; i < words.length; i++) {
+            const wordLength = words[i].length
+            const startCharIndex = charIndex
+            const endCharIndex = charIndex + wordLength - 1
+
+            if (i === currentWordIndex) {
+              currentStartCharacterIndex = startCharIndex
+              currentEndCharacterIndex = endCharIndex
+              break
+            }
+            charIndex += wordLength + 1 // +1 to account for the space
+          }
 
           return {
             ...subtitle,
-            currentWordIndex: Math.min(currentWordIndex, words.length - 1)
+            currentWordIndex: Math.min(currentWordIndex, words.length - 1),
+            currentStartCharacterIndex,
+            currentEndCharacterIndex
           }
         } else if (time < subtitle.start) {
           high = mid - 1
