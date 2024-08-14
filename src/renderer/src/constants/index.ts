@@ -3,6 +3,7 @@ import FlipClock from '@renderer/assets/animations/flip-clock.svg?react'
 import Highlight from '@renderer/assets/animations/highlight.svg?react'
 import Karaoke from '@renderer/assets/animations/karaoke.svg?react'
 import Impact from '@renderer/assets/animations/impact.svg?react'
+import Reveal from '@renderer/assets/animations/reveal.svg?react'
 
 export const PROJECTS_LIMIT = 10
 
@@ -360,7 +361,8 @@ export enum AnimationType {
   FlipClock = 'Flip Clock',
   Highlight = 'Highlight',
   Karaoke = 'Karaoke',
-  Impact = 'Impact'
+  Impact = 'Impact',
+  Reveal = 'Reveal'
 }
 
 export type AnimationConfig = {
@@ -373,7 +375,8 @@ export const ANIMATIONS: Record<AnimationType, AnimationConfig> = {
   [AnimationType.FlipClock]: { colorRequired: false, icon: FlipClock },
   [AnimationType.Highlight]: { colorRequired: false, icon: Highlight },
   [AnimationType.Karaoke]: { colorRequired: false, icon: Karaoke },
-  [AnimationType.Impact]: { colorRequired: false, icon: Impact }
+  [AnimationType.Impact]: { colorRequired: false, icon: Impact },
+  [AnimationType.Reveal]: { colorRequired: false, icon: Reveal }
 }
 
 export const DEFAULT_ANIMATION_COLOR = '#000000FF'

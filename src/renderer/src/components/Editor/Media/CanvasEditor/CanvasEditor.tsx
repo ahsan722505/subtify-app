@@ -484,6 +484,7 @@ export default React.memo(function CanvasEditor(
 
               const allTextNodes = casedSubtitle.split('').flatMap((w, i) => {
                 let textColor = subtitleStyleProps?.fill || DEFAULT_TEXT_COLOR
+                let opacity = 1
                 const currentCharacter =
                   i >= props.currentStartCharacterIndex! && i <= props.currentEndCharacterIndex!
                 if (
@@ -501,6 +502,13 @@ export default React.memo(function CanvasEditor(
                 ) {
                   textColor = lightenColor(textColor as string)
                 }
+
+                if (
+                  showAnimation &&
+                  currentAnimation === AnimationType.Reveal &&
+                  i > props.currentEndCharacterIndex!
+                )
+                  opacity = 0
 
                 if (w === '\n') {
                   const lineNodes = renderLine(currentLine, subtitleAlignment)
@@ -561,6 +569,7 @@ export default React.memo(function CanvasEditor(
                       fontFamily={subtitleStyleProps?.fontFamily}
                       fill={textColor}
                       fontStyle={fontStyle}
+                      opacity={opacity}
                     />
                   ]
                   accumulatedWidth = characterWidth
@@ -577,6 +586,7 @@ export default React.memo(function CanvasEditor(
                     fontFamily={subtitleStyleProps?.fontFamily}
                     fill={textColor}
                     fontStyle={fontStyle}
+                    opacity={opacity}
                   />
                 )
 
