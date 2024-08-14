@@ -9,7 +9,7 @@ import FontFaceObserver from 'fontfaceobserver'
 import BoxHighlightRect from './BoxHighlightRect'
 import { AnimationType, DEFAULT_ANIMATION, DEFAULT_TEXT_COLOR } from '@renderer/constants'
 import AnimatedGroup from './AnimatedGroup'
-import tinycolor from 'tinycolor2'
+import { lightenColor } from './CanvasEditor.utils'
 
 const canvas = document.createElement('canvas')
 const context = canvas.getContext('2d')
@@ -488,9 +488,15 @@ export default React.memo(function CanvasEditor(
                   currentAnimation === AnimationType.Highlight &&
                   !currentCharacter
                 ) {
-                  const color = tinycolor(textColor)
-                  if (color.getBrightness() === 255) textColor = color.darken(35).toString()
-                  else textColor = color.lighten(35).toString()
+                  textColor = lightenColor(textColor as string)
+                }
+
+                if (
+                  showAnimation &&
+                  currentAnimation === AnimationType.Karaoke &&
+                  i > props.currentEndCharacterIndex!
+                ) {
+                  textColor = lightenColor(textColor as string)
                 }
 
                 if (w === '\n') {
