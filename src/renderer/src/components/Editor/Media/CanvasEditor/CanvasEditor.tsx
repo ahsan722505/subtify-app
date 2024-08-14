@@ -7,7 +7,12 @@ import { Layer, Rect, Stage, StageProps, Transformer } from 'react-konva'
 import { loadFontFamily } from '../../Subtitles/SubtitleStyles/SubtitleStyles.utils'
 import FontFaceObserver from 'fontfaceobserver'
 import BoxHighlightRect from './BoxHighlightRect'
-import { AnimationType, DEFAULT_ANIMATION, DEFAULT_TEXT_COLOR } from '@renderer/constants'
+import {
+  AnimationType,
+  DEFAULT_ANIMATION,
+  DEFAULT_ANIMATION_COLOR,
+  DEFAULT_TEXT_COLOR
+} from '@renderer/constants'
 import AnimatedGroup from './AnimatedGroup'
 import { lightenColor } from './CanvasEditor.utils'
 import AnimatedText from './AnimatedText'
@@ -54,6 +59,7 @@ export default React.memo(function CanvasEditor(
   const backgroundType = useProjectStore((state) => state.backgroundType) || BackgroundType.SPLITTED
   const showAnimation = useProjectStore((state) => state.showAnimation)
   const currentAnimation = useProjectStore((state) => state.currentAnimation) || DEFAULT_ANIMATION
+  const animationColor = useProjectStore((state) => state.animationColor) || DEFAULT_ANIMATION_COLOR
 
   React.useEffect(() => {
     if (isSelected) {
@@ -504,6 +510,14 @@ export default React.memo(function CanvasEditor(
                   i > props.currentEndCharacterIndex!
                 ) {
                   textColor = lightenColor(textColor as string)
+                }
+
+                if (
+                  showAnimation &&
+                  currentAnimation === AnimationType.ColorHighlight &&
+                  currentCharacter
+                ) {
+                  textColor = animationColor
                 }
 
                 if (w === '\n') {

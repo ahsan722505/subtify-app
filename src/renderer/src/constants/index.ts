@@ -8,6 +8,7 @@ import FloatDown from '@renderer/assets/animations/float-down.svg?react'
 import FloatUp from '@renderer/assets/animations/float-up.svg?react'
 import DropIn from '@renderer/assets/animations/drop-in.svg?react'
 import ImpactPop from '@renderer/assets/animations/impact-pop.svg?react'
+import ColorHighlight from '@renderer/assets/animations/color-highlight.svg?react'
 
 export const PROJECTS_LIMIT = 10
 
@@ -370,7 +371,8 @@ export enum AnimationType {
   FloatDown = 'Float Down',
   FloatUp = 'Float Up',
   DropIn = 'Drop In',
-  ImpactPop = 'Impact Pop'
+  ImpactPop = 'Impact Pop',
+  ColorHighlight = 'Color Highlight'
 }
 
 export type AnimationConfig = {
@@ -388,10 +390,11 @@ export const ANIMATIONS: Record<AnimationType, AnimationConfig> = {
   [AnimationType.FloatDown]: { colorRequired: false, icon: FloatDown },
   [AnimationType.FloatUp]: { colorRequired: false, icon: FloatUp },
   [AnimationType.DropIn]: { colorRequired: false, icon: DropIn },
-  [AnimationType.ImpactPop]: { colorRequired: false, icon: ImpactPop }
+  [AnimationType.ImpactPop]: { colorRequired: false, icon: ImpactPop },
+  [AnimationType.ColorHighlight]: { colorRequired: true, icon: ColorHighlight }
 }
 
-export const DEFAULT_ANIMATION_COLOR = '#000000FF'
+export const DEFAULT_ANIMATION_COLOR = '#800080FF'
 
 export const DEFAULT_ANIMATION = AnimationType.BoxHighlight
 
