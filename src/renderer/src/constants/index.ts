@@ -4,6 +4,9 @@ import Highlight from '@renderer/assets/animations/highlight.svg?react'
 import Karaoke from '@renderer/assets/animations/karaoke.svg?react'
 import Impact from '@renderer/assets/animations/impact.svg?react'
 import Reveal from '@renderer/assets/animations/reveal.svg?react'
+import FloatDown from '@renderer/assets/animations/float-down.svg?react'
+import FloatUp from '@renderer/assets/animations/float-up.svg?react'
+import DropIn from '@renderer/assets/animations/drop-in.svg?react'
 
 export const PROJECTS_LIMIT = 10
 
@@ -362,7 +365,10 @@ export enum AnimationType {
   Highlight = 'Highlight',
   Karaoke = 'Karaoke',
   Impact = 'Impact',
-  Reveal = 'Reveal'
+  Reveal = 'Reveal',
+  FloatDown = 'Float Down',
+  FloatUp = 'Float Up',
+  DropIn = 'Drop In'
 }
 
 export type AnimationConfig = {
@@ -376,7 +382,10 @@ export const ANIMATIONS: Record<AnimationType, AnimationConfig> = {
   [AnimationType.Highlight]: { colorRequired: false, icon: Highlight },
   [AnimationType.Karaoke]: { colorRequired: false, icon: Karaoke },
   [AnimationType.Impact]: { colorRequired: false, icon: Impact },
-  [AnimationType.Reveal]: { colorRequired: false, icon: Reveal }
+  [AnimationType.Reveal]: { colorRequired: false, icon: Reveal },
+  [AnimationType.FloatDown]: { colorRequired: false, icon: FloatDown },
+  [AnimationType.FloatUp]: { colorRequired: false, icon: FloatUp },
+  [AnimationType.DropIn]: { colorRequired: false, icon: DropIn }
 }
 
 export const DEFAULT_ANIMATION_COLOR = '#000000FF'

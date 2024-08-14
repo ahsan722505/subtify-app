@@ -3,13 +3,14 @@ import useAppStore, { AlphabetCase, BackgroundType } from '@renderer/store/store
 import Konva from 'konva'
 import { KonvaEventObject } from 'konva/lib/Node'
 import React from 'react'
-import { Layer, Rect, Stage, StageProps, Text, Transformer } from 'react-konva'
+import { Layer, Rect, Stage, StageProps, Transformer } from 'react-konva'
 import { loadFontFamily } from '../../Subtitles/SubtitleStyles/SubtitleStyles.utils'
 import FontFaceObserver from 'fontfaceobserver'
 import BoxHighlightRect from './BoxHighlightRect'
 import { AnimationType, DEFAULT_ANIMATION, DEFAULT_TEXT_COLOR } from '@renderer/constants'
 import AnimatedGroup from './AnimatedGroup'
 import { lightenColor } from './CanvasEditor.utils'
+import AnimatedText from './AnimatedText'
 
 const canvas = document.createElement('canvas')
 const context = canvas.getContext('2d')
@@ -484,7 +485,6 @@ export default React.memo(function CanvasEditor(
 
               const allTextNodes = casedSubtitle.split('').flatMap((w, i) => {
                 let textColor = subtitleStyleProps?.fill || DEFAULT_TEXT_COLOR
-                let opacity = 1
                 const currentCharacter =
                   i >= props.currentStartCharacterIndex! && i <= props.currentEndCharacterIndex!
                 if (
@@ -502,13 +502,6 @@ export default React.memo(function CanvasEditor(
                 ) {
                   textColor = lightenColor(textColor as string)
                 }
-
-                if (
-                  showAnimation &&
-                  currentAnimation === AnimationType.Reveal &&
-                  i > props.currentEndCharacterIndex!
-                )
-                  opacity = 0
 
                 if (w === '\n') {
                   const lineNodes = renderLine(currentLine, subtitleAlignment)
@@ -560,7 +553,10 @@ export default React.memo(function CanvasEditor(
                   const lineNodes = renderLine(currentLine, subtitleAlignment)
                   accumulatedHeight += textHeight * lineHeight
                   currentLine = [
-                    <Text
+                    <AnimatedText
+                      characterIndex={i}
+                      currentEndCharacterIndex={props.currentEndCharacterIndex!}
+                      currentStartCharacterIndex={props.currentStartCharacterIndex!}
                       key={i}
                       text={w}
                       x={0}
@@ -569,7 +565,6 @@ export default React.memo(function CanvasEditor(
                       fontFamily={subtitleStyleProps?.fontFamily}
                       fill={textColor}
                       fontStyle={fontStyle}
-                      opacity={opacity}
                     />
                   ]
                   accumulatedWidth = characterWidth
@@ -577,7 +572,10 @@ export default React.memo(function CanvasEditor(
                 }
 
                 const textNode = (
-                  <Text
+                  <AnimatedText
+                    characterIndex={i}
+                    currentEndCharacterIndex={props.currentEndCharacterIndex!}
+                    currentStartCharacterIndex={props.currentStartCharacterIndex!}
                     key={i}
                     text={w}
                     x={accumulatedWidth}
@@ -586,7 +584,6 @@ export default React.memo(function CanvasEditor(
                     fontFamily={subtitleStyleProps?.fontFamily}
                     fill={textColor}
                     fontStyle={fontStyle}
-                    opacity={opacity}
                   />
                 )
 
