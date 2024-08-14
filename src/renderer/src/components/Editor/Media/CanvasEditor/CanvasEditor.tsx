@@ -464,6 +464,7 @@ export default React.memo(function CanvasEditor(
                 if (showBackground && backgroundType === BackgroundType.SPLITTED) {
                   splittedBackgrounds.push(
                     <Rect
+                      key={'split-background-' + lineNumber}
                       width={totalLineWidth + 12}
                       height={textHeight + 16}
                       y={accumulatedHeight - 8}
@@ -559,7 +560,13 @@ export default React.memo(function CanvasEditor(
                       currentWordLineNumber++
                     }
                     currentWordBackground = (
-                      <BoxHighlightRect width={wordWidth} height={textHeight} x={x} y={y} />
+                      <BoxHighlightRect
+                        key="box-highlight-rect"
+                        width={wordWidth}
+                        height={textHeight}
+                        x={x}
+                        y={y}
+                      />
                     )
                   }
 
@@ -613,6 +620,7 @@ export default React.memo(function CanvasEditor(
 
               const singleBackground = (
                 <Rect
+                  key="single-background"
                   width={subtitleStyleProps?.width}
                   height={accumulatedHeight + textHeight + 8}
                   fill={
