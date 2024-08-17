@@ -80,6 +80,12 @@ export type Project = {
   currentAnimation: AnimationType | null
   showAnimation: boolean
 }
+type CaptureFramesPayload = {
+  subtitle: string
+  currentWordIndex: number
+  currentStartCharacterIndex: number
+  currentEndCharacterIndex: number
+}
 
 type State = {
   projects: Project[]
@@ -93,6 +99,10 @@ type State = {
   projectsSearchFilter: string
   userFonts: UserFont[]
   presetColors: string[]
+  captureFramesPayload: CaptureFramesPayload | null
+  konvaStage: Konva.Stage | null
+  setKonvaStage: (stage: Konva.Stage | null) => void
+  setCaptureFramesPayload: (payload: CaptureFramesPayload | null) => void
   fetchProjects: (pageNumber: number, limit: number, searchFilter: string) => Promise<void>
   createNewProject: (project: Project) => void
   setTranscriptionStatus: (status: TranscriptionStatus, projectId: IDBValidKey) => void
@@ -151,6 +161,8 @@ const useAppStore = create<State>()(
       projectsSearchFilter: '',
       userFonts: [],
       presetColors: [],
+      captureFramesPayload: null,
+      konvaStage: null,
       setProjectsSearchFilter: (filter): void => {
         set({ projectsSearchFilter: filter })
       },
@@ -593,6 +605,13 @@ const useAppStore = create<State>()(
           indexedDBService.updateProject(project)
           return { projects }
         })
+      },
+      setCaptureFramesPayload: (payload): void => {
+        set({ captureFramesPayload: payload })
+      },
+
+      setKonvaStage: (stage): void => {
+        set({ konvaStage: stage })
       }
     }),
     {

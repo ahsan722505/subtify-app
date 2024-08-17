@@ -52,6 +52,8 @@ export default React.memo(function CanvasEditor(
   const trRef = React.useRef<Konva.Transformer>(null)
   const alphabetCase = useProjectStore((state) => state.alphabetCase)
   const userFonts = useAppStore((state) => state.userFonts)
+  const stageRef = React.useRef<Konva.Stage>(null)
+  const setKonvaStage = useAppStore((state) => state.setKonvaStage)
 
   const showBackground = useProjectStore((state) => state.showSubtitleBackground)
   const backgroundColor = useProjectStore((state) => state.subtitleBackgroundColor) || '#000000FF'
@@ -60,6 +62,10 @@ export default React.memo(function CanvasEditor(
   const showAnimation = useProjectStore((state) => state.showAnimation)
   const currentAnimation = useProjectStore((state) => state.currentAnimation) || DEFAULT_ANIMATION
   const animationColor = useProjectStore((state) => state.animationColor) || DEFAULT_ANIMATION_COLOR
+
+  React.useEffect(() => {
+    setKonvaStage(stageRef.current)
+  }, [])
 
   React.useEffect(() => {
     if (isSelected) {
@@ -396,7 +402,7 @@ export default React.memo(function CanvasEditor(
   }, [subtitleStyleProps?.fontFamily])
 
   return (
-    <Stage {...props} onMouseDown={checkDeselect} onTouchStart={checkDeselect}>
+    <Stage ref={stageRef} {...props} onMouseDown={checkDeselect} onTouchStart={checkDeselect}>
       <Layer id="canvas-editor">
         {casedSubtitle && fontAvailable && (
           <AnimatedGroup
