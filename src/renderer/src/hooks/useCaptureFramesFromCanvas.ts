@@ -35,36 +35,45 @@ export default function useCaptureFramesFromCanvas(): (
   }
   React.useEffect(() => {
     if (!captureFramesPayload || !konvaStage) return
-    konvaStage.toDataURL({
-      pixelRatio: pixelRatio,
-      callback: (image) => {
-        window.electron.ipcRenderer.invoke(
-          'save-subtitle-image',
-          image,
-          exportIdRef.current,
-          imageNumber.current
-        )
-        const currentSubtitleWords = subtitles[currentSubtitleIndex.current].text.split(' ')
-        const lastSubtitle = currentSubtitleIndex.current === subtitles.length - 1
-        const lastWord = currentWordIndex.current === currentSubtitleWords.length - 1
-        if (lastSubtitle && lastWord) {
-          setCaptureFramesPayload(null)
-          callbackRef.current()
-          return
+    const start = new Date().getTime()
+    const capture = (): void => {
+      konvaStage.toDataURL({
+        pixelRatio: pixelRatio,
+        callback: (image) => {
+          window.electron.ipcRenderer.invoke(
+            'save-subtitle-image',
+            image,
+            exportIdRef.current,
+            imageNumber.current
+          )
+          imageNumber.current++
         }
-        if (lastWord) {
-          currentSubtitleIndex.current++
-          currentWordIndex.current = 0
-          currentStartCharacterIndex.current = 0
-        } else {
-          const currentWord = currentSubtitleWords[currentWordIndex.current]
-          currentWordIndex.current++
-          currentStartCharacterIndex.current += currentWord.length + 1
-        }
-        imageNumber.current++
-        setTimeout(updateStage, 20)
+      })
+      if (new Date().getTime() - start <= 200) {
+        requestAnimationFrame(capture)
+        return
       }
-    })
+      const currentSubtitleWords = subtitles[currentSubtitleIndex.current].text.split(' ')
+      const lastSubtitle = currentSubtitleIndex.current === subtitles.length - 1
+      const lastWord = currentWordIndex.current === currentSubtitleWords.length - 1
+      if (lastSubtitle && lastWord) {
+        setCaptureFramesPayload(null)
+        callbackRef.current()
+        return
+      }
+      if (lastWord) {
+        currentSubtitleIndex.current++
+        currentWordIndex.current = 0
+        currentStartCharacterIndex.current = 0
+      } else {
+        const currentWord = currentSubtitleWords[currentWordIndex.current]
+        currentWordIndex.current++
+        currentStartCharacterIndex.current += currentWord.length + 1
+      }
+      //   setTimeout(updateStage, 20)
+      updateStage()
+    }
+    capture()
   }, [captureFramesPayload])
 
   return initiateCapturing
