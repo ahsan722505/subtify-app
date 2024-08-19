@@ -23,6 +23,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.0",
     "@electron-toolkit/utils": "^3.0.0",
+    "@react-spring/konva": "^9.7.4",
     "@sentry/electron": "^5.2.0",
     "@uiw/react-color-sketch": "^2.3.0",
     "antd": "^5.17.2",
@@ -34,7 +35,9 @@
     "react-infinite-scroll-component": "^6.1.0",
     "react-konva": "^18.2.10",
     "srt-parser-2": "^1.2.3",
+    "tinycolor2": "^1.6.0",
     "use-debounce": "^10.0.1",
+    "vite-plugin-svgr": "^4.2.0",
     "webvtt-parser": "^2.2.0",
     "zustand": "^4.5.2"
   },

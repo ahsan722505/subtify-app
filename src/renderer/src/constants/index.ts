@@ -1,3 +1,15 @@
+import BoxHighlight from '@renderer/assets/animations/box-highlight.svg?react'
+import FlipClock from '@renderer/assets/animations/flip-clock.svg?react'
+import Highlight from '@renderer/assets/animations/highlight.svg?react'
+import Karaoke from '@renderer/assets/animations/karaoke.svg?react'
+import Impact from '@renderer/assets/animations/impact.svg?react'
+import Reveal from '@renderer/assets/animations/reveal.svg?react'
+import FloatDown from '@renderer/assets/animations/float-down.svg?react'
+import FloatUp from '@renderer/assets/animations/float-up.svg?react'
+import DropIn from '@renderer/assets/animations/drop-in.svg?react'
+import ImpactPop from '@renderer/assets/animations/impact-pop.svg?react'
+import ColorHighlight from '@renderer/assets/animations/color-highlight.svg?react'
+
 export const PROJECTS_LIMIT = 10
 
 export const FONTS_FAMILIES = [
@@ -348,3 +360,42 @@ export const FONTS_FAMILIES = [
   'Zilla Slab',
   'Zilla Slab Highlight'
 ]
+
+export enum AnimationType {
+  BoxHighlight = 'Box Highlight',
+  FlipClock = 'Flip Clock',
+  Highlight = 'Highlight',
+  Karaoke = 'Karaoke',
+  Impact = 'Impact',
+  Reveal = 'Reveal',
+  FloatDown = 'Float Down',
+  FloatUp = 'Float Up',
+  DropIn = 'Drop In',
+  ImpactPop = 'Impact Pop',
+  ColorHighlight = 'Color Highlight'
+}
+
+export type AnimationConfig = {
+  colorRequired: boolean
+  icon: Icon
+}
+
+export const ANIMATIONS: Record<AnimationType, AnimationConfig> = {
+  [AnimationType.BoxHighlight]: { colorRequired: true, icon: BoxHighlight },
+  [AnimationType.FlipClock]: { colorRequired: false, icon: FlipClock },
+  [AnimationType.Highlight]: { colorRequired: false, icon: Highlight },
+  [AnimationType.Karaoke]: { colorRequired: false, icon: Karaoke },
+  [AnimationType.Impact]: { colorRequired: false, icon: Impact },
+  [AnimationType.Reveal]: { colorRequired: false, icon: Reveal },
+  [AnimationType.FloatDown]: { colorRequired: false, icon: FloatDown },
+  [AnimationType.FloatUp]: { colorRequired: false, icon: FloatUp },
+  [AnimationType.DropIn]: { colorRequired: false, icon: DropIn },
+  [AnimationType.ImpactPop]: { colorRequired: false, icon: ImpactPop },
+  [AnimationType.ColorHighlight]: { colorRequired: true, icon: ColorHighlight }
+}
+
+export const DEFAULT_ANIMATION_COLOR = '#800080FF'
+
+export const DEFAULT_ANIMATION = AnimationType.BoxHighlight
+
+export const DEFAULT_TEXT_COLOR = '#FFFFFFFF'

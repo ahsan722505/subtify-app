@@ -54,7 +54,7 @@ export default function Background(): JSX.Element {
   const setShowSubtitleBackground = useAppStore((state) => state.setShowSubtitleBackground)
   const subtitleBackgroundColor = useProjectStore((state) => state.subtitleBackgroundColor)
   const setSubtitleBackgroundColor = useAppStore((state) => state.setSubtitleBackgroundColor)
-  const backgroundType = useProjectStore((state) => state.backgroundType) || BackgroundType.SINGLE
+  const backgroundType = useProjectStore((state) => state.backgroundType) || BackgroundType.SPLITTED
   const borderRadius = useProjectStore((state) => state.borderRadius)
   const setBackgroundType = useAppStore((state) => state.setBackgroundType)
   const setBorderRadius = useAppStore((state) => state.setBorderRadius)

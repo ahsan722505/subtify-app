@@ -34,8 +34,11 @@ export default function Projects(): JSX.Element {
       subtitleBackgroundColor: '',
       alphabetCase: null,
       fileNotFound: false,
-      backgroundType: BackgroundType.SINGLE,
-      borderRadius: false
+      backgroundType: BackgroundType.SPLITTED,
+      borderRadius: false,
+      animationColor: '',
+      showAnimation: false,
+      currentAnimation: null
     })
   }
 

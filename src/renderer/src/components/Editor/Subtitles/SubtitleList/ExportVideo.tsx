@@ -3,10 +3,10 @@ import React from 'react'
 import { Switch } from 'antd'
 import { InfoCircleFilled } from '@ant-design/icons'
 import { useProjectStore } from '@renderer/hooks/useProjectStore'
-import { generateSRT, generateVTT, handleBurnSubtitles } from './SubtitleList.utils'
+import { generateSRT, generateUniqueId, generateVTT } from './SubtitleList.utils'
 import { SubtitleFormat } from './SubtitleList.types'
 import { DownloadOutlined } from '@ant-design/icons'
-import { BackgroundType } from '@renderer/store/store'
+import useCaptureFramesFromCanvas from '@renderer/hooks/useCaptureFramesFromCanvas'
 
 export default function ExportVideo(): JSX.Element {
   const subtitles = useProjectStore((state) => state.subtitles)
@@ -15,53 +15,28 @@ export default function ExportVideo(): JSX.Element {
   const [burnSubtitles, setBurnSubtitles] = React.useState(false)
   const [loading, setLoading] = React.useState(false)
   const mediaType = useProjectStore((state) => state.mediaType)
-  const canvasWidth = useProjectStore((state) => state.canvasWidth)
-  const canvasHeight = useProjectStore((state) => state.canvasHeight)
-  const subtitleStyleProps = useProjectStore((state) => state.subtitleStyleProps)
-  const subtitleBackgroundColor = useProjectStore((state) => state.subtitleBackgroundColor)
-  const showSubtitleBackground = useProjectStore((state) => state.showSubtitleBackground)
-  const mediaPath = useProjectStore((state) => state.mediaPath)
-  const backgroundType = useProjectStore((state) => state.backgroundType)
-  const borderRadius = useProjectStore((state) => state.borderRadius)
+  const initiateCapture = useCaptureFramesFromCanvas()
 
-  const handleExportVideo = async (): Promise<void> => {
+  const handleAddSubtitleStream = async (): Promise<void> => {
     try {
-      setLoading(true)
-      if (burnSubtitles) {
-        const video = document.getElementById('media') as HTMLVideoElement
-        await handleBurnSubtitles(
-          subtitleStyleProps!,
-          showSubtitleBackground,
-          subtitleBackgroundColor,
-          subtitles,
-          mediaPath!,
-          canvasWidth,
-          canvasHeight,
-          video.videoWidth,
-          video.videoHeight,
-          backgroundType || BackgroundType.SINGLE,
-          borderRadius
-        )
-      } else {
-        let subtitleMetadata: { text: string; type: SubtitleFormat } | null = null
-        const isWebm = mediaType === 'video/webm'
-        if (isWebm) {
-          subtitleMetadata = {
-            text: generateVTT(subtitles),
-            type: SubtitleFormat.VTT
-          }
-        } else {
-          subtitleMetadata = {
-            text: generateSRT(subtitles),
-            type: SubtitleFormat.SRT
-          }
+      let subtitleMetadata: { text: string; type: SubtitleFormat } | null = null
+      const isWebm = mediaType === 'video/webm'
+      if (isWebm) {
+        subtitleMetadata = {
+          text: generateVTT(subtitles),
+          type: SubtitleFormat.VTT
         }
-        await window.electron.ipcRenderer.invoke('add-subtitle-stream', {
-          filePath,
-          subtitleMetadata,
-          mediaType
-        })
+      } else {
+        subtitleMetadata = {
+          text: generateSRT(subtitles),
+          type: SubtitleFormat.SRT
+        }
       }
+      await window.electron.ipcRenderer.invoke('add-subtitle-stream', {
+        filePath,
+        subtitleMetadata,
+        mediaType
+      })
 
       message.success('Video exported successfully. Please Check your downloads folder.')
     } catch (error) {
@@ -70,6 +45,18 @@ export default function ExportVideo(): JSX.Element {
       setIsModalOpen(false)
       setLoading(false)
     }
+  }
+
+  const handleBurnSubtitles = async (): Promise<void> => {
+    return new Promise((res) => {
+      setLoading(true)
+      const exportId = generateUniqueId()
+      initiateCapture(exportId, () => {
+        setLoading(false)
+        setIsModalOpen(false)
+        res()
+      })
+    })
   }
   return (
     <>
@@ -80,7 +67,7 @@ export default function ExportVideo(): JSX.Element {
       <Modal
         title="Export Video"
         open={isModalOpen}
-        onOk={handleExportVideo}
+        onOk={burnSubtitles ? handleBurnSubtitles : handleAddSubtitleStream}
         onCancel={() => setIsModalOpen(false)}
         okText="Export"
         okButtonProps={{ loading }}

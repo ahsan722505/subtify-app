@@ -10,6 +10,7 @@ import AlphabetCasing from './AlphabetCasing'
 import Spacing from './Spacing'
 import Alignment from './Alignment'
 import FontFamily from './FontFamily/FontFamily'
+import TextAnimation from './TextAnimation'
 
 const availablefontSizes = [
   18, 24, 30, 36, 42, 48, 54, 60, 66, 72, 78, 84, 90, 96, 102, 108, 114, 120, 136, 148, 160
@@ -69,6 +70,7 @@ export default function SubtitleStyles(): JSX.Element {
         <AlphabetCasing />
         <Spacing />
       </div>
+      <TextAnimation />
     </>
   )
 }

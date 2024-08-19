@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+/// <reference types="vite-plugin-svgr/client" />
 
 interface ImportMetaEnv {
   readonly VITE_POSTHOG_KEY: string
@@ -8,3 +9,5 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
+
+type Icon = React.FunctionComponent<React.SVGProps<SVGSVGElement>>

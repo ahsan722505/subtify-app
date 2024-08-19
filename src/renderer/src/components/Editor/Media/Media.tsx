@@ -2,7 +2,7 @@ import { useProjectStore } from '@renderer/hooks/useProjectStore'
 import React from 'react'
 import { PlaySquareFilled } from '@ant-design/icons'
 import { checkFileExistence, isVideo } from './Media.utils'
-import CanvasEditor from './CanvasEditor'
+import CanvasEditor from './CanvasEditor/CanvasEditor'
 import useAppStore from '@renderer/store/store'
 import { Empty, Spin } from 'antd'
 import useGetSubtitleFromTime from '@renderer/hooks/useGetSubtitleIndexFromTime'
@@ -17,6 +17,7 @@ function Media(): JSX.Element {
   const canvasHeight = useProjectStore((state) => state.canvasHeight)
   const fileNotFound = useProjectStore((state) => state.fileNotFound)
   const setFileNotFound = useAppStore((state) => state.setFileNotFound)
+  const captureFramesPayload = useAppStore((state) => state.captureFramesPayload)
   const mediaRef = React.useRef<HTMLVideoElement | null>(null)
   const currentSubtitle = useGetSubtitleFromTime()
 
@@ -42,6 +43,8 @@ function Media(): JSX.Element {
       mediaRef.current?.removeEventListener('loadedmetadata', handleSetParameters)
     }
   }, [mediaPath])
+
+  console.log('cuurent word', currentSubtitle?.currentWordIndex)
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-start relative">
@@ -74,12 +77,31 @@ function Media(): JSX.Element {
                   Your browser does not support the video tag.
                 </video>
                 {Boolean(canvasWidth) && Boolean(canvasHeight) ? (
-                  <CanvasEditor
-                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-                    width={canvasWidth}
-                    height={canvasHeight}
-                    subtitle={currentSubtitle && currentSubtitle.text}
-                  />
+                  captureFramesPayload ? (
+                    <CanvasEditor
+                      className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                      width={canvasWidth}
+                      height={canvasHeight}
+                      subtitle={captureFramesPayload.subtitle}
+                      currentWordIndex={captureFramesPayload.currentWordIndex}
+                      currentStartCharacterIndex={captureFramesPayload.currentStartCharacterIndex}
+                      currentEndCharacterIndex={captureFramesPayload.currentEndCharacterIndex}
+                    />
+                  ) : (
+                    <CanvasEditor
+                      className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                      width={canvasWidth}
+                      height={canvasHeight}
+                      subtitle={currentSubtitle && currentSubtitle.text}
+                      currentWordIndex={currentSubtitle && currentSubtitle.currentWordIndex}
+                      currentStartCharacterIndex={
+                        currentSubtitle && currentSubtitle.currentStartCharacterIndex
+                      }
+                      currentEndCharacterIndex={
+                        currentSubtitle && currentSubtitle.currentEndCharacterIndex
+                      }
+                    />
+                  )
                 ) : (
                   <Spin
                     size="large"
