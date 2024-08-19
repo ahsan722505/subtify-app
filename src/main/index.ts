@@ -11,7 +11,7 @@ import * as Sentry from '@sentry/electron/main'
 
 if (import.meta.env.PROD) {
   Sentry.init({
-    dsn: 'https://2c09d9da66302a00214fa0df138c0c22@o4507633186701312.ingest.de.sentry.io/4507633225433168',
+    dsn: import.meta.env.VITE_SENTRY_DSN,
     maxValueLength: 100000
   })
 }
