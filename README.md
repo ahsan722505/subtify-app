@@ -1,34 +1,15 @@
-# transcribe-app
+A desktop app to create subtitles with AI. You can also edit and style the subtitles afterwards.
 
-An Electron application with React and TypeScript
+Download latest releases from our website: [subtify](https://subtify.lol)
 
-## Recommended IDE Setup
+![image](https://github.com/user-attachments/assets/3881abd7-ff81-4067-9a4d-cdef5f42046c)
 
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+![image](https://github.com/user-attachments/assets/cbb56916-f5d0-483d-9827-c7c3cd131d64)
 
-## Project Setup
+![image](https://github.com/user-attachments/assets/478c340b-7fbf-4f4d-824c-c7a81001ceba)
 
-### Install
 
-```bash
-$ yarn
-```
 
-### Development
 
-```bash
-$ yarn dev
-```
 
-### Build
 
-```bash
-# For windows
-$ yarn build:win
-
-# For macOS
-$ yarn build:mac
-
-# For Linux
-$ yarn build:linux
-```
