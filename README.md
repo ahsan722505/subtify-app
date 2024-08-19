@@ -1,5 +1,3 @@
-# transcribe-app
-
 A desktop app to create subtitles with AI. You can also edit and style the subtitles afterwards.
 
 Download latest releases from our website: [subtify](https://subtify.lol)
