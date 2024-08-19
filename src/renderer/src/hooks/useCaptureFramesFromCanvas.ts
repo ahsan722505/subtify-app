@@ -49,7 +49,7 @@ export default function useCaptureFramesFromCanvas(): (
           imageNumber.current++
         }
       })
-      if (new Date().getTime() - start <= 200) {
+      if (new Date().getTime() - start <= 300) {
         requestAnimationFrame(capture)
         return
       }

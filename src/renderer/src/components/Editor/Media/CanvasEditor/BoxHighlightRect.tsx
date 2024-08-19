@@ -24,10 +24,10 @@ export default function BoxHighlightRect({
     },
     to: [
       {
-        x: initialX - 5,
-        y: initialY - 5,
-        width: initialWidth + 10,
-        height: initialHeight + 10
+        x: initialX - 8,
+        y: initialY - 8,
+        width: initialWidth + 16,
+        height: initialHeight + 16
       },
       {
         x: initialX - 2,
@@ -36,7 +36,7 @@ export default function BoxHighlightRect({
         height: initialHeight + 4
       }
     ],
-    config: { duration: 100 }
+    config: { duration: 150 }
   })
   // @ts-ignore - unkown type error
   return <animated.Rect {...spring} fill={animationColor} cornerRadius={6} />
